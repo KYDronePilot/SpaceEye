@@ -99,6 +99,7 @@
     "@types/react-dom": "^16.8.4",
     "@types/react-redux": "^7.0.9",
     "@types/react-test-renderer": "^16.8.1",
+    "@types/styled-components": "^5.1.0",
     "@types/webdriverio": "^4.8.7",
     "@types/webpack-env": "^1.13.3",
     "@typescript-eslint/eslint-plugin": "^2.4.0",
@@ -144,6 +145,7 @@
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "react-redux": "^7.0.3",
-    "redux": "^4.0.1"
+    "redux": "^4.0.1",
+    "styled-components": "^5.1.0"
   }
 }
