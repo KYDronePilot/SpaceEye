@@ -3,7 +3,7 @@ import * as React from 'react';
 import Main from './Main';
 
 const Application = () => (
-    <Main/>
+    <Main />
 );
 
 export default hot(Application);

@@ -1,14 +1,20 @@
 import * as React from 'react';
-import { Component } from 'react';
 import styled from 'styled-components';
 
 const ImageContainer = styled.div`
-    width: 144px;
-    height: 81px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+    --width: 200px;
+    width: var(--width);
+    height: calc((var(--width) * 9) / 16);
+    //display: flex;
+    //flex-direction: column;
+    //justify-content: center;
+    //align-items: center;
+    background-color: black;
+    border-radius: 10px;
+    box-shadow: 0 0 20px black;
+    //border-color: black;
+    //border-style: solid;
+    //border-width: 5px;
 `
 
 const Image = styled.img`
@@ -20,14 +26,12 @@ interface ThumbnailProps {
     src: string
 }
 
-class Thumbnail extends Component<ThumbnailProps, {}> {
-    render() {
-        return (
-            <ImageContainer>
-                <Image src={this.props.src}/>
-            </ImageContainer>
-        );
-    }
+function Thumbnail(props: ThumbnailProps) {
+    return (
+        <ImageContainer>
+            <Image src={props.src} />
+        </ImageContainer>
+    );
 }
 
 export default Thumbnail;
