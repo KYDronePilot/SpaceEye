@@ -25,6 +25,7 @@ const HeaderContainer = styled.div`
     height: var(--header-height);
     //position: absolute;
     //top: -20px;
+    -webkit-app-region: drag;
 `
 
 const Toolbar = styled.div`
@@ -41,7 +42,7 @@ function Main() {
     return (
         <Container>
             <HeaderContainer>
-                <h1>test</h1>
+                {/* <h2>This is another test</h2> */}
             </HeaderContainer>
             <Thumbnails />
             <Toolbar />
