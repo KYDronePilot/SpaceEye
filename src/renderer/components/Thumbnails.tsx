@@ -1,46 +1,31 @@
 import * as React from 'react';
 import styled from 'styled-components';
+import SimpleBar from 'simplebar-react';
 import Thumbnail from './Thumbnail';
+
+import 'simplebar/dist/simplebar.min.css';
 
 const Container = styled.div`
     flex-grow: 1;
     height: var(--thumbnails-height);
 `;
 
-const ScrollbarColorInnerContainer = styled.div`
-    --scrollbar-color: rgb(60, 60, 60);
-    --scrollbar-hover-color: rgb(65, 65, 65);
-    max-height: 100%;
-    background-color: transparent;
-    transition: background-color 500ms;
-    overflow-y: scroll;
-    margin-right: 10px;
+const ThumbnailSimpleBar = styled(SimpleBar)`
+    height: 100%;
+    margin-right: 2px;
     
-    &:hover {
-        background-color: var(--scrollbar-color);
-        transition: background-color 200ms;
+    .simplebar-scrollbar::before {
+        background-color: rgb(90, 90, 90);
+        margin-top: var(--header-height);
     }
-    
-    &::-webkit-scrollbar {
-        width: 12px;
-    }
-    
-    &::-webkit-scrollbar-track {
-        background-color: var(--background-color);
-    }
-    
-    &::-webkit-scrollbar-thumb {
-        border-radius: 10px;
-        background-color: inherit;
-    }
-    
-    &::-webkit-scrollbar-thumb:hover {
-        background-color: var(--scrollbar-hover-color);
-    }
-`
+`;
 
 const ThumbnailGrid = styled.div`
-    padding: 20px 50px;
+    --x-padding: 20px;
+    --y-padding: 50px;
+    padding-left: var(--y-padding);
+    padding-right: var(--y-padding);
+    padding-top: calc(var(--x-padding) + var(--header-height));
     background-color: var(--background-color);
     display: grid;
     max-width: 100%;
@@ -54,7 +39,7 @@ const ThumbnailGrid = styled.div`
 
 const Thumbnails = () => (
     <Container>
-        <ScrollbarColorInnerContainer>
+        <ThumbnailSimpleBar>
             <ThumbnailGrid>
                 <Thumbnail src="https://cdn.star.nesdis.noaa.gov/GOES17/ABI/FD/GEOCOLOR/thumbnail.jpg" />
                 <Thumbnail
@@ -78,7 +63,7 @@ const Thumbnails = () => (
                 <Thumbnail src="https://cdn.star.nesdis.noaa.gov/GOES16/ABI/SECTOR/nsa/GEOCOLOR/thumbnail.jpg" />
                 <Thumbnail src="https://cdn.star.nesdis.noaa.gov/GOES16/ABI/SECTOR/ssa/GEOCOLOR/thumbnail.jpg" />
             </ThumbnailGrid>
-        </ScrollbarColorInnerContainer>
+        </ThumbnailSimpleBar>
     </Container>
 );
 
