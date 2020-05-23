@@ -8,14 +8,17 @@ const Container = styled.div`
 `;
 
 const ScrollbarColorInnerContainer = styled.div`
+    --scrollbar-color: rgb(60, 60, 60);
+    --scrollbar-hover-color: rgb(65, 65, 65);
     max-height: 100%;
-    background-color: rgb(60, 60, 60);
-    transition: background-color 400ms;
+    background-color: transparent;
+    transition: background-color 500ms;
     overflow-y: scroll;
     margin-right: 10px;
     
     &:hover {
-        background-color: rgb(60, 60, 60);
+        background-color: var(--scrollbar-color);
+        transition: background-color 200ms;
     }
     
     &::-webkit-scrollbar {
@@ -23,7 +26,7 @@ const ScrollbarColorInnerContainer = styled.div`
     }
     
     &::-webkit-scrollbar-track {
-        background-color: rgb(34, 34, 34);
+        background-color: var(--background-color);
     }
     
     &::-webkit-scrollbar-thumb {
@@ -32,13 +35,13 @@ const ScrollbarColorInnerContainer = styled.div`
     }
     
     &::-webkit-scrollbar-thumb:hover {
-        background-color: rgba(65, 65, 65, 1);
+        background-color: var(--scrollbar-hover-color);
     }
 `
 
 const ThumbnailGrid = styled.div`
-    padding: 0 50px;
-    background-color: rgb(34, 34, 34);
+    padding: 20px 50px;
+    background-color: var(--background-color);
     display: grid;
     max-width: 100%;
     grid-auto-flow: row;

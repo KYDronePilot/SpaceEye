@@ -27,7 +27,8 @@ const createWindow = async () => {
         frame: false,
         webPreferences: {
             nodeIntegration: true
-        }
+        },
+        backgroundColor: '#222222'
     });
 
     if (process.env.NODE_ENV !== 'production') {

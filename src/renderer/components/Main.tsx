@@ -6,25 +6,19 @@ const Container = styled.div`
     --header-height: 70px;
     --thumbnails-height: calc(100vh - var(--header-height) - var(--toolbar-height));
     --toolbar-height: 50px;
+    --background-color: rgb(34, 34, 34);
     position: absolute;
-    //height: 100vh;
     width: 100%;
     top: 0;
     left: 0;
-    background-color: rgb(34, 34, 34);
+    background-color: var(--background-color);
     color: white;
     display: flex;
     flex-direction: column;
 `
 
-const ThumbnailContainer = styled.div`
-    
-`
-
 const HeaderContainer = styled.div`
     height: var(--header-height);
-    //position: absolute;
-    //top: -20px;
     -webkit-app-region: drag;
 `
 
@@ -41,9 +35,7 @@ const Toolbar = styled.div`
 function Main() {
     return (
         <Container>
-            <HeaderContainer>
-                {/* <h2>This is another test</h2> */}
-            </HeaderContainer>
+            <HeaderContainer />
             <Thumbnails />
             <Toolbar />
         </Container>
