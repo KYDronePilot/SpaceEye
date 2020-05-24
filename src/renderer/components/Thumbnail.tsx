@@ -11,7 +11,7 @@ const ImageContainer = styled.div`
     //align-items: center;
     background-color: black;
     border-radius: 10px;
-    box-shadow: 0 0 20px black;
+    box-shadow: ${props => props.theme.elevation.low.boxShadow};
     //border-color: black;
     //border-style: solid;
     //border-width: 5px;
