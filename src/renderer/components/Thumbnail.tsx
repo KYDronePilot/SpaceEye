@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { Component } from 'react';
 import styled from 'styled-components';
 
 const ThumbnailContainer = styled.div`
@@ -22,12 +23,16 @@ const ImageName = styled.p`
     margin-bottom: 8px;
 `;
 
-const ImageContainer = styled.div`
+interface ImageContainerProps {
+    readonly isSelected: boolean
+}
+
+const ImageContainer = styled.div<ImageContainerProps>`
     padding: 10px;
     box-shadow: ${props => props.theme.elevation.low.boxShadow};
     border-radius: 5px;
     background-color: ${props => props.theme.elevation.low.backgroundColor};
-    border: 4px solid ${props => props.theme.colors.borderHighlight};
+    border: ${props => props.isSelected ? `4px solid ${props.theme.colors.borderHighlight}` : ''};
 `;
 
 interface ThumbnailProps {
@@ -35,17 +40,36 @@ interface ThumbnailProps {
     name: string
 }
 
-function Thumbnail(props: ThumbnailProps) {
-    return (
-        <ImageContainer>
-            <ThumbnailContainer>
-                <Image src={props.src} />
-            </ThumbnailContainer>
-            <ImageName>
-                {props.name}
-            </ImageName>
-        </ImageContainer>
-    );
+interface ThumbnailState {
+    isSelected: boolean
+}
+
+class Thumbnail extends Component<ThumbnailProps, ThumbnailState> {
+    constructor(props: ThumbnailProps) {
+        super(props);
+        this.state = {
+            isSelected: false
+        };
+
+        this.toggleSelected = this.toggleSelected.bind(this);
+    }
+
+    toggleSelected() {
+        this.setState(state => ({ isSelected: !state.isSelected }));
+    };
+
+    render() {
+        return (
+            <ImageContainer isSelected={this.state.isSelected} onClick={() => this.toggleSelected()}>
+                <ThumbnailContainer>
+                    <Image src={this.props.src} />
+                </ThumbnailContainer>
+                <ImageName>
+                    {this.props.name}
+                </ImageName>
+            </ImageContainer>
+        );
+    }
 }
 
 export default Thumbnail;
