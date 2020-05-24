@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {Component} from 'react';
+import { Component } from 'react';
 import styled from 'styled-components';
 import SimpleBar from 'simplebar-react';
 import axios from 'axios';
@@ -23,11 +23,9 @@ const ThumbnailSimpleBar = styled(SimpleBar)`
 `;
 
 const ThumbnailGrid = styled.div`
-    --x-padding: 20px;
-    --y-padding: 50px;
-    padding-left: var(--y-padding);
-    padding-right: var(--y-padding);
-    padding-top: calc(var(--x-padding) + var(--header-height));
+    --x-padding: 50px;
+    --y-padding: 30px;
+    padding: calc(var(--y-padding) + var(--header-height)) var(--x-padding) var(--y-padding);
     background-color: var(--background-color);
     display: grid;
     max-width: 100%;
@@ -67,14 +65,14 @@ class Thumbnails extends Component<{}, ThumbnailsState> {
         super(props);
         this.state = {
             images: []
-        }
+        };
     }
 
     componentDidMount() {
         axios.get<DownlinkSourcesResponse>('https://downlinkapp.com/sources.json')
             .then(res => {
-                this.setState({images: res.data.sources})
-            })
+                this.setState({ images: res.data.sources });
+            });
     }
 
     render() {
@@ -83,7 +81,7 @@ class Thumbnails extends Component<{}, ThumbnailsState> {
                 <ThumbnailSimpleBar>
                     <ThumbnailGrid>
                         {this.state.images.map(image => (
-                            <Thumbnail src={image.url.small} key={image.name} />
+                            <Thumbnail src={image.url.small} name={image.name} key={image.name} />
                         ))}
                     </ThumbnailGrid>
                 </ThumbnailSimpleBar>

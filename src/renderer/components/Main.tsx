@@ -1,20 +1,21 @@
 import * as React from 'react';
-import styled, { DefaultTheme, ThemeProvider } from 'styled-components';
+import styled, { ThemeProvider } from 'styled-components';
 import Thumbnails from './Thumbnails';
-import Toolbar from './Toolbar';
-import { LightTheme } from '../themes';
+import { DarkTheme } from '../themes';
+import 'typeface-roboto/index.css';
 
 const Container = styled.div`
     --header-height: 50px;
     --thumbnails-height: calc(100vh - var(--toolbar-height));
-    --toolbar-height: 50px;
+    --toolbar-height: 0.001px;
     --background-color: ${props => props.theme.colors.background};
+    --font-color: ${props => props.theme.colors.foreground};
+    color: var(--font-color);
     position: absolute;
     width: 100%;
     top: 0;
     left: 0;
     background-color: var(--background-color);
-    color: white;
     display: flex;
     flex-direction: column;
 `;
@@ -40,13 +41,13 @@ const HeaderBlur = styled.div`
 
 function Main() {
     return (
-        <ThemeProvider theme={LightTheme}>
+        <ThemeProvider theme={DarkTheme}>
             <Container>
                 <HeaderContainer>
                     <HeaderBlur />
                 </HeaderContainer>
                 <Thumbnails />
-                <Toolbar />
+                {/* <Toolbar /> */}
             </Container>
         </ThemeProvider>
     );

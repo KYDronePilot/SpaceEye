@@ -1,12 +1,14 @@
-import 'styled-components'
+import 'styled-components';
 
 declare module 'styled-components' {
     export interface DefaultTheme {
         colors: {
-            main: string
-            headerBackground: string
-            secondary: string
             background: string
+            headerBackground: string
+            foreground: string
+            borderHighlight: string
+            main: string
+            secondary: string
         }
 
         elevation: {

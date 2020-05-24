@@ -1,6 +1,5 @@
 import * as React from 'react';
 import styled from 'styled-components';
-import { FC } from 'react';
 
 enum ButtonType {
     Primary,
@@ -13,14 +12,18 @@ interface ButtonContainerProps {
 }
 
 const ButtonContainer = styled.button`
+    border: none;
+    text-decoration: none;
+    appearance: none;
+    outline: none;
+    cursor: pointer;
     margin: 5px;
-    background-color: blue;
-    border-style: none;
+    background-color: rgb(33, 75, 243);
     border-radius: 10px;
-    color: antiquewhite;
+    color: white;
     padding: 10px;
     box-shadow: 0 0 20px black;
-`
+`;
 
 interface ButtonProps {
     type: ButtonType

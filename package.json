@@ -91,7 +91,7 @@
     "@babel/polyfill": "^7.4.4",
     "@babel/preset-env": "^7.4.5",
     "@babel/preset-react": "^7.0.0",
-    "@babel/preset-typescript": "^7.3.3",
+    "@babel/preset-typescript": "^7.9.0",
     "@hot-loader/react-dom": "^16.8.6",
     "@types/electron-devtools-installer": "^2.2.0",
     "@types/jest": "^24.0.13",
@@ -102,8 +102,8 @@
     "@types/styled-components": "^5.1.0",
     "@types/webdriverio": "^4.8.7",
     "@types/webpack-env": "^1.13.3",
-    "@typescript-eslint/eslint-plugin": "^2.4.0",
-    "@typescript-eslint/parser": "^2.4.0",
+    "@typescript-eslint/eslint-plugin": "^3.0.0",
+    "@typescript-eslint/parser": "^3.0.0",
     "babel-loader": "^8.0.6",
     "cross-env": "^5.1.3",
     "css-loader": "^2.1.1",
@@ -135,7 +135,7 @@
     "spectron": "^5.0.0",
     "style-loader": "^0.23.1",
     "ts-jest": "^24.0.2",
-    "typescript": "^3.4.5",
+    "typescript": "^3.9.3",
     "webpack": "^4.32.2",
     "webpack-cli": "^3.3.2",
     "webpack-dev-server": "^3.4.1",
@@ -148,6 +148,7 @@
     "react-redux": "^7.0.3",
     "redux": "^4.0.1",
     "simplebar-react": "^2.2.0",
-    "styled-components": "^5.1.0"
+    "styled-components": "^5.1.0",
+    "typeface-roboto": "0.0.75"
   }
 }
