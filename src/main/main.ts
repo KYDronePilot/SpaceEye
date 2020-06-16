@@ -1,6 +1,7 @@
 import { app, BrowserWindow } from 'electron';
 import * as path from 'path';
 import * as url from 'url';
+import {IDesktopWallpaper} from 'earth_from_space_live_windows_node_api';
 
 let win: BrowserWindow | null;
 

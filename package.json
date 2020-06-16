@@ -20,11 +20,6 @@
     "dist": "npm run build && electron-builder",
     "postinstall": "electron-builder install-app-deps"
   },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
-  },
   "lint-staged": {
     "{src,test,mocks}/**/*.{json,css,scss,md}": [
       "prettier --config ./.prettierrc --write"
@@ -143,6 +138,7 @@
   },
   "dependencies": {
     "axios": "^0.19.2",
+    "earth_from_space_live_windows_node_api": "file:../../Desktop/earth_from_space_live_windows_node_api",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "react-redux": "^7.0.3",
