@@ -139,6 +139,7 @@
   "dependencies": {
     "axios": "^0.19.2",
     "earth_from_space_live_windows_node_api": "file:../../Desktop/earth_from_space_live_windows_node_api",
+    "moment": "^2.26.0",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "react-redux": "^7.0.3",
