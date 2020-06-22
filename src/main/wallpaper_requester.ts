@@ -1,9 +1,18 @@
-import * as moment from 'moment';
-import axios from 'axios';
-import { Moment } from 'moment';
-import * as Url from 'url';
-import * as Path from 'path';
+import * as moment from 'moment'
+import { Moment } from 'moment'
+import * as Url from 'url'
+import * as Path from 'path'
+import * as fs from 'fs'
+import * as AsyncLock from 'async-lock'
+// import axios from 'axios';
+import axios, { CancelTokenSource } from 'axios'
+import { Readable } from 'stream'
 
+const IMAGE_DIR = '/tmp/efsl_test_images'
+const imageDownloadResourceKey = 'imageDownload'
+let downloaderLock = new AsyncLock()
+let cancelDownloadSourse: CancelTokenSource | undefined
+axios.defaults.adapter = require('axios/lib/adapters/http')
 
 interface URLImageTypes {
     tiny: string
@@ -60,7 +69,7 @@ interface SatelliteView {
 /**
  * Information about a particular image from a satellite view which can be downloaded.
  */
-interface SourceImage {
+export interface SourceImage {
     /**
      * Unique identifier for the image.
      */
@@ -85,14 +94,12 @@ interface SourceImage {
 /**
  * A source image which has been downloaded.
  */
-interface DownloadedImage extends SourceImage {
+export interface DownloadedImage extends SourceImage {
     /**
      * UTC timestamp of when the image was downloaded.
      */
     timestamp: Moment
 }
-
-moment.utc()
 
 /**
  * Get extension from a URL.
@@ -113,14 +120,79 @@ function formatTimestamp(timestamp: Moment): string {
 }
 
 /**
- * Format a name for a downloaded image.
+ * Format a file path for a downloaded image.
  * @param image - Information about downloaded image
- * @return File name for image
+ * @return Path to image
  */
-function formatImageName(image: DownloadedImage): string {
+function formatImagePath(image: DownloadedImage): string {
     const ext = getUrlExtension(image.url)
-    return `${image.id}-${formatTimestamp(image.timestamp)}.${ext}`
+    return Path.join(IMAGE_DIR, `${image.id}-${formatTimestamp(image.timestamp)}${ext}`)
 }
 
-export async function downloadImage(image: SourceImage) {
+/**
+ * Get the downloaded images' filenames for a particular ID.
+ * @param imageId - Image ID to look for
+ * @return Filenames of downloaded images
+ */
+function getDownloadedImages(imageId: number): string[] {
+    const regex = new RegExp(`${imageId}-\\d+\\.\\w+`)
+    return fs.readdirSync(IMAGE_DIR).filter(filename => filename.match(regex))
+}
+
+/**
+ * Get the timestamps of downloaded images for an image ID.
+ */
+function getImageTimestamps(imageId: number): Moment[] {
+    return getDownloadedImages(imageId).map(filename => {
+        const unixTimestamp = filename.match(/\d+-(\d+)\.\w+/)![1]
+        return moment.unix(parseInt(unixTimestamp, 10))
+    })
+}
+
+interface ImageDownloadResponse {}
+
+/**
+ * Download and save an image.
+ * @param image - Details about image to download
+ * @return Details about downloaded image
+ */
+export async function downloadImage(image: SourceImage, timeout: number): Promise<DownloadedImage> {
+    return downloaderLock.acquire(imageDownloadResourceKey, async () => {
+        const downloadedImage: DownloadedImage = {
+            ...image,
+            timestamp: moment.utc()
+        }
+        const path = formatImagePath(downloadedImage)
+        const source = axios.CancelToken.source()
+        cancelDownloadSourse = source
+
+        setTimeout(() => {
+            source.cancel('Download cancelled due to timeout')
+        }, timeout)
+
+        return new Promise<DownloadedImage>((resolve, reject) => {
+            axios({
+                url: image.url,
+                method: 'GET',
+                responseType: 'stream',
+                cancelToken: source.token
+            }).then(({ data, headers }) => {
+                const writer = fs.createWriteStream(path)
+                const dataStream = data as Readable
+                dataStream.pipe(writer)
+
+                source.token.promise.then(cancellation => {
+                    writer.destroy()
+                    // Delete partially downloaded file if there was an error
+                    if (fs.existsSync(path)) {
+                        fs.unlinkSync(path)
+                    }
+                    reject(cancellation)
+                })
+                writer.on('finish', () => {
+                    resolve(downloadedImage)
+                })
+            }).catch(error => reject(error))
+        })
+    })
 }
