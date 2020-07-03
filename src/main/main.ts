@@ -1,4 +1,4 @@
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, ipcMain, screen, systemPreferences } from 'electron'
 import * as path from 'path';
 import * as url from 'url';
 import {IDesktopWallpaper} from 'earth_from_space_live_windows_node_api';
@@ -31,6 +31,10 @@ const createWindow = async () => {
         },
         backgroundColor: '#222222'
     });
+    if (process.platform === 'darwin') {
+        win.setWindowButtonVisibility(false)
+    }
+
 
     if (process.env.NODE_ENV !== 'production') {
         process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = '1'; // eslint-disable-line require-atomic-updates
@@ -70,3 +74,6 @@ app.on('activate', () => {
         createWindow();
     }
 });
+ipcMain.on('close_windows', () => {
+    win!.close()
+})

@@ -3,6 +3,7 @@ import styled, { ThemeProvider } from 'styled-components';
 import Thumbnails from './Thumbnails';
 import { DarkTheme } from '../themes';
 import 'typeface-roboto/index.css';
+import CloseButton from './CloseButton'
 
 const Container = styled.div`
     --header-height: 50px;
@@ -44,7 +45,9 @@ function Main() {
         <ThemeProvider theme={DarkTheme}>
             <Container>
                 <HeaderContainer>
-                    <HeaderBlur />
+                    <HeaderBlur>
+                        <CloseButton />
+                    </HeaderBlur>
                 </HeaderContainer>
                 <Thumbnails />
                 {/* <Toolbar /> */}
