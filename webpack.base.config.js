@@ -16,6 +16,8 @@ module.exports = {
         extensions: ['.tsx', '.ts', '.js', '.json']
     },
     devtool: 'source-map',
-    plugins: [
-    ]
-};
+    watchOptions: {
+        ignored: /node_modules/
+    },
+    plugins: []
+}
