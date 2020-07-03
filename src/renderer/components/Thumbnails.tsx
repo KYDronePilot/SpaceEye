@@ -1,16 +1,16 @@
-import * as React from 'react';
-import { Component } from 'react';
-import styled from 'styled-components';
-import SimpleBar from 'simplebar-react';
-import axios from 'axios';
-import Thumbnail from './Thumbnail';
+import * as React from 'react'
+import { Component } from 'react'
+import styled from 'styled-components'
+import SimpleBar from 'simplebar-react'
+import axios from 'axios'
+import Thumbnail from './Thumbnail'
 
-import 'simplebar/dist/simplebar.min.css';
+import 'simplebar/dist/simplebar.min.css'
 
 const Container = styled.div`
     flex-grow: 1;
     height: var(--thumbnails-height);
-`;
+`
 
 const ThumbnailSimpleBar = styled(SimpleBar)`
     height: 100%;
@@ -20,7 +20,7 @@ const ThumbnailSimpleBar = styled(SimpleBar)`
         background-color: rgb(90, 90, 90);
         margin-top: var(--header-height);
     }
-`;
+`
 
 const ThumbnailGrid = styled.div`
     --x-padding: 50px;
@@ -35,7 +35,7 @@ const ThumbnailGrid = styled.div`
     justify-items: center;
     text-align: center;
     height: max-content;
-`;
+`
 
 interface URLImageTypes {
     tiny: string
@@ -62,17 +62,16 @@ interface ThumbnailsState {
 
 class Thumbnails extends Component<{}, ThumbnailsState> {
     constructor(props: {}) {
-        super(props);
+        super(props)
         this.state = {
             images: []
-        };
+        }
     }
 
     componentDidMount() {
-        axios.get<DownlinkSourcesResponse>('https://downlinkapp.com/sources.json')
-            .then(res => {
-                this.setState({ images: res.data.sources });
-            });
+        axios.get<DownlinkSourcesResponse>('https://downlinkapp.com/sources.json').then(res => {
+            this.setState({ images: res.data.sources })
+        })
     }
 
     render() {
@@ -86,8 +85,8 @@ class Thumbnails extends Component<{}, ThumbnailsState> {
                     </ThumbnailGrid>
                 </ThumbnailSimpleBar>
             </Container>
-        );
+        )
     }
 }
 
-export default Thumbnails;
+export default Thumbnails

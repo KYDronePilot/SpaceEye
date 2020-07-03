@@ -1,8 +1,8 @@
-import * as React from 'react';
-import styled, { ThemeProvider } from 'styled-components';
-import Thumbnails from './Thumbnails';
-import { DarkTheme } from '../themes';
-import 'typeface-roboto/index.css';
+import * as React from 'react'
+import styled, { ThemeProvider } from 'styled-components'
+import Thumbnails from './Thumbnails'
+import { DarkTheme } from '../themes'
+import 'typeface-roboto/index.css'
 import CloseButton from './CloseButton'
 
 const Container = styled.div`
@@ -19,7 +19,7 @@ const Container = styled.div`
     background-color: var(--background-color);
     display: flex;
     flex-direction: column;
-`;
+`
 
 const HeaderContainer = styled.div`
     height: var(--header-height);
@@ -31,14 +31,14 @@ const HeaderContainer = styled.div`
     backdrop-filter: blur(15px);
     z-index: 10;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
-`;
+`
 
 const HeaderBlur = styled.div`
     background-color: ${props => props.theme.colors.headerBackground};
     opacity: 0.75;
     width: 100%;
     height: 100%;
-`;
+`
 
 function Main() {
     return (
@@ -53,7 +53,7 @@ function Main() {
                 {/* <Toolbar /> */}
             </Container>
         </ThemeProvider>
-    );
+    )
 }
 
-export default Main;
+export default Main

@@ -1,3 +1,3 @@
-import { CounterAction } from './counterActions';
+import { CounterAction } from './counterActions'
 
-export type RootActions = CounterAction[keyof CounterAction];
+export type RootActions = CounterAction[keyof CounterAction]

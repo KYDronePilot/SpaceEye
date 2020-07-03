@@ -1,14 +1,14 @@
-const webpack = require('webpack');
-const merge = require('webpack-merge');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
+const webpack = require('webpack')
+const merge = require('webpack-merge')
+const HtmlWebpackPlugin = require('html-webpack-plugin')
+const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin')
 
-const baseConfig = require('./webpack.base.config');
+const baseConfig = require('./webpack.base.config')
 
 module.exports = merge.smart(baseConfig, {
     target: 'electron-renderer',
     entry: {
-        app: ['@babel/polyfill','./src/renderer/app.tsx']
+        app: ['@babel/polyfill', './src/renderer/app.tsx']
     },
     module: {
         rules: [
@@ -20,16 +20,11 @@ module.exports = merge.smart(baseConfig, {
                     cacheDirectory: true,
                     babelrc: false,
                     presets: [
-                        [
-                            '@babel/preset-env',
-                            { targets: { browsers: 'last 2 versions ' } }
-                        ],
+                        ['@babel/preset-env', { targets: { browsers: 'last 2 versions ' } }],
                         '@babel/preset-typescript',
                         '@babel/preset-react'
                     ],
-                    plugins: [
-                        ['@babel/plugin-proposal-class-properties', { loose: true }]
-                    ]
+                    plugins: [['@babel/plugin-proposal-class-properties', { loose: true }]]
                 }
             },
             {
@@ -84,4 +79,4 @@ module.exports = merge.smart(baseConfig, {
             'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development')
         })
     ]
-});
+})

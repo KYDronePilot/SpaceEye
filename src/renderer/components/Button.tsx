@@ -1,10 +1,10 @@
-import * as React from 'react';
-import styled from 'styled-components';
+import * as React from 'react'
+import styled from 'styled-components'
 
 enum ButtonType {
     Primary,
     Secondary,
-    Destructive,
+    Destructive
 }
 
 interface ButtonContainerProps {
@@ -23,17 +23,13 @@ const ButtonContainer = styled.button`
     color: white;
     padding: 10px;
     box-shadow: 0 0 20px black;
-`;
+`
 
 interface ButtonProps {
     type: ButtonType
     onClick: () => void
 }
 
-const Button = () => (
-    <ButtonContainer>
-        Set Background
-    </ButtonContainer>
-);
+const Button = () => <ButtonContainer>Set Background</ButtonContainer>
 
-export default Button;
+export default Button

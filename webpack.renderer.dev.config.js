@@ -1,7 +1,7 @@
-const merge = require('webpack-merge');
-const spawn = require('child_process').spawn;
+const merge = require('webpack-merge')
+const spawn = require('child_process').spawn
 
-const baseConfig = require('./webpack.renderer.config');
+const baseConfig = require('./webpack.renderer.config')
 
 module.exports = merge.smart(baseConfig, {
     resolve: {
@@ -23,15 +23,15 @@ module.exports = merge.smart(baseConfig, {
         },
         before() {
             if (process.env.START_HOT) {
-                console.log('Starting main process');
+                console.log('Starting main process')
                 spawn('npm', ['run', 'start-main-dev'], {
                     shell: true,
                     env: process.env,
                     stdio: 'inherit'
                 })
                     .on('close', code => process.exit(code))
-                    .on('error', spawnError => console.error(spawnError));
+                    .on('error', spawnError => console.error(spawnError))
             }
         }
     }
-});
+})

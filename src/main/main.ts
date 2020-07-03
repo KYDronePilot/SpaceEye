@@ -1,23 +1,23 @@
 import { app, BrowserWindow, ipcMain, screen, systemPreferences } from 'electron'
-import * as path from 'path';
-import * as url from 'url';
-import {IDesktopWallpaper} from 'earth_from_space_live_windows_node_api';
+import * as path from 'path'
+import * as url from 'url'
+import { IDesktopWallpaper } from 'earth_from_space_live_windows_node_api'
 
-let win: BrowserWindow | null;
+let win: BrowserWindow | null
 
 const installExtensions = async () => {
-    const installer = require('electron-devtools-installer');
-    const forceDownload = !!process.env.UPGRADE_EXTENSIONS;
-    const extensions = ['REACT_DEVELOPER_TOOLS', 'REDUX_DEVTOOLS'];
+    const installer = require('electron-devtools-installer')
+    const forceDownload = !!process.env.UPGRADE_EXTENSIONS
+    const extensions = ['REACT_DEVELOPER_TOOLS', 'REDUX_DEVTOOLS']
 
     return Promise.all(
         extensions.map(name => installer.default(installer[name], forceDownload))
-    ).catch(console.log); // eslint-disable-line no-console
-};
+    ).catch(console.log) // eslint-disable-line no-console
+}
 
 const createWindow = async () => {
     if (process.env.NODE_ENV !== 'production') {
-        await installExtensions();
+        await installExtensions()
     }
 
     win = new BrowserWindow({
@@ -30,15 +30,14 @@ const createWindow = async () => {
             nodeIntegration: true
         },
         backgroundColor: '#222222'
-    });
+    })
     if (process.platform === 'darwin') {
         win.setWindowButtonVisibility(false)
     }
 
-
     if (process.env.NODE_ENV !== 'production') {
-        process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = '1'; // eslint-disable-line require-atomic-updates
-        win.loadURL(`http://localhost:2003`);
+        process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = '1' // eslint-disable-line require-atomic-updates
+        win.loadURL(`http://localhost:2003`)
     } else {
         win.loadURL(
             url.format({
@@ -46,34 +45,35 @@ const createWindow = async () => {
                 protocol: 'file:',
                 slashes: true
             })
-        );
+        )
     }
 
     if (process.env.NODE_ENV !== 'production') {
         // Open DevTools, see https://github.com/electron/electron/issues/12438 for why we wait for dom-ready
         win.webContents.once('dom-ready', () => {
-            win!.webContents.openDevTools({mode: 'detach'});
-        });
+            win!.webContents.openDevTools({ mode: 'detach' })
+        })
     }
 
     win.on('closed', () => {
-        win = null;
-    });
-};
+        win = null
+    })
+}
 
-app.on('ready', createWindow);
+app.on('ready', createWindow)
 
 app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') {
-        app.quit();
+        app.quit()
     }
-});
+})
 
 app.on('activate', () => {
     if (win === null) {
-        createWindow();
+        createWindow()
     }
-});
+})
+
 ipcMain.on('close_windows', () => {
     win!.close()
 })

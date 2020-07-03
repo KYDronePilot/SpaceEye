@@ -176,23 +176,25 @@ export async function downloadImage(image: SourceImage, timeout: number): Promis
                 method: 'GET',
                 responseType: 'stream',
                 cancelToken: source.token
-            }).then(({ data, headers }) => {
-                const writer = fs.createWriteStream(path)
-                const dataStream = data as Readable
-                dataStream.pipe(writer)
+            })
+                .then(({ data, headers }) => {
+                    const writer = fs.createWriteStream(path)
+                    const dataStream = data as Readable
+                    dataStream.pipe(writer)
 
-                source.token.promise.then(cancellation => {
-                    writer.destroy()
-                    // Delete partially downloaded file if there was an error
-                    if (fs.existsSync(path)) {
-                        fs.unlinkSync(path)
-                    }
-                    reject(cancellation)
+                    source.token.promise.then(cancellation => {
+                        writer.destroy()
+                        // Delete partially downloaded file if there was an error
+                        if (fs.existsSync(path)) {
+                            fs.unlinkSync(path)
+                        }
+                        reject(cancellation)
+                    })
+                    writer.on('finish', () => {
+                        resolve(downloadedImage)
+                    })
                 })
-                writer.on('finish', () => {
-                    resolve(downloadedImage)
-                })
-            }).catch(error => reject(error))
+                .catch(error => reject(error))
         })
     })
 }

@@ -1,4 +1,4 @@
-import { DefaultTheme } from 'styled-components';
+import { DefaultTheme } from 'styled-components'
 
 export const DarkTheme: DefaultTheme = {
     colors: {
@@ -24,7 +24,7 @@ export const DarkTheme: DefaultTheme = {
             boxShadow: 'test'
         }
     }
-};
+}
 
 export const LightTheme: DefaultTheme = {
     colors: {
@@ -50,4 +50,4 @@ export const LightTheme: DefaultTheme = {
             boxShadow: 'test'
         }
     }
-};
+}

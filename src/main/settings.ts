@@ -1,7 +1,7 @@
 import { app, Size } from 'electron'
 import * as path from 'path'
 import * as fs from 'fs'
-import * as deepEqual from 'deep-equal'
+import deepEqual from 'deep-equal'
 
 /**
  * Settings directory.
