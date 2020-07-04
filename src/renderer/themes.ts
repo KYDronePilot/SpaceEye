@@ -3,7 +3,7 @@ import { DefaultTheme } from 'styled-components'
 export const DarkTheme: DefaultTheme = {
     colors: {
         background: 'rgb(34, 34, 34)',
-        headerBackground: 'rgb(50, 50, 50)',
+        headerBackground: 'rgb(30, 30, 30)',
         foreground: 'white',
         borderHighlight: 'rgb(0, 80, 196)',
         main: '',

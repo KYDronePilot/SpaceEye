@@ -28,14 +28,13 @@ const HeaderContainer = styled.div`
     top: 0;
     left: 0;
     width: 100%;
-    backdrop-filter: blur(15px);
+    backdrop-filter: blur(25px);
     z-index: 10;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
 `
 
 const HeaderBlur = styled.div`
     background-color: ${props => props.theme.colors.headerBackground};
-    opacity: 0.75;
+    opacity: 0.5;
     width: 100%;
     height: 100%;
 `

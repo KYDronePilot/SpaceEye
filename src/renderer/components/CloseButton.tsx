@@ -18,6 +18,7 @@ const CloseIconImageContainer = styled.div`
     display: inline-block;
     padding: 3px 10px;
     --close-icon-color: #c7c7c7;
+    cursor: pointer;
     &:hover {
         --close-icon-color: white;
     }

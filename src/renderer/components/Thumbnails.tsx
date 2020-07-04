@@ -10,6 +10,7 @@ import 'simplebar/dist/simplebar.min.css'
 const Container = styled.div`
     flex-grow: 1;
     height: var(--thumbnails-height);
+    -webkit-app-region: drag;
 `
 
 const ThumbnailSimpleBar = styled(SimpleBar)`
