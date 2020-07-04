@@ -4,6 +4,7 @@ import Thumbnails from './Thumbnails'
 import { DarkTheme } from '../themes'
 import 'typeface-roboto/index.css'
 import CloseButton from './CloseButton'
+import WallpaperModeSelector from './WallpaperModeSelector'
 
 const Container = styled.div`
     --header-height: 50px;
@@ -37,6 +38,11 @@ const HeaderBlur = styled.div`
     opacity: 0.5;
     width: 100%;
     height: 100%;
+    display: flex;
+`
+
+const FlexSpacer = styled.div`
+    flex-grow: 1;
 `
 
 function Main() {
@@ -46,6 +52,8 @@ function Main() {
                 <HeaderContainer>
                     <HeaderBlur>
                         <CloseButton />
+                        <FlexSpacer />
+                        <WallpaperModeSelector />
                     </HeaderBlur>
                 </HeaderContainer>
                 <Thumbnails />
