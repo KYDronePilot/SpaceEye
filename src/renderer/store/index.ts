@@ -11,8 +11,8 @@ const configureStore = (initialState?: RootState): Store<RootState | undefined> 
 
 const store = configureStore()
 
-if (typeof module.hot !== 'undefined') {
-    module.hot.accept('../reducers', () => store.replaceReducer(require('../reducers').rootReducer))
-}
+// if (typeof module.hot !== 'undefined') {
+//     module.hot.accept('../reducers', () => store.replaceReducer(require('../reducers').rootReducer))
+// }
 
 export default store

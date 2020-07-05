@@ -10,7 +10,6 @@ import 'simplebar/dist/simplebar.min.css'
 const Container = styled.div`
     flex-grow: 1;
     height: var(--thumbnails-height);
-    -webkit-app-region: drag;
 `
 
 const ThumbnailSimpleBar = styled(SimpleBar)`
@@ -25,7 +24,7 @@ const ThumbnailSimpleBar = styled(SimpleBar)`
 
 const ThumbnailGrid = styled.div`
     --x-padding: 50px;
-    --y-padding: 30px;
+    --y-padding: 10px;
     padding: calc(var(--y-padding) + var(--header-height)) var(--x-padding) var(--y-padding);
     background-color: var(--background-color);
     display: grid;

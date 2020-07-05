@@ -23,7 +23,6 @@ const createWindow = async () => {
     win = new BrowserWindow({
         width: 800,
         height: 600,
-        titleBarStyle: 'hiddenInset',
         darkTheme: true,
         frame: false,
         webPreferences: {
@@ -75,5 +74,5 @@ app.on('activate', () => {
 })
 
 ipcMain.on('close_windows', () => {
-    win!.close()
+    win?.close()
 })

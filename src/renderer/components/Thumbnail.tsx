@@ -12,7 +12,6 @@ const ThumbnailContainer = styled.div<ThumbnailContainerProps>`
     // border: 4px solid
     //     ${props => (props.isSelected ? props.theme.colors.borderHighlight : 'transparent')};
     transition: box-shadow 200ms;
-    cursor: pointer;
 `
 
 const ThumbnailContainerBackground = styled.div<ThumbnailContainerProps>`
