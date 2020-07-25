@@ -4,24 +4,33 @@ import { ipcRenderer } from 'electron'
 
 interface CloseButtonProps {}
 
-const CloseIconSvg = styled.svg`
+const CloseIconBlock = styled.div`
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0 20px;
+`
+
+const CloseIconClickableContainer = styled.div`
     --size: 8px;
     width: var(--size);
     height: var(--size);
-    fill: var(--close-icon-color);
-    &:hover {
-        fill: var(--close-icon-color);
-    }
-`
-
-const CloseIconImageContainer = styled.div`
-    display: inline-block;
-    padding: 3px 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 5px 5px;
+    cursor: pointer;
     --close-icon-color: #c7c7c7;
     &:hover {
         --close-icon-color: white;
     }
     -webkit-app-region: no-drag;
+`
+
+const CloseIconSvg = styled.svg`
+    width: auto;
+    height: auto;
+    fill: var(--close-icon-color);
 `
 
 /**
@@ -33,8 +42,8 @@ function closeWindow() {
 
 const CloseButton: React.FunctionComponent<CloseButtonProps> = props => {
     return (
-        <div>
-            <CloseIconImageContainer onClick={closeWindow}>
+        <CloseIconBlock>
+            <CloseIconClickableContainer onClick={closeWindow}>
                 <CloseIconSvg
                     version="1.1"
                     id="Layer_1"
@@ -46,8 +55,8 @@ const CloseButton: React.FunctionComponent<CloseButtonProps> = props => {
                 >
                     <polygon points="96,14 82,0 48,34 14,0 0,14 34,48 0,82 14,96 48,62 82,96 96,82 62,48 " />
                 </CloseIconSvg>
-            </CloseIconImageContainer>
-        </div>
+            </CloseIconClickableContainer>
+        </CloseIconBlock>
     )
 }
 

@@ -20,6 +20,7 @@ const ThumbnailContainerBackground = styled.div<ThumbnailContainerProps>`
     padding: 4px 4px;
     box-shadow: ${props => (props.isSelected ? '0 3px 20px rgba(0, 0, 0, 0.5)' : 'none')};
     transition: box-shadow 200ms, background-color 200ms;
+    cursor: pointer;
 `
 
 const Image = styled.img`

@@ -59,7 +59,7 @@ function HeaderBar() {
             <FloatingHeader>
                 <CloseButton />
                 <FlexSpacer />
-                <WallpaperModeSelector />
+                {/* <WallpaperModeSelector /> */}
             </FloatingHeader>
         </>
     )
