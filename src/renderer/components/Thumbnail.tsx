@@ -5,13 +5,14 @@ import styled from 'styled-components'
 const ThumbnailContainer = styled.div<ThumbnailContainerProps>`
     --width: 200px;
     width: var(--width);
-    height: calc((var(--width) * 9) / 16);
+    height: calc((var(--width) * 3) / 5);
     background-color: black;
     border-radius: 10px;
     box-shadow: ${props => (!props.isSelected ? '0 3px 10px rgba(0, 0, 0, 0.3)' : 'none')};
     // border: 4px solid
     //     ${props => (props.isSelected ? props.theme.colors.borderHighlight : 'transparent')};
     transition: box-shadow 200ms;
+    overflow: hidden;
 `
 
 const ThumbnailContainerBackground = styled.div<ThumbnailContainerProps>`
