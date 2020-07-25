@@ -1,9 +1,11 @@
+import 'typeface-roboto/index.css'
+
 import * as React from 'react'
 import styled, { ThemeProvider } from 'styled-components'
-import Thumbnails from './Thumbnails'
+
 import { DarkTheme } from '../themes'
-import 'typeface-roboto/index.css'
 import HeaderBar from './HeaderBar'
+import ThumbnailManager from './ThumbnailManager'
 
 const Container = styled.div`
     --header-height: 50px;
@@ -26,7 +28,7 @@ function Main() {
         <ThemeProvider theme={DarkTheme}>
             <Container>
                 <HeaderBar />
-                <Thumbnails />
+                <ThumbnailManager />
                 {/* <Toolbar /> */}
             </Container>
         </ThemeProvider>

@@ -1,35 +1,49 @@
 import * as React from 'react'
-import { Component } from 'react'
 import styled from 'styled-components'
 
-const ThumbnailContainer = styled.div<ThumbnailContainerProps>`
+interface IsSelectedStyleProps {
+    readonly isSelected: boolean
+}
+
+/**
+ * Styling for the image itself.
+ */
+const Image = styled.img`
+    max-width: 100%;
+    max-height: 100%;
+    pointer-events: none;
+`
+
+/**
+ * Clickable container which the image is in.
+ */
+const ImageContainer = styled.div<IsSelectedStyleProps>`
     --width: 200px;
     width: var(--width);
     height: calc((var(--width) * 3) / 5);
     background-color: black;
-    border-radius: 10px;
+    border-radius: var(--image-border-radius);
     box-shadow: ${props => (!props.isSelected ? '0 3px 10px rgba(0, 0, 0, 0.3)' : 'none')};
-    // border: 4px solid
-    //     ${props => (props.isSelected ? props.theme.colors.borderHighlight : 'transparent')};
-    transition: box-shadow 200ms;
+    transition: box-shadow var(--transition-time);
     overflow: hidden;
 `
 
-const ThumbnailContainerBackground = styled.div<ThumbnailContainerProps>`
+/**
+ * Background of the image container which acts as a border.
+ */
+const ImageContainerBackground = styled.div<IsSelectedStyleProps>`
     background: ${props => (props.isSelected ? props.theme.colors.borderHighlight : 'transparent')};
-    border-radius: 10px;
-    padding: 4px 4px;
+    border-radius: var(--image-border-radius);
+    padding: 4px;
     box-shadow: ${props => (props.isSelected ? '0 3px 20px rgba(0, 0, 0, 0.5)' : 'none')};
-    transition: box-shadow 200ms, background-color 200ms;
-    cursor: pointer;
+    transition: box-shadow var(--transition-time), background-color var(--transition-time);
+    cursor: ${props => (props.isSelected ? 'default' : 'pointer')};
 `
 
-const Image = styled.img`
-    max-width: 100%;
-    max-height: 100%;
-`
-
-const ImageName = styled.p<ThumbnailContainerProps>`
+/**
+ * Name describing the thumbnail.
+ */
+const ThumbnailName = styled.p<IsSelectedStyleProps>`
     font-family: Roboto, sans-serif;
     font-size: 16px;
     font-weight: normal;
@@ -39,58 +53,40 @@ const ImageName = styled.p<ThumbnailContainerProps>`
         !props.isSelected ? '0 3px 10px rgba(0, 0, 0, 0.4)' : '0 3px 20px rgba(0, 0, 0, 1)'};
 `
 
-interface ThumbnailContainerProps {
-    readonly isSelected: boolean
-}
-
-const ImageContainer = styled.div<ThumbnailContainerProps>`
+/**
+ * Container for the image and name.
+ */
+const ThumbnailContainer = styled.div<IsSelectedStyleProps>`
+    --transition-time: 200ms;
+    --image-border-radius: 10px;
     padding: 10px;
-    // box-shadow: ${props => props.theme.elevation.low.boxShadow};
-    border-radius: 5px;
-     //background-color: ${props => props.theme.elevation.low.backgroundColor};
-     ${props => (props.isSelected ? 'transform: scale(1.03)' : '')};
-     transition: transform 200ms;
-     user-select: none;
+    transform: ${props => (props.isSelected ? 'scale(1.03)' : '')};
+    transition: transform var(--transition-time);
+    user-select: none;
 `
 
 interface ThumbnailProps {
+    id: string
     src: string
     name: string
+    isSelected: (id: string) => boolean
+    onClick: (id: string) => void
 }
 
-interface ThumbnailState {
-    isSelected: boolean
-}
+const Thumbnail: React.FunctionComponent<ThumbnailProps> = props => {
+    const { id, src, name, isSelected, onClick } = props
+    const isSelectedValue = isSelected(id)
 
-class Thumbnail extends Component<ThumbnailProps, ThumbnailState> {
-    constructor(props: ThumbnailProps) {
-        super(props)
-        this.state = {
-            isSelected: false
-        }
-
-        this.toggleSelected = this.toggleSelected.bind(this)
-    }
-
-    toggleSelected() {
-        this.setState(state => ({ isSelected: !state.isSelected }))
-    }
-
-    render() {
-        return (
-            <ImageContainer isSelected={this.state.isSelected}>
-                <ThumbnailContainerBackground isSelected={this.state.isSelected}>
-                    <ThumbnailContainer
-                        isSelected={this.state.isSelected}
-                        onClick={() => this.toggleSelected()}
-                    >
-                        <Image src={this.props.src} />
-                    </ThumbnailContainer>
-                </ThumbnailContainerBackground>
-                <ImageName isSelected={this.state.isSelected}>{this.props.name}</ImageName>
-            </ImageContainer>
-        )
-    }
+    return (
+        <ThumbnailContainer isSelected={isSelectedValue}>
+            <ImageContainerBackground isSelected={isSelectedValue}>
+                <ImageContainer isSelected={isSelectedValue} onClick={() => onClick(id)}>
+                    <Image src={src} />
+                </ImageContainer>
+            </ImageContainerBackground>
+            <ThumbnailName isSelected={isSelectedValue}>{name}</ThumbnailName>
+        </ThumbnailContainer>
+    )
 }
 
 export default Thumbnail
