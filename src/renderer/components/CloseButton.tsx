@@ -1,8 +1,8 @@
 import * as React from 'react'
 import styled from 'styled-components'
-import { ipcRenderer } from 'electron'
 
-interface CloseButtonProps {}
+import { CLOSE_APPLICATION_CHANNEL } from '../../shared/IpcDefinitions'
+import { ipcRequest } from '../IpcService'
 
 const CloseIconBlock = styled.div`
     display: flex;
@@ -36,11 +36,11 @@ const CloseIconSvg = styled.svg`
 /**
  * Close the application window.
  */
-function closeWindow() {
-    ipcRenderer.send('close_windows')
+async function closeWindow() {
+    await ipcRequest(CLOSE_APPLICATION_CHANNEL, {}, false)
 }
 
-const CloseButton: React.FunctionComponent<CloseButtonProps> = props => {
+const CloseButton: React.FunctionComponent = props => {
     return (
         <CloseIconBlock>
             <CloseIconClickableContainer onClick={closeWindow}>

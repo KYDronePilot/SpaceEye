@@ -1,7 +1,17 @@
+import Axios from 'axios'
+import { DesktopWallpaper } from 'earth_from_space_live_mac_node_api'
+// import { IDesktopWallpaper } from 'earth_from_space_live_windows_node_api'
 import { app, BrowserWindow, ipcMain, screen, systemPreferences } from 'electron'
 import * as path from 'path'
 import * as url from 'url'
-import { IDesktopWallpaper } from 'earth_from_space_live_windows_node_api'
+
+import {
+    CLOSE_APPLICATION_CHANNEL,
+    CloseApplicationIpcParams,
+    EXAMPLE_CHANNEL,
+    ExampleIpcParams,
+    IpcRequest
+} from '../shared/IpcDefinitions'
 
 let win: BrowserWindow | null
 
@@ -73,6 +83,10 @@ app.on('activate', () => {
     }
 })
 
-ipcMain.on('close_windows', () => {
-    win?.close()
+ipcMain.on(CLOSE_APPLICATION_CHANNEL, () => {
+    if (win !== undefined) {
+        win!.close()
+    }
+        win!.close()
+    }
 })
