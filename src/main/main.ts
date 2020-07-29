@@ -13,6 +13,9 @@ import {
     IpcRequest
 } from '../shared/IpcDefinitions'
 
+const HEARTBEAT_INTERVAL = 2000
+let heartbeatHandle: number
+
 let win: BrowserWindow | null
 
 const installExtensions = async () => {
@@ -69,7 +72,22 @@ const createWindow = async () => {
     })
 }
 
-app.on('ready', createWindow)
+/**
+ * Heartbeat function which runs every `HEARTBEAT_INTERVAL` seconds to perform
+ * any necessary tasks.
+ */
+function heartbeat() {
+    console.log('Lub dub')
+}
+
+app.on('ready', () => {
+    createWindow()
+    heartbeatHandle = setInterval(heartbeat, HEARTBEAT_INTERVAL)
+})
+
+app.on('will-quit', () => {
+    clearInterval(heartbeatHandle)
+})
 
 app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') {
@@ -85,8 +103,6 @@ app.on('activate', () => {
 
 ipcMain.on(CLOSE_APPLICATION_CHANNEL, () => {
     if (win !== undefined) {
-        win!.close()
-    }
         win!.close()
     }
 })
