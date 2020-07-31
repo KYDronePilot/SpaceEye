@@ -66,11 +66,11 @@ const ThumbnailContainer = styled.div<IsSelectedStyleProps>`
 `
 
 interface ThumbnailProps {
-    id: string
+    id: number
     src: string
     name: string
-    isSelected: (id: string) => boolean
-    onClick: (id: string) => void
+    isSelected: (id: number) => boolean
+    onClick: (id: number) => void
 }
 
 const Thumbnail: React.FunctionComponent<ThumbnailProps> = props => {

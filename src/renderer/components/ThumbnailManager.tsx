@@ -1,12 +1,10 @@
-import Axios from 'axios'
 import * as React from 'react'
 import { ReactNode } from 'react'
 
 import {
     GET_SATELLITE_CONFIG_CHANNEL,
     GetSatelliteConfigIpcResponse,
-    IpcParams,
-    IpcResponse
+    IpcParams
 } from '../../shared/IpcDefinitions'
 import { ipcRequest } from '../IpcService'
 import Thumbnail from './Thumbnail'
@@ -26,7 +24,7 @@ interface ThumbnailInformation {
 
 export interface ThumbnailManagerState {
     satelliteConfig?: RootSatelliteConfig
-    selectedId?: string
+    selectedId?: number
 }
 
 export default class ThumbnailManager extends React.Component<
@@ -57,7 +55,7 @@ export default class ThumbnailManager extends React.Component<
      * Action to perform when new image is selected.
      * @param imageId - ID of the selected image
      */
-    onSelectImage(imageId: string): void {
+    onSelectImage(imageId: number): void {
         if (this.state.selectedId === imageId) {
             return
         }
@@ -96,11 +94,11 @@ export default class ThumbnailManager extends React.Component<
             <ThumbnailsContainer>
                 {this.getThumbnailInformation().map(image => (
                     <Thumbnail
-                        id={image.imageId.toString()}
+                        id={image.imageId}
                         src={image.url}
                         name={image.name}
-                        isSelected={(id: string) => id === this.state.selectedId}
-                        onClick={(id: string) => this.onSelectImage(id)}
+                        isSelected={(id: number) => id === this.state.selectedId}
+                        onClick={(id: number) => this.onSelectImage(id)}
                         key={image.imageId}
                     />
                 ))}
