@@ -2,39 +2,30 @@ import Axios from 'axios'
 import * as React from 'react'
 import { ReactNode } from 'react'
 
+import {
+    GET_SATELLITE_CONFIG_CHANNEL,
+    GetSatelliteConfigIpcResponse,
+    IpcParams,
+    IpcResponse
+} from '../../shared/IpcDefinitions'
+import { ipcRequest } from '../IpcService'
 import Thumbnail from './Thumbnail'
 import { ThumbnailsContainer } from './ThumbnailsContainer'
 
 /**
- * Downlink URL image types.
+ * Information about a thumbnail to display.
  */
-interface URLImageTypes {
-    tiny: string
-    small: string
-    large: string
-    full: string
-}
-
-/**
- * Downlink information about each image.
- */
-export interface ImageData {
+interface ThumbnailInformation {
+    satelliteId: number
+    viewId: number
+    imageId: number
     name: string
-    spacecraft: string
-    interval: number
-    aspect: number
-    url: URLImageTypes
-}
-
-/**
- * Downlink JSON response.
- */
-interface DownlinkSourcesResponse {
-    sources: ImageData[]
+    url: string
+    dimensions: [number, number]
 }
 
 export interface ThumbnailManagerState {
-    images: ImageData[]
+    satelliteConfig?: RootSatelliteConfig
     selectedId?: string
 }
 
@@ -46,18 +37,20 @@ export default class ThumbnailManager extends React.Component<
         super(props)
 
         this.state = {
-            images: [],
+            satelliteConfig: undefined,
             selectedId: undefined
         }
 
         this.onSelectImage = this.onSelectImage.bind(this)
+        this.getThumbnailInformation = this.getThumbnailInformation.bind(this)
     }
 
-    componentDidMount(): void {
-        // Download image manifest
-        Axios.get<DownlinkSourcesResponse>('https://downlinkapp.com/sources.json').then(res => {
-            this.setState({ images: res.data.sources })
-        })
+    async componentDidMount(): Promise<void> {
+        const response = await ipcRequest<IpcParams, GetSatelliteConfigIpcResponse>(
+            GET_SATELLITE_CONFIG_CHANNEL,
+            {}
+        )
+        this.setState({ satelliteConfig: response.config })
     }
 
     /**
@@ -71,17 +64,44 @@ export default class ThumbnailManager extends React.Component<
         this.setState({ selectedId: imageId })
     }
 
+    /**
+     * Get thumbnail information for the current config.
+     */
+    getThumbnailInformation(): ThumbnailInformation[] {
+        if (this.state.satelliteConfig === undefined) {
+            return []
+        }
+        const thumbnails: ThumbnailInformation[] = []
+        for (const satellite of this.state.satelliteConfig.satellites) {
+            for (const view of satellite.views) {
+                for (const imageSource of view.imageSources) {
+                    if (imageSource.isThumbnail) {
+                        thumbnails.push({
+                            satelliteId: satellite.id,
+                            viewId: view.id,
+                            imageId: imageSource.id,
+                            name: `${satellite.name} - ${view.name}`,
+                            url: imageSource.url,
+                            dimensions: imageSource.dimensions
+                        })
+                    }
+                }
+            }
+        }
+        return thumbnails
+    }
+
     public render(): ReactNode {
         return (
             <ThumbnailsContainer>
-                {this.state.images.map(image => (
+                {this.getThumbnailInformation().map(image => (
                     <Thumbnail
-                        id={image.name}
-                        src={image.url.small}
+                        id={image.imageId.toString()}
+                        src={image.url}
                         name={image.name}
                         isSelected={(id: string) => id === this.state.selectedId}
                         onClick={(id: string) => this.onSelectImage(id)}
-                        key={image.name}
+                        key={image.imageId}
                     />
                 ))}
             </ThumbnailsContainer>

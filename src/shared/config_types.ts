@@ -6,6 +6,7 @@ interface ImageSource {
     url: string
     updateInterval: number
     dimensions: [number, number]
+    isThumbnail?: boolean
 }
 
 /**

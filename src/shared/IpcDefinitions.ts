@@ -21,4 +21,9 @@ export interface ExampleIpcResponse {
     testR: string
 }
 
+export interface GetSatelliteConfigIpcResponse {
+    config: RootSatelliteConfig
+}
+
 export const EXAMPLE_CHANNEL = 'EXAMPLE_CHANNEL'
+export const GET_SATELLITE_CONFIG_CHANNEL = 'GET_SATELLITE_CONFIG_CHANNEL'

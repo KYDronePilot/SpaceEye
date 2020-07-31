@@ -10,8 +10,12 @@ import {
     CloseApplicationIpcParams,
     EXAMPLE_CHANNEL,
     ExampleIpcParams,
+    GET_SATELLITE_CONFIG_CHANNEL,
+    GetSatelliteConfigIpcResponse,
+    IpcParams,
     IpcRequest
 } from '../shared/IpcDefinitions'
+import { SatelliteConfigStore } from './satellite_config_store'
 
 const HEARTBEAT_INTERVAL = 2000
 let heartbeatHandle: number
@@ -105,4 +109,12 @@ ipcMain.on(CLOSE_APPLICATION_CHANNEL, () => {
     if (win !== undefined) {
         win!.close()
     }
+})
+
+ipcMain.on(GET_SATELLITE_CONFIG_CHANNEL, async (event, params: IpcRequest<IpcParams>) => {
+    const configStore = SatelliteConfigStore.Instance
+    const response: GetSatelliteConfigIpcResponse = {
+        config: await configStore.getConfig()
+    }
+    event.reply(params.responseChannel, response)
 })
