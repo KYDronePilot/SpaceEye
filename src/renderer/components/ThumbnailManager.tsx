@@ -4,7 +4,10 @@ import { ReactNode } from 'react'
 import {
     GET_SATELLITE_CONFIG_CHANNEL,
     GetSatelliteConfigIpcResponse,
-    IpcParams
+    IpcParams,
+    IpcResponse,
+    SET_WALLPAPER_CHANNEL,
+    SetWallpaperIpcParams
 } from '../../shared/IpcDefinitions'
 import { ipcRequest } from '../IpcService'
 import Thumbnail from './Thumbnail'
@@ -53,13 +56,14 @@ export default class ThumbnailManager extends React.Component<
 
     /**
      * Action to perform when new image is selected.
-     * @param imageId - ID of the selected image
+     * @param viewId - ID of the selected image
      */
-    onSelectImage(imageId: number): void {
-        if (this.state.selectedId === imageId) {
+    async onSelectImage(viewId: number): Promise<void> {
+        if (this.state.selectedId === viewId) {
             return
         }
-        this.setState({ selectedId: imageId })
+        this.setState({ selectedId: viewId })
+        await ipcRequest<SetWallpaperIpcParams, IpcResponse>(SET_WALLPAPER_CHANNEL, { viewId })
     }
 
     /**
@@ -94,12 +98,12 @@ export default class ThumbnailManager extends React.Component<
             <ThumbnailsContainer>
                 {this.getThumbnailInformation().map(image => (
                     <Thumbnail
-                        id={image.imageId}
+                        id={image.viewId}
                         src={image.url}
                         name={image.name}
                         isSelected={(id: number) => id === this.state.selectedId}
                         onClick={(id: number) => this.onSelectImage(id)}
-                        key={image.imageId}
+                        key={image.viewId}
                     />
                 ))}
             </ThumbnailsContainer>

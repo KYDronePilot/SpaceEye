@@ -13,9 +13,13 @@ import {
     GET_SATELLITE_CONFIG_CHANNEL,
     GetSatelliteConfigIpcResponse,
     IpcParams,
-    IpcRequest
+    IpcRequest,
+    IpcResponse,
+    SET_WALLPAPER_CHANNEL,
+    SetWallpaperIpcParams
 } from '../shared/IpcDefinitions'
 import { SatelliteConfigStore } from './satellite_config_store'
+import { WallpaperManager } from './wallpaper_manager'
 
 const HEARTBEAT_INTERVAL = 2000
 let heartbeatHandle: number
@@ -116,5 +120,12 @@ ipcMain.on(GET_SATELLITE_CONFIG_CHANNEL, async (event, params: IpcRequest<IpcPar
     const response: GetSatelliteConfigIpcResponse = {
         config: await configStore.getConfig()
     }
+    event.reply(params.responseChannel, response)
+})
+
+ipcMain.on(SET_WALLPAPER_CHANNEL, async (event, params: IpcRequest<SetWallpaperIpcParams>) => {
+    const manager = WallpaperManager.Instance
+    await manager.setWallpaper(params.params.viewId)
+    const response: IpcResponse = {}
     event.reply(params.responseChannel, response)
 })

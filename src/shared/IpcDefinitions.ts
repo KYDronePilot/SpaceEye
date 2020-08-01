@@ -25,5 +25,10 @@ export interface GetSatelliteConfigIpcResponse {
     config: RootSatelliteConfig
 }
 
+export interface SetWallpaperIpcParams {
+    viewId: number
+}
+
 export const EXAMPLE_CHANNEL = 'EXAMPLE_CHANNEL'
 export const GET_SATELLITE_CONFIG_CHANNEL = 'GET_SATELLITE_CONFIG_CHANNEL'
+export const SET_WALLPAPER_CHANNEL = 'SET_WALLPAPER_CHANNEL'
