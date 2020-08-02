@@ -1,5 +1,4 @@
 import Axios from 'axios'
-import { DesktopWallpaper } from 'earth_from_space_live_mac_node_api'
 // import { IDesktopWallpaper } from 'earth_from_space_live_windows_node_api'
 import { app, BrowserWindow, ipcMain, screen, systemPreferences } from 'electron'
 import * as path from 'path'

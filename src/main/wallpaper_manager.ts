@@ -3,7 +3,6 @@
  */
 
 import Axios, { CancelToken, CancelTokenSource } from 'axios'
-import { DesktopWallpaper } from 'earth_from_space_live_mac_node_api'
 import { Display, screen } from 'electron'
 import { maxBy } from 'lodash'
 import moment, { Moment } from 'moment'
@@ -148,9 +147,9 @@ export class WallpaperManager {
         if (downloadedImage === undefined) {
             downloadedImage = await WallpaperManager.downloadImage(biggestImageSource!)
         }
-        for (const monitor of monitors) {
-            DesktopWallpaper.SetWallpaper(monitor.id, downloadedImage!.getPath())
-        }
+        monitors.forEach((monitor, i) => {
+            wallpaperInterface.setWallpaper(monitor, i, downloadedImage!.getPath())
+        })
     }
 
     /**

@@ -1,4 +1,7 @@
-declare enum WallpaperPosition {
+export declare class HResultError extends Error {
+    constructor(error: number)
+}
+export declare enum WallpaperPosition {
     center = 'DWPOS_CENTER',
     tile = 'DWPOS_TILE',
     stretch = 'DWPOS_STRETCH',
@@ -13,4 +16,3 @@ export declare function GetWallpaper(monitorId: string): string
 export declare function SetWallpaper(monitorId: string, wallpaperPath: string): void
 export declare function GetPosition(): WallpaperPosition
 export declare function SetPosition(position: WallpaperPosition): void
-export {}
