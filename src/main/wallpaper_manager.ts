@@ -12,10 +12,16 @@ import { basename, dirname } from 'path'
 import { ImageDownloadManager, RequestCancelledError } from './image_download_manager'
 import { OSWallpaperInterface } from './os_wallpaper_interface'
 import { MacOSWallpaperInterface } from './os_wallpaper_interface/macos'
+import { WindowsWallpaperInterface } from './os_wallpaper_interface/windows'
 import { SatelliteConfigStore } from './satellite_config_store'
 import { DownloadedImage, downloadImage, IMAGE_DIR } from './wallpaper_requester'
 
-const wallpaperInterface: OSWallpaperInterface = new MacOSWallpaperInterface()
+let wallpaperInterface: OSWallpaperInterface
+if (process.platform === 'darwin') {
+    wallpaperInterface = new MacOSWallpaperInterface()
+} else {
+    wallpaperInterface = new WindowsWallpaperInterface()
+}
 const DOWNLOAD_TIMEOUT = 300000
 export const UPDATE_INTERVAL_MIN = 20
 
@@ -77,7 +83,7 @@ export class WallpaperManager {
      */
     private static async getNewestDownloadedImage(): Promise<DownloadedImage | undefined> {
         const monitors = WallpaperManager.getMonitors()
-        const imagePaths = monitors.map(monitor => wallpaperInterface.getWallpaper(monitor))
+        const imagePaths = monitors.map((monitor, i) => wallpaperInterface.getWallpaper(monitor, i))
         const ourImagePaths = imagePaths.filter(path => dirname(path) === IMAGE_DIR)
         const images = ourImagePaths.map(path => DownloadedImage.constructFromPath(path))
         if (images.length === 0) {

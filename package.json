@@ -146,8 +146,6 @@
     "async-lock": "^1.2.4",
     "axios": "^0.19.2",
     "deep-equal": "^2.0.3",
-    "earth_from_space_live_mac_node_api": "git+ssh://git@github.com/KYDronePilot/earth_from_space_live_mac_node_api.git",
-    "earth_from_space_live_windows_node_api": "file:../../Desktop/earth_from_space_live_windows_node_api",
     "lodash": "^4.17.19",
     "moment": "^2.26.0",
     "react": "^16.8.6",

@@ -6,12 +6,12 @@ export interface OSWallpaperInterface {
      * @param monitor - Monitor to set on
      * @param path - Path to the image
      */
-    setWallpaper(monitor: Display, path: string): void
+    setWallpaper(monitor: Display, monitorIndex: number, path: string): void
 
     /**
      * Get the wallpaper image path for a particular monitor.
      * @param monitor - Monitor to get image path for
      * @returns Path to monitor image
      */
-    getWallpaper(monitor: Display): string
+    getWallpaper(monitor: Display, monitorIndex: number): string
 }
