@@ -21,7 +21,7 @@ import {
 import { SatelliteConfigStore } from './satellite_config_store'
 import { WallpaperManager } from './wallpaper_manager'
 
-const HEARTBEAT_INTERVAL = 2000
+const HEARTBEAT_INTERVAL = 600000
 let heartbeatHandle: number
 
 let win: BrowserWindow | null
@@ -84,8 +84,8 @@ const createWindow = async () => {
  * Heartbeat function which runs every `HEARTBEAT_INTERVAL` seconds to perform
  * any necessary tasks.
  */
-function heartbeat() {
-    console.log('Lub dub')
+async function heartbeat() {
+    await WallpaperManager.updateWallpaper()
 }
 
 app.on('ready', () => {
@@ -124,8 +124,6 @@ ipcMain.on(GET_SATELLITE_CONFIG_CHANNEL, async (event, params: IpcRequest<IpcPar
 })
 
 ipcMain.on(SET_WALLPAPER_CHANNEL, async (event, params: IpcRequest<SetWallpaperIpcParams>) => {
-    const manager = WallpaperManager.Instance
-    await manager.setWallpaper(params.params.viewId)
-    const response: IpcResponse = {}
-    event.reply(params.responseChannel, response)
+    await WallpaperManager.setWallpaper(params.params.viewId)
+    event.reply(params.responseChannel, {})
 })

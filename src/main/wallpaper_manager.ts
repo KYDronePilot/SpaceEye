@@ -7,14 +7,20 @@ import { DesktopWallpaper } from 'earth_from_space_live_mac_node_api'
 import { Display, screen } from 'electron'
 import { maxBy } from 'lodash'
 import moment, { Moment } from 'moment'
+import { basename, dirname } from 'path'
 
+import { ImageDownloadManager, RequestCancelledError } from './image_download_manager'
+import { OSWallpaperInterface } from './os_wallpaper_interface'
+import { MacOSWallpaperInterface } from './os_wallpaper_interface/macos'
 import { SatelliteConfigStore } from './satellite_config_store'
-import { downloadImage } from './wallpaper_requester'
+import { DownloadedImage, downloadImage, IMAGE_DIR } from './wallpaper_requester'
+
+const wallpaperInterface: OSWallpaperInterface = new MacOSWallpaperInterface()
+const DOWNLOAD_TIMEOUT = 300000
+export const UPDATE_INTERVAL_MIN = 20
 
 export class WallpaperManager {
     private static instance?: WallpaperManager
-
-    private downloadCancelToken?: CancelTokenSource
 
     /**
      * Path to the current wallpaper image
@@ -47,6 +53,14 @@ export class WallpaperManager {
     }
 
     /**
+     * Get all non-internal monitors.
+     * @returns All non-internal monitors
+     */
+    private static getMonitors(): Display[] {
+        return screen.getAllDisplays().filter(monitor => !monitor.internal)
+    }
+
+    /**
      * Select the image source that best matches the monitor.
      * @param monitor - Monitor in question
      * @param sources - Possible image sources
@@ -58,20 +72,63 @@ export class WallpaperManager {
         return sources[sources.length - 1]
     }
 
-    // private async setSatelliteViewForMonitor(monitor: Display, view: SatelliteView) {
-    //     const imageSource = await this.selectImageSourceForMonitor(monitor, view.imageSources)
-    // }
+    /**
+     * Get the current satellite view being displayed.
+     */
+    private static async getNewestDownloadedImage(): Promise<DownloadedImage | undefined> {
+        const monitors = WallpaperManager.getMonitors()
+        const imagePaths = monitors.map(monitor => wallpaperInterface.getWallpaper(monitor))
+        const ourImagePaths = imagePaths.filter(path => dirname(path) === IMAGE_DIR)
+        const images = ourImagePaths.map(path => DownloadedImage.constructFromPath(path))
+        if (images.length === 0) {
+            return undefined
+        }
+        return maxBy(images, image => image.timestamp.valueOf())!
+    }
+
+    private static async imageIdToView(id: number): Promise<SatelliteView | undefined> {
+        const configStore = SatelliteConfigStore.Instance
+        const config = await configStore.getConfig()
+        for (const satellite of config.satellites) {
+            for (const view of satellite.views) {
+                for (const image of view.imageSources) {
+                    if (image.id === id) {
+                        return view
+                    }
+                }
+            }
+        }
+        return undefined
+    }
+
+    /**
+     * Download a wallpaper image.
+     * @param image - Image to download
+     */
+    private static async downloadImage(image: ImageSource): Promise<DownloadedImage | undefined> {
+        const downloadManager = ImageDownloadManager.Instance
+        try {
+            return await downloadManager.downloadImage(image, -1, DOWNLOAD_TIMEOUT)
+        } catch (error) {
+            if (error instanceof RequestCancelledError) {
+                // TODO: Handle timeout errors
+                console.log('We were cancelled')
+                return undefined
+            }
+            throw error
+        }
+    }
 
     /**
      * Set the wallpaper to a particular view ID
      * @param viewId - ID of view to set wallpaper to
      */
-    public async setWallpaper(viewId: number): Promise<void> {
+    public static async setWallpaper(viewId: number): Promise<void> {
         const viewConfig = await WallpaperManager.getViewConfig(viewId)
         if (viewConfig === undefined) {
             throw new Error('Specified view ID does not exist')
         }
-        const monitors = screen.getAllDisplays().filter(monitor => !monitor.internal)
+        const monitors = WallpaperManager.getMonitors()
         const imageSources = monitors.map(monitor =>
             WallpaperManager.selectImageSourceForMonitor(monitor, viewConfig.imageSources)
         )
@@ -79,15 +136,32 @@ export class WallpaperManager {
             imageSources,
             source => source.dimensions[0] * source.dimensions[1]
         )
-        this.downloadCancelToken = Axios.CancelToken.source()
-        const downloadedImage = await downloadImage(
-            biggestImageSource!,
-            60000,
-            this.downloadCancelToken
-        )
-
-        for (const monitor of monitors) {
-            DesktopWallpaper.SetWallpaper(monitor.id, downloadedImage.getPath())
+        // If that image already exists, no need to download it
+        let downloadedImage: DownloadedImage | undefined
+        downloadedImage = await DownloadedImage.constructNewestExistingImage(biggestImageSource!.id)
+        if (downloadedImage === undefined) {
+            downloadedImage = await WallpaperManager.downloadImage(biggestImageSource!)
         }
+        for (const monitor of monitors) {
+            DesktopWallpaper.SetWallpaper(monitor.id, downloadedImage!.getPath())
+        }
+    }
+
+    /**
+     * Check if wallpaper needs to be updated and do so if necessary.
+     */
+    public static async updateWallpaper(): Promise<void> {
+        const newestDownloadedImage = await WallpaperManager.getNewestDownloadedImage()
+        if (
+            newestDownloadedImage === undefined ||
+            !(moment.utc().diff(newestDownloadedImage.timestamp, 'minutes') > UPDATE_INTERVAL_MIN)
+        ) {
+            return
+        }
+        const view = await WallpaperManager.imageIdToView(newestDownloadedImage.imageId)
+        if (view === undefined) {
+            return
+        }
+        await WallpaperManager.setWallpaper(view.id)
     }
 }

@@ -2,13 +2,15 @@ import AsyncLock from 'async-lock'
 // import axios from 'axios';
 import axios, { CancelTokenSource } from 'axios'
 import * as fs from 'fs'
-import * as moment from 'moment'
-import { Moment } from 'moment'
+import { maxBy } from 'lodash'
+import moment, { Moment } from 'moment'
 import * as Path from 'path'
 import { Readable } from 'stream'
 import * as Url from 'url'
 
-const IMAGE_DIR = '/tmp/efsl_test_images'
+import { UPDATE_INTERVAL_MIN } from './wallpaper_manager'
+
+export const IMAGE_DIR = '/tmp/efsl_test_images'
 const imageDownloadResourceKey = 'imageDownload'
 const downloaderLock = new AsyncLock()
 let cancelDownloadSource: CancelTokenSource | undefined
@@ -20,7 +22,7 @@ axios.defaults.adapter = require('axios/lib/adapters/http')
  * @return Formatted timestamp
  */
 function formatTimestamp(timestamp: Moment): string {
-    return timestamp.unix().toString()
+    return timestamp.valueOf().toString()
 }
 
 export class DownloadedImage {
@@ -45,9 +47,33 @@ export class DownloadedImage {
         const matchGroup = fileName.match(/(\d+)-(\d+)\.(\w+)/)! // TODO: What if there is an error?
         return new DownloadedImage(
             parseInt(matchGroup[1], 10),
-            moment.unix(parseInt(matchGroup[2], 10)),
+            moment(parseInt(matchGroup[2], 10)),
             matchGroup[3]
         )
+    }
+
+    static async constructNewestExistingImage(id: number): Promise<DownloadedImage | undefined> {
+        const regex = new RegExp(`^${id}-\\d+\\.\\w+$`)
+
+        return new Promise<DownloadedImage | undefined>((resolve, reject) => {
+            fs.readdir(IMAGE_DIR, (err, files) => {
+                if (err) {
+                    reject(err)
+                }
+                const matchingFiles = files.filter(file => Path.basename(file).match(regex))
+                const downloadedImages = matchingFiles.map(file =>
+                    DownloadedImage.constructFromPath(file)
+                )
+                const newestImage = maxBy(downloadedImages, image => image.timestamp.valueOf())
+                if (
+                    newestImage !== undefined &&
+                    moment.utc().diff(newestImage.timestamp, 'minutes') <= UPDATE_INTERVAL_MIN
+                ) {
+                    return resolve(newestImage)
+                }
+                return resolve()
+            })
+        })
     }
 
     /**
@@ -123,7 +149,7 @@ export async function downloadImage(
                             })
                         }
                     })
-                    writer.on('finish', () => {
+                    writer.once('finish', () => {
                         resolve(downloadedImage)
                     })
                 })
