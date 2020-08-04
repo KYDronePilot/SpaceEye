@@ -40,24 +40,6 @@ export class WallpaperManager {
     }
 
     /**
-     * Get the view config for a view ID.
-     * @param viewId - View ID to get config for
-     * @returns View config if one exists
-     */
-    private static async getViewConfig(viewId: number): Promise<SatelliteView | undefined> {
-        const configStore = SatelliteConfigStore.Instance
-        const config = await configStore.getConfig()
-        for (const satellite of config.satellites) {
-            for (const view of satellite.views) {
-                if (view.id === viewId) {
-                    return view
-                }
-            }
-        }
-        return undefined
-    }
-
-    /**
      * Get all non-internal monitors.
      * @returns All non-internal monitors
      */
@@ -91,21 +73,6 @@ export class WallpaperManager {
         return maxBy(images, image => image.timestamp.valueOf())!
     }
 
-    private static async imageIdToView(id: number): Promise<SatelliteView | undefined> {
-        const configStore = SatelliteConfigStore.Instance
-        const config = await configStore.getConfig()
-        for (const satellite of config.satellites) {
-            for (const view of satellite.views) {
-                for (const image of view.imageSources) {
-                    if (image.id === id) {
-                        return view
-                    }
-                }
-            }
-        }
-        return undefined
-    }
-
     /**
      * Download a wallpaper image.
      * @param image - Image to download
@@ -129,7 +96,7 @@ export class WallpaperManager {
      * @param viewId - ID of view to set wallpaper to
      */
     public static async setWallpaper(viewId: number): Promise<void> {
-        const viewConfig = await WallpaperManager.getViewConfig(viewId)
+        const viewConfig = await SatelliteConfigStore.Instance.getViewById(viewId)
         if (viewConfig === undefined) {
             throw new Error('Specified view ID does not exist')
         }
@@ -163,7 +130,9 @@ export class WallpaperManager {
         ) {
             return
         }
-        const view = await WallpaperManager.imageIdToView(newestDownloadedImage.imageId)
+        const view = await SatelliteConfigStore.Instance.getViewByImageId(
+            newestDownloadedImage.imageId
+        )
         if (view === undefined) {
             return
         }
