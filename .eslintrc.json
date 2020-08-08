@@ -16,7 +16,8 @@
         "plugin:@typescript-eslint/recommended",
         "prettier",
         "prettier/react",
-        "prettier/@typescript-eslint"
+        "prettier/@typescript-eslint",
+        "plugin:jsdoc/recommended"
     ],
     "globals": {
         "Atomics": "readonly",
@@ -31,7 +32,7 @@
         "sourceType": "module",
         "project": "./tsconfig.json"
     },
-    "plugins": ["react", "prettier", "@typescript-eslint", "simple-import-sort"],
+    "plugins": ["react", "prettier", "@typescript-eslint", "simple-import-sort", "jsdoc"],
     "rules": {
         "global-require": 0,
         "import/prefer-default-export": 0,
@@ -91,6 +92,8 @@
         "@typescript-eslint/explicit-member-accessibility": 0,
         "@typescript-eslint/no-angle-bracket-type-assertion": 0,
         "no-restricted-syntax": ["error", "ForInStatement", "LabeledStatement", "WithStatement"],
-        "simple-import-sort/sort": "error"
+        "simple-import-sort/sort": "error",
+        "jsdoc/require-param-type": 0,
+        "jsdoc/require-returns-type": 0
     }
 }

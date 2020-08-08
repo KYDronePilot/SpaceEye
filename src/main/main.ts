@@ -18,6 +18,7 @@ import {
     SetWallpaperIpcParams
 } from '../shared/IpcDefinitions'
 import { SatelliteConfigStore } from './satellite_config_store'
+import { Initiator } from './update_lock'
 import { WallpaperManager } from './wallpaper_manager'
 
 const HEARTBEAT_INTERVAL = 600000
@@ -84,7 +85,7 @@ const createWindow = async () => {
  * any necessary tasks.
  */
 async function heartbeat() {
-    await WallpaperManager.updateWallpaper()
+    await WallpaperManager.update(Initiator.heartbeatFunction)
 }
 
 app.on('ready', () => {
@@ -123,6 +124,7 @@ ipcMain.on(GET_SATELLITE_CONFIG_CHANNEL, async (event, params: IpcRequest<IpcPar
 })
 
 ipcMain.on(SET_WALLPAPER_CHANNEL, async (event, params: IpcRequest<SetWallpaperIpcParams>) => {
-    await WallpaperManager.setWallpaper(params.params.viewId)
+    WallpaperManager.changeWallpaper(params.params.viewId)
+    await WallpaperManager.update(Initiator.user)
     event.reply(params.responseChannel, {})
 })
