@@ -22,7 +22,7 @@ export interface ExampleIpcResponse {
 }
 
 export interface GetSatelliteConfigIpcResponse {
-    config: RootSatelliteConfig
+    config?: RootSatelliteConfig
 }
 
 export interface SetWallpaperIpcParams {

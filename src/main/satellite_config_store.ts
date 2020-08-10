@@ -4,6 +4,8 @@
 import Axios from 'axios'
 import moment, { Moment } from 'moment'
 
+import { RequestError } from './errors'
+
 // Time in seconds before invalidating the cached config.
 const INVALIDATION_TIMEOUT = 60
 
@@ -32,9 +34,16 @@ export class SatelliteConfigStore {
 
     /**
      * Download and cache a new config.
+     *
+     * @throws {RequestError} if there is an error while fetching the config
      */
     private async updateConfig() {
-        this.config = (await Axios.get<RootSatelliteConfig>(CONFIG_URL)).data
+        try {
+            this.config = (await Axios.get<RootSatelliteConfig>(CONFIG_URL)).data
+        } catch (error) {
+            // TODO: Log the error here
+            throw new RequestError('Error while fetching the satellite config')
+        }
         this.lastUpdated = moment.utc()
     }
 
@@ -43,6 +52,8 @@ export class SatelliteConfigStore {
      *
      * Checks the cache first. If the config doesn't exist there or is invalid,
      * a new config is downloaded.
+     *
+     * @throws {RequestError} if there is an error while fetching the config
      * @returns Satellite config
      */
     public async getConfig(): Promise<RootSatelliteConfig> {
@@ -58,7 +69,9 @@ export class SatelliteConfigStore {
 
     /**
      * Get a satellite config by its ID.
+     *
      * @param satelliteId - ID of the satellite
+     * @throws {RequestError} if there is an error while fetching the config
      * @returns Satellite config
      */
     public async getSatelliteById(satelliteId: number): Promise<Satellite | undefined> {
@@ -73,7 +86,9 @@ export class SatelliteConfigStore {
 
     /**
      * Get a satellite and satellite view config by a satellite view ID.
+     *
      * @param viewId - ID of the view
+     * @throws {RequestError} if there is an error while fetching the config
      * @returns Satellite and view config
      */
     private async getSatelliteAndViewById(
@@ -93,7 +108,9 @@ export class SatelliteConfigStore {
     /**
      * Get a satellite, satellite view, and image source config by an image
      * source ID.
+     *
      * @param imageId - ID of the image
+     * @throws {RequestError} if there is an error while fetching the config
      * @returns Satellite, view, and image config
      */
     private async getSatelliteViewAndImageById(
@@ -114,7 +131,9 @@ export class SatelliteConfigStore {
 
     /**
      * Get a satellite view config by its ID.
+     *
      * @param viewId - ID of the view
+     * @throws {RequestError} if there is an error while fetching the config
      * @returns View config
      */
     public async getViewById(viewId: number): Promise<SatelliteView | undefined> {
@@ -123,7 +142,9 @@ export class SatelliteConfigStore {
 
     /**
      * Get an image source config by its ID.
+     *
      * @param imageId - ID of the image
+     * @throws {RequestError} if there is an error while fetching the config
      * @returns Image config
      */
     public async getImageById(imageId: number): Promise<ImageSource | undefined> {
@@ -132,7 +153,9 @@ export class SatelliteConfigStore {
 
     /**
      * Get a satellite view config by an image source ID.
+     *
      * @param imageId - ID of the image
+     * @throws {RequestError} if there is an error while fetching the config
      * @returns View config containing the image
      */
     public async getViewByImageId(imageId: number): Promise<SatelliteView | undefined> {
@@ -141,7 +164,9 @@ export class SatelliteConfigStore {
 
     /**
      * Get a satellite config by an image source ID.
+     *
      * @param imageId - ID of the image
+     * @throws {RequestError} if there is an error while fetching the config
      * @returns Satellite config containing the image
      */
     public async getSatelliteByImageId(imageId: number): Promise<Satellite | undefined> {
@@ -150,7 +175,9 @@ export class SatelliteConfigStore {
 
     /**
      * Get a satellite config by a satellite view ID.
+     *
      * @param viewId - ID of the view
+     * @throws {RequestError} if there is an error while fetching the config
      * @returns Satellite config containing the view
      */
     public async getSatelliteByViewId(viewId: number): Promise<Satellite | undefined> {

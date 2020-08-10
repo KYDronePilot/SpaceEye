@@ -1,22 +1,18 @@
 import Axios from 'axios'
-// import { IDesktopWallpaper } from 'earth_from_space_live_windows_node_api'
-import { app, BrowserWindow, ipcMain, screen, systemPreferences } from 'electron'
+import { app, BrowserWindow, ipcMain, systemPreferences } from 'electron'
 import * as path from 'path'
 import * as url from 'url'
 
 import {
     CLOSE_APPLICATION_CHANNEL,
-    CloseApplicationIpcParams,
-    EXAMPLE_CHANNEL,
-    ExampleIpcParams,
     GET_SATELLITE_CONFIG_CHANNEL,
     GetSatelliteConfigIpcResponse,
     IpcParams,
     IpcRequest,
-    IpcResponse,
     SET_WALLPAPER_CHANNEL,
     SetWallpaperIpcParams
 } from '../shared/IpcDefinitions'
+import { AppConfigStore } from './app_config_store'
 import { SatelliteConfigStore } from './satellite_config_store'
 import { Initiator } from './update_lock'
 import { WallpaperManager } from './wallpaper_manager'
@@ -25,6 +21,8 @@ const HEARTBEAT_INTERVAL = 600000
 let heartbeatHandle: number
 
 let win: BrowserWindow | null
+
+Axios.defaults.adapter = require('axios/lib/adapters/http')
 
 const installExtensions = async () => {
     const installer = require('electron-devtools-installer')
@@ -117,14 +115,30 @@ ipcMain.on(CLOSE_APPLICATION_CHANNEL, () => {
 
 ipcMain.on(GET_SATELLITE_CONFIG_CHANNEL, async (event, params: IpcRequest<IpcParams>) => {
     const configStore = SatelliteConfigStore.Instance
-    const response: GetSatelliteConfigIpcResponse = {
-        config: await configStore.getConfig()
+    try {
+        const response: GetSatelliteConfigIpcResponse = {
+            config: await configStore.getConfig()
+        }
+        event.reply(params.responseChannel, response)
+    } catch (error) {
+        const response: GetSatelliteConfigIpcResponse = {
+            config: undefined
+        }
+        event.reply(params.responseChannel, response)
     }
-    event.reply(params.responseChannel, response)
 })
 
 ipcMain.on(SET_WALLPAPER_CHANNEL, async (event, params: IpcRequest<SetWallpaperIpcParams>) => {
-    WallpaperManager.changeWallpaper(params.params.viewId)
+    AppConfigStore.currentViewId = params.params.viewId
     await WallpaperManager.update(Initiator.user)
     event.reply(params.responseChannel, {})
 })
+
+if (process.platform === 'darwin') {
+    systemPreferences.subscribeWorkspaceNotification(
+        'NSWorkspaceActiveSpaceDidChangeNotification',
+        async () => {
+            await WallpaperManager.update(Initiator.displayChangeWatcher)
+        }
+    )
+}

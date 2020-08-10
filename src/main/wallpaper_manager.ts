@@ -3,20 +3,26 @@
  */
 
 // eslint-disable-next-line max-classes-per-file
-import Axios, { CancelToken, CancelTokenSource } from 'axios'
 import { Display, screen } from 'electron'
-import { maxBy, update } from 'lodash'
-import moment, { Moment } from 'moment'
-import { basename, dirname } from 'path'
+import { maxBy } from 'lodash'
+import moment from 'moment'
 
-import { AppConfigStore } from './config_manager'
-import { downloadImage, RequestCancelledError } from './image_download_manager'
+import { AppConfigStore } from './app_config_store'
+import { UPDATE_INTERVAL_MIN } from './consts'
+import { DownloadedImage } from './downloaded_image'
+import {
+    LockInvalidatedError,
+    MonitorConfigChangedError,
+    RequestError,
+    ViewConfigAccessError,
+    ViewNotSetError
+} from './errors'
+import { downloadImage } from './image_downloader'
 import { OSWallpaperInterface } from './os_wallpaper_interface'
 import { MacOSWallpaperInterface } from './os_wallpaper_interface/macos'
 import { WindowsWallpaperInterface } from './os_wallpaper_interface/windows'
 import { SatelliteConfigStore } from './satellite_config_store'
 import { Initiator, UpdateLock } from './update_lock'
-import { DownloadedImage, IMAGE_DIR } from './wallpaper_requester'
 
 let wallpaperInterface: OSWallpaperInterface
 if (process.platform === 'darwin') {
@@ -24,10 +30,6 @@ if (process.platform === 'darwin') {
 } else {
     wallpaperInterface = new WindowsWallpaperInterface()
 }
-const DOWNLOAD_TIMEOUT = 300000
-export const UPDATE_INTERVAL_MIN = 20
-export class LockAcquisitionRejectedError extends Error {}
-export class LockCancelledError extends Error {}
 
 export class WallpaperManager {
     private static instance?: WallpaperManager
@@ -58,6 +60,7 @@ export class WallpaperManager {
      *
      * @param monitor - Monitor in question
      * @param sources - Possible image sources
+     * @returns Selected image
      */
     private static selectImageSourceForMonitor(
         monitor: Display,
@@ -84,125 +87,57 @@ export class WallpaperManager {
         return maxBy(possibleImages, image => image.dimensions[0] * image.dimensions[1])!
     }
 
-    // /**
-    //  * Get the current satellite view being displayed.
-    //  */
-    // private static async getNewestDownloadedImage(): Promise<DownloadedImage | undefined> {
-    //     const monitors = WallpaperManager.getMonitors()
-    //     const imagePaths = monitors.map((monitor, i) => wallpaperInterface.getWallpaper(monitor, i))
-    //     const ourImagePaths = imagePaths.filter(path => dirname(path) === IMAGE_DIR)
-    //     const images = ourImagePaths.map(path => DownloadedImage.constructFromPath(path))
-    //     if (images.length === 0) {
-    //         return undefined
-    //     }
-    //     return maxBy(images, image => image.timestamp.valueOf())!
-    // }
-
-    // /**
-    //  * Download a wallpaper image.
-    //  *
-    //  * @param image - Image to download
-    //  * @returns
-    //  */
-    // private static async downloadImage(image: ImageSource): Promise<DownloadedImage | undefined> {
-    //     const downloadManager = ImageDownloadManager.Instance
-    //     try {
-    //         return await downloadManager.downloadImage(image, -1, DOWNLOAD_TIMEOUT)
-    //     } catch (error) {
-    //         if (error instanceof RequestCancelledError) {
-    //             // TODO: Handle timeout errors
-    //             console.log('We were cancelled')
-    //             return undefined
-    //         }
-    //         throw error
-    //     }
-    // }
-
-    // /**
-    //  * Set the wallpaper to a particular view ID
-    //  *
-    //  * @param viewId - ID of view to set wallpaper to
-    //  */
-    // public static async setWallpaper(viewId: number): Promise<void> {
-    //     const viewConfig = await SatelliteConfigStore.Instance.getViewById(viewId)
-    //     if (viewConfig === undefined) {
-    //         throw new Error('Specified view ID does not exist')
-    //     }
-    //     const monitors = WallpaperManager.getMonitors()
-    //     const imageSources = monitors.map(monitor =>
-    //         WallpaperManager.selectImageSourceForMonitor(monitor, viewConfig.imageSources)
-    //     )
-    //     const biggestImageSource = maxBy(
-    //         imageSources,
-    //         source => source.dimensions[0] * source.dimensions[1]
-    //     )
-    //     // If that image already exists, no need to download it
-    //     let downloadedImage: DownloadedImage | undefined
-    //     downloadedImage = await DownloadedImage.getNewestDownloadedImage(biggestImageSource!.id)
-    //     if (
-    //         downloadedImage === undefined ||
-    //         moment.utc().diff(downloadedImage.timestamp, 'minutes') > UPDATE_INTERVAL_MIN
-    //     ) {
-    //         downloadedImage = await WallpaperManager.downloadImage(biggestImageSource!)
-    //     }
-    //     monitors.forEach((monitor, i) => {
-    //         wallpaperInterface.setWallpaper(monitor, i, downloadedImage!.getPath())
-    //     })
-    // }
-
     /**
-     * Change the wallpaper to a different view.
+     * Check if the monitor configuration has changed.
      *
-     * @param viewId - ID of the new view
+     * @param oldMonitors - Old configuration of monitors
+     * @param newMonitors - New configuration of monitors
+     * @returns Whether the config has changed
      */
-    public static changeWallpaper(viewId: number): void {
-        AppConfigStore.currentViewId = viewId
+    private static haveMonitorsChanged(oldMonitors: Display[], newMonitors: Display[]): boolean {
+        // TODO: Check monitor sizes too
+        return oldMonitors.length !== newMonitors.length
     }
-
-    // /**
-    //  * Check if wallpaper needs to be updated and do so if necessary.
-    //  */
-    // public static async updateWallpaper(): Promise<void> {
-    //     const newestDownloadedImage = await WallpaperManager.getNewestDownloadedImage()
-    //     if (
-    //         newestDownloadedImage === undefined ||
-    //         !(moment.utc().diff(newestDownloadedImage.timestamp, 'minutes') > UPDATE_INTERVAL_MIN)
-    //     ) {
-    //         return
-    //     }
-    //     const view = await SatelliteConfigStore.Instance.getViewByImageId(
-    //         newestDownloadedImage.imageId
-    //     )
-    //     if (view === undefined) {
-    //         return
-    //     }
-    //     await WallpaperManager.setWallpaper(view.id)
-    // }
 
     /**
      * Non-error catching pipeline to update the wallpaper.
      *
      * @param lock - Acquired update pipeline lock
-     * @throws Unknown errors
-     * @throws LockCancelledError if lock is cancelled while updating
+     * @throws {ViewNotSetError} if view not set in config when running
+     * @throws {ViewConfigAccessError} if there's an issue while obtaining the
+     * current view config
+     * @throws {LockInvalidatedError} if lock is invalidated while updating
+     * @throws {RequestCancelledError} if download request was cancelled
+     * @throws {FileDoesNotExistError} if image not downloaded properly
+     * @throws {MonitorConfigChangedError} if the monitor config changed while
+     * running update tasks
+     * @throws {Error} Unknown errors
      */
-    public static async updatePipeline(lock: UpdateLock): Promise<undefined> {
+    public static async updatePipeline(lock: UpdateLock): Promise<void> {
         const viewId = AppConfigStore.currentViewId
         // If no view ID set, nothing to update
-        // TODO: Should this check be done here?
         if (viewId === undefined) {
-            return
+            throw new ViewNotSetError()
         }
         // Fetch the view config
-        const viewConfig = await SatelliteConfigStore.Instance.getViewById(viewId)
-        // If view ID does not correspond to a config, nothing to update
-        // TODO: Should the check be done here?
-        if (viewConfig === undefined) {
-            return
+        let viewConfig: SatelliteView | undefined
+        try {
+            viewConfig = await SatelliteConfigStore.Instance.getViewById(viewId)
+        } catch (error) {
+            if (error instanceof RequestError) {
+                throw new ViewConfigAccessError(
+                    `Error while downloading view config for ID "${viewId}"`
+                )
+            }
+            throw error
         }
         // Make sure we still have the lock
-        if (!lock.isStillValid()) {
-            throw new LockCancelledError()
+        if (!lock.isStillHeld()) {
+            throw new LockInvalidatedError()
+        }
+        // If no config for ID, we can't proceed
+        if (viewConfig === undefined) {
+            throw new ViewConfigAccessError(`No view config matching ID "${viewId}"`)
         }
         // Determine which image we need
         const monitors = WallpaperManager.getMonitors()
@@ -210,24 +145,24 @@ export class WallpaperManager {
         // Get the newest downloaded image for the config
         let imageToSet = await DownloadedImage.getNewestDownloadedImage(imageConfig.id)
         // Make sure we still have the lock
-        if (!lock.isStillValid()) {
-            throw new LockCancelledError()
+        if (!lock.isStillHeld()) {
+            throw new LockInvalidatedError()
         }
         // If there isn't a downloaded image or it's too old, download a new one
         if (
             imageToSet === undefined ||
             moment.utc().diff(imageToSet.timestamp, 'minutes') > UPDATE_INTERVAL_MIN
         ) {
-            imageToSet = await downloadImage(imageConfig, lock)
+            imageToSet = await downloadImage(imageConfig, lock.generateCancelToken(), lock)
             // Make sure we still have the lock
-            if (!lock.isStillValid()) {
-                throw new LockCancelledError()
+            if (!lock.isStillHeld()) {
+                throw new LockInvalidatedError()
             }
-            // If no image downloaded, return
-            // TODO: More checking needs to be done here
-            if (imageToSet === undefined) {
-                return
-            }
+        }
+        // Make sure the monitor config hasn't changed
+        const newMonitors = WallpaperManager.getMonitors()
+        if (WallpaperManager.haveMonitorsChanged(monitors, newMonitors)) {
+            throw new MonitorConfigChangedError()
         }
         // Get monitors that don't already have the image set
         const monitorsToSet = monitors.filter(
@@ -255,14 +190,15 @@ export class WallpaperManager {
             // Try to run the pipeline and release the lock when done
             await WallpaperManager.updatePipeline(lock)
             lock.release()
+            // Delete old images
+            await DownloadedImage.cleanupOldImages()
             return true
-        } catch (error) {
-            // If the lock was cancelled, we weren't successful
-            if (error instanceof LockCancelledError) {
-                return false
-            }
-            // If an unknown error, propagate to caller
-            throw error
+        } catch {
+            lock.invalidate()
+            // If there was an error, we couldn't complete successfully
+            // TODO: Log the error and let the user know if it is worth
+            //  knowing
+            return false
         }
     }
 }

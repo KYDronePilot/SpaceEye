@@ -1,8 +1,8 @@
-import { CancelTokenSource } from 'axios'
+import Axios, { CancelTokenSource } from 'axios'
 import { clearTimeout, setTimeout } from 'timers'
 
-// Max time the lock can be held (5 minutes)
-const LOCK_TIMEOUT = 5 * 60 * 1000
+import { LOCK_TIMEOUT } from './consts'
+import { LockNotHeldError } from './errors'
 
 /**
  * The lock data given back to the requester.
@@ -47,11 +47,11 @@ export class UpdateLock {
     private lockTimeout: NodeJS.Timeout
 
     // Key-mapped download cancel tokens for a lock
-    public downloadCancelTokens: { [key: number]: CancelTokenSource }
+    private downloadCancelTokens: Set<CancelTokenSource>
 
     private constructor(initiator: Initiator) {
         this.initiator = initiator
-        this.downloadCancelTokens = {}
+        this.downloadCancelTokens = new Set()
         this.lockTimeout = setTimeout(() => {
             this.invalidate()
         }, LOCK_TIMEOUT)
@@ -103,20 +103,42 @@ export class UpdateLock {
     /**
      * Invalidate the lock.
      */
-    private invalidate() {
-        clearTimeout(this.lockTimeout)
-        // Cancel any download tokens
-        for (const token of Object.values(this.downloadCancelTokens)) {
-            token.cancel()
-        }
+    public invalidate(): void {
+        // Cancel any download tokens and release
+        this.downloadCancelTokens.forEach(token => token.cancel())
+        this.release()
     }
 
     /**
-     * Check if the lock is still valid or if it has been superseded.
+     * Generate a new Axios download cancel token.
      *
-     * @returns Whether the lock is still valid
+     * @throws {LockNotHeldError} if lock is no longer held
+     * @returns New cancel token
      */
-    public isStillValid(): boolean {
+    public generateCancelToken(): CancelTokenSource {
+        if (!this.isStillHeld()) {
+            throw new LockNotHeldError()
+        }
+        const token = Axios.CancelToken.source()
+        this.downloadCancelTokens.add(token)
+        return token
+    }
+
+    /**
+     * Remove reference to a token.
+     *
+     * @param token - Token to remove
+     */
+    public destroyCancelToken(token: CancelTokenSource): void {
+        this.downloadCancelTokens.delete(token)
+    }
+
+    /**
+     * Check if the update pipeline lock is still held.
+     *
+     * @returns Whether the lock is still held
+     */
+    public isStillHeld(): boolean {
         return this === UpdateLock.activeLock
     }
 

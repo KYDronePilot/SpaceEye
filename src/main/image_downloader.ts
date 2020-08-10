@@ -3,11 +3,16 @@ import Axios, { CancelTokenSource } from 'axios'
 import Fs from 'fs'
 import moment from 'moment'
 import { Readable } from 'stream'
-import { clearTimeout, setTimeout } from 'timers'
+import { promisify } from 'util'
 
+import { DownloadedImage } from './downloaded_image'
+import { FileDoesNotExistError, RequestCancelledError } from './errors'
 import { UpdateLock } from './update_lock'
-import { DownloadedImage } from './wallpaper_requester'
 
+const existsAsync = promisify(Fs.exists)
+const unlinkAsync = promisify(Fs.unlink)
+
+// eslint-disable-next-line jsdoc/require-returns
 /**
  * Download a file as a cancellable stream.
  *
@@ -25,22 +30,17 @@ async function downloadStream(
             responseType: 'stream',
             cancelToken: cancelToken.token
         })
-            .then(({ data, headers }) => {
+            .then(({ data }) => {
                 const writer = Fs.createWriteStream(destPath)
                 const dataStream = data as Readable
                 dataStream.pipe(writer)
-                cancelToken.token.promise.then(cancellation => {
+                cancelToken.token.promise.then(async cancellation => {
                     writer.destroy()
                     // Delete partially downloaded file
-                    Fs.exists(destPath, exists => {
-                        if (exists) {
-                            Fs.unlink(destPath, () => {
-                                reject(cancellation)
-                            })
-                        } else {
-                            reject(cancellation)
-                        }
-                    })
+                    if (await existsAsync(destPath)) {
+                        await unlinkAsync(destPath)
+                        reject(cancellation)
+                    }
                 })
                 writer.on('close', () => {
                     resolve()
@@ -51,8 +51,6 @@ async function downloadStream(
             })
     })
 }
-
-export class RequestCancelledError extends Error {}
 
 /**
  * Download an image, canceling any other downloads with the same lock key
@@ -65,39 +63,24 @@ export class RequestCancelledError extends Error {}
  * in parallel.
  *
  * @param image - Image to download
+ * @param cancelToken - Cancel token for this download
  * @param lock - Active lock on the download pipeline
  * @throws {RequestCancelledError} If request is cancelled
  * @returns Downloaded image information
  */
 export async function downloadImage(
     image: ImageSource,
+    cancelToken: CancelTokenSource,
     lock: UpdateLock
 ): Promise<DownloadedImage> {
-    // TODO: This first part may be unnecessary...
-    // TODO: If it is necessary, change to use functions rather than accessing
-    //  `downloadCancelTokens` directly
-    // Check if there is already a download in progress for the image
-    if (image.id in lock.downloadCancelTokens) {
-        // If so, cancel it
-        lock.downloadCancelTokens[image.id].cancel()
-    }
-    // Replace with our token
-    // eslint-disable-next-line no-param-reassign
-    lock.downloadCancelTokens[image.id] = Axios.CancelToken.source()
     // FIXME: Don't leave as hardcoded jpg
     const downloadedImage = new DownloadedImage(image.id, moment.utc(), 'jpg')
 
     try {
-        await downloadStream(
-            image.url,
-            downloadedImage.getPath(),
-            lock.downloadCancelTokens[image.id]
-        )
-        // eslint-disable-next-line no-param-reassign
-        delete lock.downloadCancelTokens[image.id]
+        await downloadStream(image.url, downloadedImage.getPath(), cancelToken)
+        lock.destroyCancelToken(cancelToken)
     } catch (error) {
-        // eslint-disable-next-line no-param-reassign
-        delete lock.downloadCancelTokens[image.id]
+        lock.destroyCancelToken(cancelToken)
         // Throw special error if request is cancelled
         if (Axios.isCancel(error)) {
             throw new RequestCancelledError()
@@ -105,5 +88,12 @@ export async function downloadImage(
         // Rethrow if not
         throw error
     }
-    return downloadedImage
+    // Sanity check to make sure the image actually exists
+    if (await existsAsync(downloadedImage.getPath())) {
+        return downloadedImage
+    }
+    // Else, throw an error
+    throw new FileDoesNotExistError(
+        `Downloaded image "${downloadedImage.getPath()}" does not exist`
+    )
 }
