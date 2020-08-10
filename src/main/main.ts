@@ -1,5 +1,5 @@
 import Axios from 'axios'
-import { app, BrowserWindow, ipcMain, systemPreferences } from 'electron'
+import { app, BrowserWindow, ipcMain, powerMonitor, screen, systemPreferences } from 'electron'
 import * as path from 'path'
 import * as url from 'url'
 
@@ -89,6 +89,33 @@ async function heartbeat() {
 app.on('ready', () => {
     createWindow()
     heartbeatHandle = setInterval(heartbeat, HEARTBEAT_INTERVAL)
+
+    // Display config change triggers update
+    screen.on('display-added', async () => {
+        await WallpaperManager.update(Initiator.displayChangeWatcher)
+    })
+
+    screen.on('display-removed', async () => {
+        await WallpaperManager.update(Initiator.displayChangeWatcher)
+    })
+
+    screen.on('display-metrics-changed', async () => {
+        await WallpaperManager.update(Initiator.displayChangeWatcher)
+    })
+
+    // Update when machine is unlocked/resumed
+    // TODO: Need a new initiator
+    if (process.platform === 'darwin' || process.platform === 'win32') {
+        powerMonitor.on('unlock-screen', async () => {
+            await WallpaperManager.update(Initiator.displayChangeWatcher)
+        })
+    }
+
+    if (process.platform === 'linux' || process.platform === 'win32') {
+        powerMonitor.on('resume', async () => {
+            await WallpaperManager.update(Initiator.displayChangeWatcher)
+        })
+    }
 })
 
 app.on('will-quit', () => {
