@@ -19,7 +19,8 @@ jobs:
         with:
           node-version: 13
 
-      - name: Build app
-        uses: samuelmeuli/action-electron-builder@v1
-        with:
-          github_token: ${{ secrets.github_token }}
+      - run: npm install
+      - run: npm run dist
+
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v2
