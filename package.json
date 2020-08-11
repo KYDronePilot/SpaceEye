@@ -1,7 +1,7 @@
 {
-    "name": "electron-react-typescript",
+    "name": "space-eye",
     "version": "0.0.7",
-    "description": "",
+    "description": "Live satellite imagery for your desktop",
     "main": "./dist/main.js",
     "scripts": {
         "build-main": "cross-env NODE_ENV=production webpack --config webpack.main.prod.config.js",
@@ -44,27 +44,6 @@
         "moduleNameMapper": {
             "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/mocks/fileMock.js",
             "\\.(s?css|sass)$": "<rootDir>/mocks/styleMock.js"
-        }
-    },
-    "build": {
-        "productName": "ProductName",
-        "appId": "org.your.productname",
-        "mac": {
-            "category": "your.app.category.type"
-        },
-        "directories": {
-            "output": "release"
-        },
-        "files": [
-            "dist/",
-            "node_modules/",
-            "package.json"
-        ],
-        "linux": {
-            "target": "deb"
-        },
-        "win": {
-            "target": "nsis"
         }
     },
     "repository": {

@@ -1,0 +1,22 @@
+productName: SpaceEye
+appId: com.kydronepilot.spaceeye
+directories:
+  output: release
+npmRebuild: true
+files:
+  - dist/
+  - node_modules/
+  - package.json
+mac:
+  category: public.app-category.utilities
+  target:
+    - target: zip
+      arch: x64
+  darkModeSupport: true
+  type: distribution
+linux:
+  target: deb
+win:
+  target:
+    - target: portable
+      arch: x64

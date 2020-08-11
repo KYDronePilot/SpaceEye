@@ -7,5 +7,11 @@
     "cSpell.words": [
         "Scrollable",
         "simplebar"
-    ]
+    ],
+    "yaml.schemas": {
+        "https://json.schemastore.org/electron-builder": [
+            "electron-builder.yaml",
+            "electron-builder.yml"
+        ]
+    }
 }
