@@ -29,4 +29,6 @@ jobs:
       - uses: actions/upload-artifact@v2
         with:
           name: SpaceEye-${{ matrix.os }}
-          path: release/*.zip
+          path: |
+            release/*.zip
+            release/*.exe
