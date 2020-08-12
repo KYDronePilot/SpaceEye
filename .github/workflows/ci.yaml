@@ -14,14 +14,6 @@ jobs:
       - name: Check out Git repository
         uses: actions/checkout@v1
 
-      - name: Cache NPM dependencies
-        uses: actions/cache@v2
-        with:
-          path: ~/.npm
-          key: ${{ runner.OS }}-npm-cache-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.OS }}-npm-cache-
-
       - name: Install Node.js, NPM and Yarn
         uses: actions/setup-node@v1
         with:
@@ -51,8 +43,6 @@ jobs:
         env:
           API_KEY_ID: ${{ secrets.api_key_id }}
           API_KEY_ISSUER_ID: ${{ secrets.api_key_issuer_id }}
-
-      - run: ls release
 
       - uses: actions/upload-artifact@v2
         with:
