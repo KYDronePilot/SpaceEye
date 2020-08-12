@@ -48,17 +48,17 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+ssh://git@github.com:Robinfr/electron-react-typescript.git"
+        "url": "git+ssh://git@github.com:KYDronePilot/earth_from_space_live.git"
     },
     "author": {
-        "name": "Your name",
-        "email": "Your email"
+        "name": "Michael Galliers",
+        "email": "kydronepilotdev@gmail.com"
     },
-    "license": "SEE LICENSE",
+    "license": "MIT",
     "bugs": {
-        "url": "https://github.com/Robinfr/electron-react-typescript/issues"
+        "url": "https://github.com/KYDronePilot/earth_from_space_live/issues"
     },
-    "homepage": "https://github.com/Robinfr/electron-react-typescript",
+    "homepage": "https://github.com/KYDronePilot/earth_from_space_live",
     "devDependencies": {
         "@babel/core": "^7.4.5",
         "@babel/plugin-proposal-class-properties": "^7.4.4",
