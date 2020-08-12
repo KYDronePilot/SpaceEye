@@ -14,15 +14,33 @@ jobs:
       - name: Check out Git repository
         uses: actions/checkout@v1
 
+      - name: Cache NPM dependencies
+        uses: actions/cache@v2
+        with:
+          path: ~/.npm
+          key: ${{ runner.OS }}-npm-cache-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.OS }}-npm-cache-
+
       - name: Install Node.js, NPM and Yarn
         uses: actions/setup-node@v1
         with:
           node-version: 13
 
+      # If macOS, install Mac Node API
+      - run: npm install git+https://github.com/KYDronePilot/earth_from_space_live_mac_node_api.git
+        if: startsWith(matrix.os, 'macos')
+
+      # If Windows, install Windows Node API
+      - run: npm install git+https://github.com/KYDronePilot/earth_from_space_live_windows_node_api.git
+        if: startsWith(matrix.os, 'windows')
+
       - name: Build
         uses: samuelmeuli/action-electron-builder@v1
         with:
           github_token: ${{ secrets.github_token }}
+          mac_certs: ${{ secrets.mac_certs }}
+          mac_certs_password: ${{ secrets.mac_certs_password }}
 
       - run: ls release
 
@@ -30,5 +48,5 @@ jobs:
         with:
           name: SpaceEye-${{ matrix.os }}
           path: |
-            release/*.zip
+            release/*.dmg
             release/*.exe

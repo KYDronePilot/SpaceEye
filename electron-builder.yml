@@ -9,13 +9,12 @@ files:
   - package.json
 mac:
   category: public.app-category.utilities
+  hardenedRuntime: true
   target:
-    - target: zip
+    - target: dmg
       arch: x64
   darkModeSupport: true
   type: distribution
-linux:
-  target: deb
 win:
   target:
     - target: nsis
