@@ -7,6 +7,7 @@ files:
   - dist/
   - node_modules/
   - package.json
+afterSign: electron-builder-notarize
 mac:
   category: public.app-category.utilities
   hardenedRuntime: true

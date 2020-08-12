@@ -85,6 +85,7 @@
         "css-loader": "^2.1.1",
         "electron": "^9.0.0",
         "electron-builder": "^22.8.0",
+        "electron-builder-notarize": "^1.2.0",
         "electron-devtools-installer": "^3.0.0",
         "eslint": "^6.5.1",
         "eslint-config-airbnb": "^18.0.1",
