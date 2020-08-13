@@ -1,5 +1,6 @@
 import Axios from 'axios'
 import { app, BrowserWindow, ipcMain, powerMonitor, screen, systemPreferences } from 'electron'
+import { menubar } from 'menubar'
 import * as path from 'path'
 import * as url from 'url'
 
@@ -20,26 +21,72 @@ import { WallpaperManager } from './wallpaper_manager'
 const HEARTBEAT_INTERVAL = 600000
 let heartbeatHandle: number
 
-let win: BrowserWindow | null
+// let win: BrowserWindow | null
 
 Axios.defaults.adapter = require('axios/lib/adapters/http')
 
-const installExtensions = async () => {
-    const installer = require('electron-devtools-installer')
-    const forceDownload = !!process.env.UPGRADE_EXTENSIONS
-    const extensions = ['REACT_DEVELOPER_TOOLS', 'REDUX_DEVTOOLS']
+// const installExtensions = async () => {
+//     const installer = require('electron-devtools-installer')
+//     const forceDownload = !!process.env.UPGRADE_EXTENSIONS
+//     const extensions = ['REACT_DEVELOPER_TOOLS', 'REDUX_DEVTOOLS']
 
-    return Promise.all(
-        extensions.map(name => installer.default(installer[name], forceDownload))
-    ).catch(console.log) // eslint-disable-line no-console
+//     return Promise.all([].map(name => installer.default(installer[name], forceDownload)))
+// }
+
+// const createWindow = async () => {
+//     // if (process.env.NODE_ENV !== 'production') {
+//     //     await installExtensions()
+//     // }
+
+//     win = new BrowserWindow({
+//         width: 800,
+//         height: 600,
+//         darkTheme: true,
+//         frame: false,
+//         webPreferences: {
+//             nodeIntegration: true
+//         },
+//         backgroundColor: '#222222'
+//     })
+//     if (process.platform === 'darwin') {
+//         win.setWindowButtonVisibility(false)
+//     }
+
+//     if (process.env.NODE_ENV !== 'production') {
+//         process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = '1' // eslint-disable-line require-atomic-updates
+//         win.loadURL(`http://localhost:2003`)
+//     } else {
+//         win.loadURL(
+//             url.format({
+//                 pathname: path.join(__dirname, 'index.html'),
+//                 protocol: 'file:',
+//                 slashes: true
+//             })
+//         )
+//     }
+
+//     if (process.env.NODE_ENV !== 'production') {
+//         // Open DevTools, see https://github.com/electron/electron/issues/12438 for why we wait for dom-ready
+//         win.webContents.once('dom-ready', () => {
+//             win!.webContents.openDevTools({ mode: 'detach' })
+//         })
+//     }
+
+//     win.on('closed', () => {
+//         win = null
+//     })
+// }
+
+/**
+ * Heartbeat function which runs every `HEARTBEAT_INTERVAL` seconds to perform
+ * any necessary tasks.
+ */
+async function heartbeat() {
+    await WallpaperManager.update(Initiator.heartbeatFunction)
 }
 
-const createWindow = async () => {
-    if (process.env.NODE_ENV !== 'production') {
-        await installExtensions()
-    }
-
-    win = new BrowserWindow({
+const mb = menubar({
+    browserWindow: {
         width: 800,
         height: 600,
         darkTheme: true,
@@ -48,16 +95,19 @@ const createWindow = async () => {
             nodeIntegration: true
         },
         backgroundColor: '#222222'
-    })
+    }
+})
+
+mb.on('after-create-window', () => {
     if (process.platform === 'darwin') {
-        win.setWindowButtonVisibility(false)
+        mb.window!.setWindowButtonVisibility(false)
     }
 
     if (process.env.NODE_ENV !== 'production') {
         process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = '1' // eslint-disable-line require-atomic-updates
-        win.loadURL(`http://localhost:2003`)
+        mb.window!.loadURL(`http://localhost:2003`)
     } else {
-        win.loadURL(
+        mb.window!.loadURL(
             url.format({
                 pathname: path.join(__dirname, 'index.html'),
                 protocol: 'file:',
@@ -68,26 +118,16 @@ const createWindow = async () => {
 
     if (process.env.NODE_ENV !== 'production') {
         // Open DevTools, see https://github.com/electron/electron/issues/12438 for why we wait for dom-ready
-        win.webContents.once('dom-ready', () => {
-            win!.webContents.openDevTools({ mode: 'detach' })
+        mb.window!.webContents.once('dom-ready', () => {
+            mb.window!.webContents.openDevTools({ mode: 'detach' })
         })
     }
+})
 
-    win.on('closed', () => {
-        win = null
-    })
-}
+// mb.on('ready', () => {})
 
-/**
- * Heartbeat function which runs every `HEARTBEAT_INTERVAL` seconds to perform
- * any necessary tasks.
- */
-async function heartbeat() {
-    await WallpaperManager.update(Initiator.heartbeatFunction)
-}
-
-app.on('ready', () => {
-    createWindow()
+mb.on('ready', () => {
+    // createWindow()
     heartbeatHandle = setInterval(heartbeat, HEARTBEAT_INTERVAL)
 
     // Display config change triggers update
@@ -128,17 +168,17 @@ app.on('window-all-closed', () => {
     }
 })
 
-app.on('activate', () => {
-    if (win === null) {
-        createWindow()
-    }
-})
+// app.on('activate', () => {
+//     if (win === null) {
+//         createWindow()
+//     }
+// })
 
-ipcMain.on(CLOSE_APPLICATION_CHANNEL, () => {
-    if (win !== undefined) {
-        win!.close()
-    }
-})
+// ipcMain.on(CLOSE_APPLICATION_CHANNEL, () => {
+//     if (win !== undefined) {
+//         win!.close()
+//     }
+// })
 
 ipcMain.on(GET_SATELLITE_CONFIG_CHANNEL, async (event, params: IpcRequest<IpcParams>) => {
     const configStore = SatelliteConfigStore.Instance
