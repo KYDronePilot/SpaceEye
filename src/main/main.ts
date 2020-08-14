@@ -43,15 +43,16 @@ const mb = menubar({
     index,
     icon: path.join(__dirname, 'assets', 'IconTemplate.png'),
     browserWindow: {
-        width: 800,
-        height: 600,
+        width: 550,
+        height: 640,
         darkTheme: true,
         frame: false,
         webPreferences: {
             nodeIntegration: true
         },
         backgroundColor: '#222222'
-    }
+    },
+    windowPosition: 'trayRight'
 })
 
 mb.on('after-create-window', () => {
