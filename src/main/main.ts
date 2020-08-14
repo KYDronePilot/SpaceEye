@@ -41,6 +41,7 @@ const index = url.format({
 
 const mb = menubar({
     index,
+    icon: path.join(__dirname, 'assets', 'IconTemplate.png'),
     browserWindow: {
         width: 800,
         height: 600,

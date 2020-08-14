@@ -81,6 +81,7 @@
         "@typescript-eslint/eslint-plugin": "^3.5.0",
         "@typescript-eslint/parser": "^3.5.0",
         "babel-loader": "^8.0.6",
+        "copy-webpack-plugin": "^6.0.3",
         "cross-env": "^5.1.3",
         "css-loader": "^2.1.1",
         "electron": "^9.0.0",
