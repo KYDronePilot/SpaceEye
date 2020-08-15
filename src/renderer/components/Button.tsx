@@ -1,15 +1,15 @@
 import * as React from 'react'
 import styled from 'styled-components'
 
-enum ButtonType {
-    Primary,
-    Secondary,
-    Destructive
-}
+// enum ButtonType {
+//     Primary,
+//     Secondary,
+//     Destructive
+// }
 
-interface ButtonContainerProps {
-    readonly type: ButtonType
-}
+// interface ButtonContainerProps {
+//     children: React.ReactNode
+// }
 
 const ButtonContainer = styled.button`
     border: none;
@@ -26,10 +26,13 @@ const ButtonContainer = styled.button`
 `
 
 interface ButtonProps {
-    type: ButtonType
     onClick: () => void
+    children: React.ReactNode
 }
 
-const Button = () => <ButtonContainer>Set Background</ButtonContainer>
+const Button: React.FC<ButtonProps> = props => {
+    const { children, onClick } = props
+    return <ButtonContainer onClick={onClick}>{children}</ButtonContainer>
+}
 
 export default Button

@@ -1,5 +1,6 @@
 import * as React from 'react'
 import styled from 'styled-components'
+
 import Button from './Button'
 
 const ToolbarContainer = styled.div`
@@ -16,10 +17,6 @@ const ToolbarContainer = styled.div`
     justify-content: flex-end;
 `
 
-const Toolbar = () => (
-    <ToolbarContainer>
-        <Button />
-    </ToolbarContainer>
-)
+const Toolbar = () => <ToolbarContainer>{/* <Button /> */}</ToolbarContainer>
 
 export default Toolbar

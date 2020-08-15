@@ -1,7 +1,8 @@
 import * as React from 'react'
+import { Link } from 'react-router-dom'
 import styled from 'styled-components'
 
-import { CLOSE_APPLICATION_CHANNEL } from '../../shared/IpcDefinitions'
+import { QUIT_APPLICATION_CHANNEL } from '../../shared/IpcDefinitions'
 import { ipcRequest } from '../IpcService'
 
 const CloseIconBlock = styled.div`
@@ -11,7 +12,7 @@ const CloseIconBlock = styled.div`
     padding: 0 20px;
 `
 
-const CloseIconClickableContainer = styled.div`
+const CloseIconClickableContainer = styled(Link)`
     --size: 8px;
     width: var(--size);
     height: var(--size);
@@ -37,13 +38,13 @@ const CloseIconSvg = styled.svg`
  * Close the application window.
  */
 async function closeWindow() {
-    await ipcRequest(CLOSE_APPLICATION_CHANNEL, {}, false)
+    await ipcRequest(QUIT_APPLICATION_CHANNEL, {}, false)
 }
 
 const CloseButton: React.FunctionComponent = props => {
     return (
         <CloseIconBlock>
-            <CloseIconClickableContainer onClick={closeWindow}>
+            <CloseIconClickableContainer to="/settings">
                 <CloseIconSvg
                     version="1.1"
                     id="Layer_1"

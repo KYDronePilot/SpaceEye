@@ -5,11 +5,11 @@ import * as path from 'path'
 import * as url from 'url'
 
 import {
-    CLOSE_APPLICATION_CHANNEL,
     GET_SATELLITE_CONFIG_CHANNEL,
     GetSatelliteConfigIpcResponse,
     IpcParams,
     IpcRequest,
+    QUIT_APPLICATION_CHANNEL,
     SET_WALLPAPER_CHANNEL,
     SetWallpaperIpcParams
 } from '../shared/IpcDefinitions'
@@ -115,6 +115,10 @@ app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') {
         app.quit()
     }
+})
+
+ipcMain.on(QUIT_APPLICATION_CHANNEL, () => {
+    app.quit()
 })
 
 ipcMain.on(GET_SATELLITE_CONFIG_CHANNEL, async (event, params: IpcRequest<IpcParams>) => {
