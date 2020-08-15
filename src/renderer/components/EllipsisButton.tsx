@@ -2,17 +2,14 @@ import * as React from 'react'
 import { Link } from 'react-router-dom'
 import styled from 'styled-components'
 
-import { QUIT_APPLICATION_CHANNEL } from '../../shared/IpcDefinitions'
-import { ipcRequest } from '../IpcService'
-
-const CloseIconBlock = styled.div`
+const EllipsisIconBlock = styled.div`
     display: flex;
     flex-direction: column;
     justify-content: center;
     padding: 0 30px;
 `
 
-const CloseIconClickableContainer = styled(Link)`
+const EllipsisIconClickableContainer = styled(Link)`
     width: 13px;
     height: 8px;
     display: flex;
@@ -20,31 +17,24 @@ const CloseIconClickableContainer = styled(Link)`
     justify-content: center;
     padding: 5px 5px;
     cursor: pointer;
-    --close-icon-color: #c7c7c7;
+    --ellipsis-icon-color: #c7c7c7;
     &:hover {
-        --close-icon-color: white;
+        --ellipsis-icon-color: white;
     }
     -webkit-app-region: no-drag;
 `
 
-const CloseIconSvg = styled.svg`
+const EllipsisIconSvg = styled.svg`
     width: auto;
     height: auto;
-    fill: var(--close-icon-color);
+    fill: var(--ellipsis-icon-color);
 `
 
-/**
- * Close the application window.
- */
-async function closeWindow() {
-    await ipcRequest(QUIT_APPLICATION_CHANNEL, {}, false)
-}
-
-const CloseButton: React.FunctionComponent = props => {
+const EllipsisButton: React.FunctionComponent = props => {
     return (
-        <CloseIconBlock>
-            <CloseIconClickableContainer to="/settings">
-                <CloseIconSvg
+        <EllipsisIconBlock>
+            <EllipsisIconClickableContainer to="/settings">
+                <EllipsisIconSvg
                     version="1.1"
                     id="Layer_1"
                     xmlns="http://www.w3.org/2000/svg"
@@ -82,10 +72,10 @@ const CloseButton: React.FunctionComponent = props => {
                         14.151724 c 9.43448,9.434483 14.15172,21.22759 14.15172,33.020691 z`}
                         id="path4"
                     />
-                </CloseIconSvg>
-            </CloseIconClickableContainer>
-        </CloseIconBlock>
+                </EllipsisIconSvg>
+            </EllipsisIconClickableContainer>
+        </EllipsisIconBlock>
     )
 }
 
-export default CloseButton
+export default EllipsisButton

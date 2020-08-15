@@ -3,7 +3,7 @@ import 'typeface-roboto/index.css'
 import * as React from 'react'
 import styled from 'styled-components'
 
-import CloseButton from './CloseButton'
+import EllipsisButton from './EllipsisButton'
 import WallpaperModeSelector from './WallpaperModeSelector'
 
 /**
@@ -65,7 +65,7 @@ function HeaderBar() {
             </HeaderBlur>
             <FloatingHeader>
                 <FlexSpacer />
-                <CloseButton />
+                <EllipsisButton />
                 {/* <WallpaperModeSelector /> */}
             </FloatingHeader>
         </>
