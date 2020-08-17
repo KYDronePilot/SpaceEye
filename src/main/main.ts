@@ -39,6 +39,8 @@ const index = url.format({
     slashes: true
 })
 
+const windowPosition = process.platform === 'darwin' ? 'trayRight' : 'trayBottomRight'
+
 const mb = menubar({
     index,
     icon: path.join(__dirname, 'assets', 'IconTemplate.png'),
@@ -52,7 +54,7 @@ const mb = menubar({
         },
         backgroundColor: '#222222'
     },
-    windowPosition: 'trayRight'
+    windowPosition
 })
 
 mb.on('after-create-window', () => {
