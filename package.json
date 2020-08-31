@@ -1,7 +1,7 @@
 {
     "name": "space-eye",
-    "version": "0.0.7",
-    "description": "Live satellite imagery for your desktop",
+    "version": "0.0.1",
+    "description": "Live satellite imagery for your desktop background",
     "main": "./dist/main.js",
     "scripts": {
         "build-main": "cross-env NODE_ENV=production webpack --config webpack.main.prod.config.js",
