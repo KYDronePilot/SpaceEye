@@ -1,7 +1,9 @@
+import 'typeface-roboto/index.css'
+
 import * as React from 'react'
 import styled from 'styled-components'
-import 'typeface-roboto/index.css'
-import CloseButton from './CloseButton'
+
+import EllipsisButton from './EllipsisButton'
 import WallpaperModeSelector from './WallpaperModeSelector'
 
 /**
@@ -21,6 +23,8 @@ const HeaderBlur = styled.div`
 
 /**
  * Element inside of the blur element to add a color tinting.
+ *
+ * @param props
  */
 const HeaderBlurColorFilter = styled.div`
     background-color: ${props => props.theme.colors.headerBackground};
@@ -50,6 +54,9 @@ const FlexSpacer = styled.div`
     flex-grow: 1;
 `
 
+/**
+ *
+ */
 function HeaderBar() {
     return (
         <>
@@ -57,8 +64,8 @@ function HeaderBar() {
                 <HeaderBlurColorFilter />
             </HeaderBlur>
             <FloatingHeader>
-                <CloseButton />
                 <FlexSpacer />
+                <EllipsisButton />
                 {/* <WallpaperModeSelector /> */}
             </FloatingHeader>
         </>

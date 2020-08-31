@@ -9,9 +9,9 @@ export interface IpcRequest<P extends IpcParams> {
     responseChannel: string
 }
 
-export type CloseApplicationIpcParams = IpcParams
-export type CloseApplicationIpcResponse = IpcResponse
-export const CLOSE_APPLICATION_CHANNEL = 'CLOSE_APPLICATION_CHANNEL'
+export type QuitApplicationIpcParams = IpcParams
+export type QuitApplicationIpcResponse = IpcResponse
+export const QUIT_APPLICATION_CHANNEL = 'QUIT_APPLICATION_CHANNEL'
 
 export interface ExampleIpcParams {
     testP: string

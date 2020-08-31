@@ -91,6 +91,14 @@
         "@typescript-eslint/no-explicit-any": 0,
         "@typescript-eslint/explicit-member-accessibility": 0,
         "@typescript-eslint/no-angle-bracket-type-assertion": 0,
+        "@typescript-eslint/ban-types": [
+            "error",
+            {
+                "types": {
+                    "{}": false
+                }
+            }
+        ],
         "no-restricted-syntax": ["error", "ForInStatement", "LabeledStatement", "WithStatement"],
         "simple-import-sort/sort": "error",
         "jsdoc/require-param-type": 0,

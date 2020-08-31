@@ -1,10 +1,12 @@
 import 'typeface-roboto/index.css'
 
 import * as React from 'react'
+import { BrowserRouter, HashRouter, MemoryRouter, Route, Switch } from 'react-router-dom'
 import styled, { ThemeProvider } from 'styled-components'
 
 import { DarkTheme } from '../themes'
 import HeaderBar from './HeaderBar'
+import Settings from './Settings'
 import ThumbnailManager from './ThumbnailManager'
 
 const Container = styled.div`
@@ -23,15 +25,27 @@ const Container = styled.div`
     flex-direction: column;
 `
 
+const ImagePickerPage: React.FC = () => (
+    <Container>
+        <HeaderBar />
+        <ThumbnailManager />
+        {/* <Toolbar /> */}
+    </Container>
+)
+
+/**
+ *
+ */
 function Main() {
     return (
-        <ThemeProvider theme={DarkTheme}>
-            <Container>
-                <HeaderBar />
-                <ThumbnailManager />
-                {/* <Toolbar /> */}
-            </Container>
-        </ThemeProvider>
+        <HashRouter>
+            <ThemeProvider theme={DarkTheme}>
+                <div>
+                    <Route exact path="/" component={ImagePickerPage} />
+                    <Route path="/settings" component={Settings} />
+                </div>
+            </ThemeProvider>
+        </HashRouter>
     )
 }
 
