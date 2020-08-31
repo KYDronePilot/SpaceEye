@@ -4,14 +4,14 @@
     "editor.codeActionsOnSave": {
         "source.fixAll": true
     },
-    "cSpell.words": [
-        "Scrollable",
-        "simplebar"
-    ],
+    "cSpell.words": ["Scrollable", "simplebar"],
     "yaml.schemas": {
         "https://json.schemastore.org/electron-builder": [
             "electron-builder.yaml",
             "electron-builder.yml"
         ]
+    },
+    "[markdown]": {
+        "editor.formatOnSave": false
     }
 }
