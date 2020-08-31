@@ -109,6 +109,13 @@ mb.on('ready', () => {
     }
 })
 
+// Ensure app is configured to open on user login
+const loginItemSettings = app.getLoginItemSettings()
+
+if (!loginItemSettings.openAtLogin) {
+    app.setLoginItemSettings({ openAtLogin: true })
+}
+
 app.on('will-quit', () => {
     clearInterval(heartbeatHandle)
 })
