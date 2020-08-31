@@ -4,7 +4,7 @@
 
 Live satellite imagery for your desktop background.
 
-![App running on macOS](img/macos_menubar.jpg)
+![App running on macOS](docs/img/macos_menubar.jpg)
 
 ## Supported Operating Systems
 
