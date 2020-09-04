@@ -48,7 +48,7 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+ssh://git@github.com:KYDronePilot/earth_from_space_live.git"
+        "url": "git+ssh://git@github.com:KYDronePilot/SpaceEye.git"
     },
     "author": {
         "name": "Michael Galliers",
@@ -56,9 +56,9 @@
     },
     "license": "MIT",
     "bugs": {
-        "url": "https://github.com/KYDronePilot/earth_from_space_live/issues"
+        "url": "https://github.com/KYDronePilot/SpaceEye/issues"
     },
-    "homepage": "https://github.com/KYDronePilot/earth_from_space_live",
+    "homepage": "https://github.com/KYDronePilot/SpaceEye",
     "devDependencies": {
         "@babel/core": "^7.4.5",
         "@babel/plugin-proposal-class-properties": "^7.4.4",
