@@ -3,7 +3,7 @@ import * as DesktopWallpaper from './DesktopWallpaperTypes'
 
 let MacDesktopWallpaper: typeof DesktopWallpaper
 if (process.platform === 'darwin') {
-    MacDesktopWallpaper = __non_webpack_require__('earth_from_space_live_mac_node_api')
+    MacDesktopWallpaper = __non_webpack_require__('space-eye-mac-node-api')
         .DesktopWallpaper as typeof DesktopWallpaper
 } else {
     MacDesktopWallpaper = {} as typeof DesktopWallpaper

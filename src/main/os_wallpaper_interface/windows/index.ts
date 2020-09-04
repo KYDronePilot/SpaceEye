@@ -3,7 +3,7 @@ import * as DesktopWallpaper from './DesktopWallpaperTypes'
 
 let WindowsDesktopWallpaper: typeof DesktopWallpaper
 if (process.platform === 'win32') {
-    WindowsDesktopWallpaper = __non_webpack_require__('earth_from_space_live_windows_node_api')
+    WindowsDesktopWallpaper = __non_webpack_require__('space-eye-windows-node-api')
         .IDesktopWallpaper as typeof DesktopWallpaper
 } else {
     WindowsDesktopWallpaper = {} as typeof DesktopWallpaper
