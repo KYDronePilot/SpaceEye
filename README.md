@@ -1,6 +1,6 @@
 # SpaceEye
 
-![Build](https://github.com/KYDronePilot/earth_from_space_live/workflows/Build/badge.svg)
+![Build](https://github.com/KYDronePilot/SpaceEye/workflows/Build/badge.svg)
 
 Live satellite imagery for your desktop background.
 
@@ -14,7 +14,7 @@ Live satellite imagery for your desktop background.
 ## Install
 
 Find the latest version for your platform on the [Releases
-page](https://github.com/KYDronePilot/earth_from_space_live/releases).
+page](https://github.com/KYDronePilot/SpaceEye/releases).
 
 ## Beta/Prerelease Software Notice
 
@@ -24,7 +24,7 @@ things to change frequently until the first official release.
 ## Issues
 
 If you encounter a bug or have a feature request, please post it on the [Issues
-page](https://github.com/KYDronePilot/earth_from_space_live/issues).
+page](https://github.com/KYDronePilot/SpaceEye/issues).
 
 ## License
 
