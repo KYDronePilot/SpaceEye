@@ -26,6 +26,7 @@ let heartbeatHandle: number
 
 Axios.defaults.adapter = require('axios/lib/adapters/http')
 
+autoUpdater.allowPrerelease = true
 autoUpdater.checkForUpdatesAndNotify()
 
 /**
