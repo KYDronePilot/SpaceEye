@@ -129,6 +129,7 @@
         "async-lock": "^1.2.4",
         "axios": "^0.19.2",
         "deep-equal": "^2.0.3",
+        "electron-log": "^4.2.4",
         "electron-store": "^6.0.0",
         "electron-updater": "^4.3.4",
         "lodash": "^4.17.19",
