@@ -1,6 +1,6 @@
 {
     "name": "space-eye",
-    "version": "0.0.2-alpha.0",
+    "version": "0.0.2-alpha.1",
     "description": "Live satellite imagery for your desktop background",
     "main": "./dist/main.js",
     "scripts": {
