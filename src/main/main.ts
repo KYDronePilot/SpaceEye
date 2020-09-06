@@ -1,5 +1,6 @@
 import Axios from 'axios'
 import { app, BrowserWindow, ipcMain, powerMonitor, screen, systemPreferences } from 'electron'
+import { autoUpdater } from 'electron-updater'
 import { menubar } from 'menubar'
 import * as path from 'path'
 import * as url from 'url'
@@ -24,6 +25,8 @@ let heartbeatHandle: number
 // let win: BrowserWindow | null
 
 Axios.defaults.adapter = require('axios/lib/adapters/http')
+
+autoUpdater.checkForUpdatesAndNotify()
 
 /**
  * Heartbeat function which runs every `HEARTBEAT_INTERVAL` seconds to perform

@@ -11,12 +11,11 @@ afterSign: electron-builder-notarize
 mac:
   category: public.app-category.utilities
   hardenedRuntime: true
-  target:
-    - target: dmg
-      arch: x64
   darkModeSupport: true
   type: distribution
+  publish: [github]
 win:
   target:
     - target: nsis
       arch: x64
+  publish: [github]
