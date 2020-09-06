@@ -140,7 +140,7 @@ export default class Settings extends React.Component<{}, SettingsState> {
                     <SectionsColumn>
                         <Row>
                             <Spacer />
-                            <ProductTitle>SpaceEye</ProductTitle>
+                            <ProductTitle>SpaceEye alpha</ProductTitle>
                             <Spacer />
                         </Row>
                         <Row>
