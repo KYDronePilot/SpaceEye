@@ -1,3 +1,4 @@
+import electronLog from 'electron-log'
 import * as fs from 'fs'
 import { maxBy } from 'lodash'
 import moment, { Moment } from 'moment'
@@ -6,6 +7,8 @@ import { promisify } from 'util'
 
 import { UPDATE_INTERVAL_MIN } from './consts'
 import { IMAGES_DIR } from './paths'
+
+const log = electronLog.scope('downloaded-image')
 
 const asyncReadDir = promisify(fs.readdir)
 const asyncUnlink = promisify(fs.unlink)
@@ -62,10 +65,12 @@ export class DownloadedImage {
      */
     static async getDownloadedImages(): Promise<DownloadedImage[]> {
         const files = await asyncReadDir(IMAGES_DIR)
+        log.debug('All files in images dir:', files)
         // Filter so we only have the files of images we want
         // TODO: Handle other extensions
         const imageRegex = new RegExp(`^\\d+-\\d+\\.(jpg)$`)
         const imageFiles = files.filter(file => Path.basename(file).match(imageRegex))
+        log.debug('All image files:', imageFiles)
         return imageFiles.map(file => DownloadedImage.constructFromPath(file))
     }
 
@@ -77,6 +82,10 @@ export class DownloadedImage {
         const now = moment.utc()
         const oldImages = downloadedImages.filter(
             image => now.diff(image.timestamp, 'minutes') > UPDATE_INTERVAL_MIN
+        )
+        log.debug(
+            'Deleting old images:',
+            oldImages.map(image => image.getPath())
         )
         await Promise.all(oldImages.map(image => asyncUnlink(image.getPath())))
     }

@@ -30,6 +30,8 @@ autoUpdater.on('update-downloaded', async () => {
  */
 export function startUpdateChecking(): void {
     autoUpdater.checkForUpdates()
+
+    log.info('Starting update checker interval')
     setInterval(() => {
         autoUpdater.checkForUpdates()
     }, 600000)

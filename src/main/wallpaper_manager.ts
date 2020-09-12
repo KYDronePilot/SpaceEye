@@ -55,7 +55,12 @@ export class WallpaperManager {
      * @returns All non-internal monitors
      */
     private static getMonitors(): Display[] {
-        return screen.getAllDisplays().filter(monitor => !monitor.internal)
+        const allMonitors = screen.getAllDisplays().filter(monitor => !monitor.internal)
+        log.debug(
+            'All monitors:',
+            allMonitors.map(monitor => monitor.id)
+        )
+        return allMonitors
     }
 
     /**
@@ -117,9 +122,11 @@ export class WallpaperManager {
      * @throws {Error} Unknown errors
      */
     public static async updatePipeline(lock: UpdateLock): Promise<void> {
+        log.debug('Entering update pipeline')
         const viewId = AppConfigStore.currentViewId
         // If no view ID set, nothing to update
         if (viewId === undefined) {
+            log.debug('No view set to update')
             throw new ViewNotSetError()
         }
         // Fetch the view config
@@ -127,6 +134,7 @@ export class WallpaperManager {
         try {
             viewConfig = await SatelliteConfigStore.Instance.getViewById(viewId)
         } catch (error) {
+            log.debug('Error while fetching view config for update pipeline')
             if (error instanceof RequestError) {
                 throw new ViewConfigAccessError(
                     `Error while downloading view config for ID "${viewId}"`
@@ -136,19 +144,23 @@ export class WallpaperManager {
         }
         // Make sure we still have the lock
         if (!lock.isStillHeld()) {
+            log.debug('Lost update lock after getting view config')
             throw new LockInvalidatedError()
         }
         // If no config for ID, we can't proceed
         if (viewConfig === undefined) {
+            log.debug('No view config for ID:', viewId)
             throw new ViewConfigAccessError(`No view config matching ID "${viewId}"`)
         }
         // Determine which image we need
+        log.debug('Determining which image is needed to update')
         const monitors = WallpaperManager.getMonitors()
         const imageConfig = WallpaperManager.getOptimalImageFromView(viewConfig, monitors)
         // Get the newest downloaded image for the config
         let imageToSet = await DownloadedImage.getNewestDownloadedImage(imageConfig.id)
         // Make sure we still have the lock
         if (!lock.isStillHeld()) {
+            log.debug('Lost update lock after checking for newest downloaded image')
             throw new LockInvalidatedError()
         }
         // If there isn't a downloaded image or it's too old, download a new one
@@ -156,15 +168,18 @@ export class WallpaperManager {
             imageToSet === undefined ||
             moment.utc().diff(imageToSet.timestamp, 'minutes') > UPDATE_INTERVAL_MIN
         ) {
+            log.info('New image must be downloaded')
             imageToSet = await downloadImage(imageConfig, lock.generateCancelToken(), lock)
             // Make sure we still have the lock
             if (!lock.isStillHeld()) {
+                log.debug('Lost update lock while downloading image')
                 throw new LockInvalidatedError()
             }
         }
         // Make sure the monitor config hasn't changed
         const newMonitors = WallpaperManager.getMonitors()
         if (WallpaperManager.haveMonitorsChanged(monitors, newMonitors)) {
+            log.debug('Monitors changed during update process')
             throw new MonitorConfigChangedError()
         }
         // Get monitors that don't already have the image set
