@@ -37,8 +37,10 @@ async function downloadStream(
                 const writer = Fs.createWriteStream(destPath)
                 const dataStream = data as Readable
                 dataStream.pipe(writer)
+                let isCancelled = false
                 cancelToken.token.promise.then(async cancellation => {
                     log.debug('Download canceled for:', url)
+                    isCancelled = true
                     writer.destroy()
                     // Delete partially downloaded file
                     if (await existsAsync(destPath)) {
@@ -48,7 +50,9 @@ async function downloadStream(
                     }
                 })
                 writer.on('close', () => {
-                    resolve()
+                    if (!isCancelled) {
+                        resolve()
+                    }
                 })
             })
             .catch(error => {
