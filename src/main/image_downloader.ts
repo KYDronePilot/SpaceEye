@@ -1,5 +1,6 @@
 // eslint-disable-next-line max-classes-per-file
 import Axios, { CancelTokenSource } from 'axios'
+import electronLog from 'electron-log'
 import Fs from 'fs'
 import moment from 'moment'
 import { Readable } from 'stream'
@@ -8,6 +9,8 @@ import { promisify } from 'util'
 import { DownloadedImage } from './downloaded_image'
 import { FileDoesNotExistError, RequestCancelledError } from './errors'
 import { UpdateLock } from './update_lock'
+
+const log = electronLog.scope('image-downloader')
 
 const existsAsync = promisify(Fs.exists)
 const unlinkAsync = promisify(Fs.unlink)
@@ -35,9 +38,11 @@ async function downloadStream(
                 const dataStream = data as Readable
                 dataStream.pipe(writer)
                 cancelToken.token.promise.then(async cancellation => {
+                    log.debug('Download canceled for:', url)
                     writer.destroy()
                     // Delete partially downloaded file
                     if (await existsAsync(destPath)) {
+                        log.debug('Deleting partially downloaded file:', destPath)
                         await unlinkAsync(destPath)
                         reject(cancellation)
                     }
@@ -75,6 +80,7 @@ export async function downloadImage(
 ): Promise<DownloadedImage> {
     // FIXME: Don't leave as hardcoded jpg
     const downloadedImage = new DownloadedImage(image.id, moment.utc(), 'jpg')
+    log.debug('Downloading image to:', downloadedImage.getPath())
 
     try {
         await downloadStream(image.url, downloadedImage.getPath(), cancelToken)
@@ -83,16 +89,20 @@ export async function downloadImage(
         lock.destroyCancelToken(cancelToken)
         // Throw special error if request is cancelled
         if (Axios.isCancel(error)) {
+            log.debug('Download cancelled for image:', image.id)
             throw new RequestCancelledError()
         }
+        log.debug('Unknown error while downloading image:', image.id)
         // Rethrow if not
         throw error
     }
     // Sanity check to make sure the image actually exists
     if (await existsAsync(downloadedImage.getPath())) {
+        log.debug('Successfully downloaded image:', image.id)
         return downloadedImage
     }
     // Else, throw an error
+    log.debug("Image file doesn't exist at:", downloadedImage.getPath())
     throw new FileDoesNotExistError(
         `Downloaded image "${downloadedImage.getPath()}" does not exist`
     )

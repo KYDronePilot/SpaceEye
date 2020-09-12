@@ -8,6 +8,7 @@ import {
     screen,
     systemPreferences
 } from 'electron'
+import electronLog from 'electron-log'
 import { autoUpdater } from 'electron-updater'
 import { menubar } from 'menubar'
 import * as path from 'path'
@@ -33,6 +34,8 @@ let heartbeatHandle: number
 
 // let win: BrowserWindow | null
 
+const log = electronLog.scope('main')
+
 Axios.defaults.adapter = require('axios/lib/adapters/http')
 
 startUpdateChecking()
@@ -42,6 +45,7 @@ startUpdateChecking()
  * any necessary tasks.
  */
 async function heartbeat() {
+    log.debug('Heartbeat triggered')
     await WallpaperManager.update(Initiator.heartbeatFunction)
 }
 
@@ -70,6 +74,9 @@ const mb = menubar({
 })
 
 mb.on('after-create-window', () => {
+    log.info('App window created')
+    log.info('Production mode:', process.env.NODE_ENV === 'production')
+
     if (process.platform === 'darwin') {
         mb.window!.setWindowButtonVisibility(false)
     }
@@ -90,19 +97,23 @@ mb.on('after-create-window', () => {
 // mb.on('ready', () => {})
 
 mb.on('ready', () => {
+    log.info('Menubar ready')
     // createWindow()
     heartbeatHandle = setInterval(heartbeat, HEARTBEAT_INTERVAL)
 
     // Display config change triggers update
     screen.on('display-added', async () => {
+        log.debug('Display added')
         await WallpaperManager.update(Initiator.displayChangeWatcher)
     })
 
     screen.on('display-removed', async () => {
+        log.debug('Display removed')
         await WallpaperManager.update(Initiator.displayChangeWatcher)
     })
 
     screen.on('display-metrics-changed', async () => {
+        log.debug('Display metrics changed')
         await WallpaperManager.update(Initiator.displayChangeWatcher)
     })
 
@@ -110,12 +121,14 @@ mb.on('ready', () => {
     // TODO: Need a new initiator
     if (process.platform === 'darwin' || process.platform === 'win32') {
         powerMonitor.on('unlock-screen', async () => {
+            log.debug('Screen unlocked')
             await WallpaperManager.update(Initiator.displayChangeWatcher)
         })
     }
 
     if (process.platform === 'linux' || process.platform === 'win32') {
         powerMonitor.on('resume', async () => {
+            log.debug('System resumed')
             await WallpaperManager.update(Initiator.displayChangeWatcher)
         })
     }
@@ -129,20 +142,24 @@ if (!loginItemSettings.openAtLogin) {
 }
 
 app.on('will-quit', () => {
+    log.info('Application will quit')
     clearInterval(heartbeatHandle)
 })
 
 app.on('window-all-closed', () => {
+    log.info('All windows have been closed')
     if (process.platform !== 'darwin') {
         app.quit()
     }
 })
 
 ipcMain.on(QUIT_APPLICATION_CHANNEL, () => {
+    log.info('Quit request received')
     app.quit()
 })
 
 ipcMain.on(GET_SATELLITE_CONFIG_CHANNEL, async (event, params: IpcRequest<IpcParams>) => {
+    log.info('Get satellite config request received')
     const configStore = SatelliteConfigStore.Instance
     try {
         const response: GetSatelliteConfigIpcResponse = {
@@ -150,6 +167,7 @@ ipcMain.on(GET_SATELLITE_CONFIG_CHANNEL, async (event, params: IpcRequest<IpcPar
         }
         event.reply(params.responseChannel, response)
     } catch (error) {
+        log.error('Failed to get new satellite config:', error)
         const response: GetSatelliteConfigIpcResponse = {
             config: undefined
         }
@@ -158,6 +176,7 @@ ipcMain.on(GET_SATELLITE_CONFIG_CHANNEL, async (event, params: IpcRequest<IpcPar
 })
 
 ipcMain.on(SET_WALLPAPER_CHANNEL, async (event, params: IpcRequest<SetWallpaperIpcParams>) => {
+    log.info('Wallpaper set request received for view:', params.params.viewId)
     AppConfigStore.currentViewId = params.params.viewId
     await WallpaperManager.update(Initiator.user)
     event.reply(params.responseChannel, {})
@@ -167,6 +186,7 @@ if (process.platform === 'darwin') {
     systemPreferences.subscribeWorkspaceNotification(
         'NSWorkspaceActiveSpaceDidChangeNotification',
         async () => {
+            log.debug('macOS active space changed')
             await WallpaperManager.update(Initiator.displayChangeWatcher)
         }
     )
