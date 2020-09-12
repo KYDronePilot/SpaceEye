@@ -2,9 +2,12 @@
  * For storing/caching the satellite config.
  */
 import Axios from 'axios'
+import electronLog from 'electron-log'
 import moment, { Moment } from 'moment'
 
 import { RequestError } from './errors'
+
+const log = electronLog.scope('satellite-config-store')
 
 // Time in seconds before invalidating the cached config.
 const INVALIDATION_TIMEOUT = 60
@@ -38,10 +41,11 @@ export class SatelliteConfigStore {
      * @throws {RequestError} if there is an error while fetching the config
      */
     private async updateConfig() {
+        log.debug('Updating satellite config')
         try {
             this.config = (await Axios.get<RootSatelliteConfig>(CONFIG_URL)).data
         } catch (error) {
-            // TODO: Log the error here
+            log.info('Satellite config update failed')
             throw new RequestError('Error while fetching the satellite config')
         }
         this.lastUpdated = moment.utc()

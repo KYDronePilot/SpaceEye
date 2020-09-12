@@ -1,5 +1,14 @@
 import Axios from 'axios'
-import { app, BrowserWindow, ipcMain, powerMonitor, screen, systemPreferences } from 'electron'
+import {
+    app,
+    BrowserWindow,
+    dialog,
+    ipcMain,
+    powerMonitor,
+    screen,
+    systemPreferences
+} from 'electron'
+import { autoUpdater } from 'electron-updater'
 import { menubar } from 'menubar'
 import * as path from 'path'
 import * as url from 'url'
@@ -16,6 +25,7 @@ import {
 import { AppConfigStore } from './app_config_store'
 import { SatelliteConfigStore } from './satellite_config_store'
 import { Initiator } from './update_lock'
+import { startUpdateChecking } from './updater'
 import { WallpaperManager } from './wallpaper_manager'
 
 const HEARTBEAT_INTERVAL = 600000
@@ -24,6 +34,8 @@ let heartbeatHandle: number
 // let win: BrowserWindow | null
 
 Axios.defaults.adapter = require('axios/lib/adapters/http')
+
+startUpdateChecking()
 
 /**
  * Heartbeat function which runs every `HEARTBEAT_INTERVAL` seconds to perform

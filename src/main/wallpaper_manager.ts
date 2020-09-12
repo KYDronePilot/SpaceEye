@@ -4,6 +4,7 @@
 
 // eslint-disable-next-line max-classes-per-file
 import { Display, screen } from 'electron'
+import electronLog from 'electron-log'
 import { maxBy } from 'lodash'
 import moment from 'moment'
 
@@ -23,6 +24,8 @@ import { MacOSWallpaperInterface } from './os_wallpaper_interface/macos'
 import { WindowsWallpaperInterface } from './os_wallpaper_interface/windows'
 import { SatelliteConfigStore } from './satellite_config_store'
 import { Initiator, UpdateLock } from './update_lock'
+
+const log = electronLog.scope('wallpaper-manager')
 
 let wallpaperInterface: OSWallpaperInterface
 if (process.platform === 'darwin') {
@@ -184,8 +187,10 @@ export class WallpaperManager {
         const lock = UpdateLock.acquire(initiator)
         // If we couldn't get the lock, we can't proceed
         if (lock === undefined) {
+            log.info(`Update triggered by ${initiator}, lock acquisition failed`)
             return false
         }
+        log.info(`Update triggered by ${initiator}, lock acquisition succeeded`)
         try {
             // Try to run the pipeline and release the lock when done
             await WallpaperManager.updatePipeline(lock)
@@ -193,7 +198,8 @@ export class WallpaperManager {
             // Delete old images
             await DownloadedImage.cleanupOldImages()
             return true
-        } catch {
+        } catch (error) {
+            log.error('Error while updating. Invalidating lock.', error)
             lock.invalidate()
             // If there was an error, we couldn't complete successfully
             // TODO: Log the error and let the user know if it is worth
