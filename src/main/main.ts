@@ -68,7 +68,8 @@ const mb = menubar({
         webPreferences: {
             nodeIntegration: true
         },
-        backgroundColor: '#222222'
+        backgroundColor: '#222222',
+        resizable: false
     },
     windowPosition
 })
