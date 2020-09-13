@@ -1,4 +1,4 @@
-import { ipcRenderer, remote } from 'electron'
+import { ipcRenderer } from 'electron'
 import * as React from 'react'
 import { ReactNode } from 'react'
 

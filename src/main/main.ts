@@ -1,15 +1,6 @@
 import Axios from 'axios'
-import {
-    app,
-    BrowserWindow,
-    dialog,
-    ipcMain,
-    powerMonitor,
-    screen,
-    systemPreferences
-} from 'electron'
+import { app, ipcMain, powerMonitor, screen, systemPreferences } from 'electron'
 import electronLog from 'electron-log'
-import { autoUpdater } from 'electron-updater'
 import { menubar } from 'menubar'
 import * as path from 'path'
 import * as url from 'url'
