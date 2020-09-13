@@ -29,6 +29,11 @@ export interface SetWallpaperIpcParams {
     viewId: number
 }
 
+export interface VisibilityChangeAlertIpcParams {
+    visible: boolean
+}
+
 export const EXAMPLE_CHANNEL = 'EXAMPLE_CHANNEL'
 export const GET_SATELLITE_CONFIG_CHANNEL = 'GET_SATELLITE_CONFIG_CHANNEL'
 export const SET_WALLPAPER_CHANNEL = 'SET_WALLPAPER_CHANNEL'
+export const VISIBILITY_CHANGE_ALERT_CHANNEL = 'VISIBILITY_CHANGE_ALERT_CHANNEL'

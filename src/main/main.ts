@@ -21,7 +21,9 @@ import {
     IpcRequest,
     QUIT_APPLICATION_CHANNEL,
     SET_WALLPAPER_CHANNEL,
-    SetWallpaperIpcParams
+    SetWallpaperIpcParams,
+    VISIBILITY_CHANGE_ALERT_CHANNEL,
+    VisibilityChangeAlertIpcParams
 } from '../shared/IpcDefinitions'
 import { AppConfigStore } from './app_config_store'
 import { SatelliteConfigStore } from './satellite_config_store'
@@ -74,6 +76,19 @@ const mb = menubar({
     windowPosition
 })
 
+/**
+ * Alert the renderer that the window visibility has changed.
+ *
+ * @param visible Whether the window became visible or not visible
+ */
+function visibilityChangeAlert(visible: boolean) {
+    const params: VisibilityChangeAlertIpcParams = {
+        visible
+    }
+
+    mb.window!.webContents.send(VISIBILITY_CHANGE_ALERT_CHANNEL, params)
+}
+
 mb.on('after-create-window', () => {
     log.info('App window created')
     log.info('Production mode:', process.env.NODE_ENV === 'production')
@@ -93,6 +108,14 @@ mb.on('after-create-window', () => {
             mb.window!.webContents.openDevTools({ mode: 'detach' })
         })
     }
+
+    mb.on('hide', () => {
+        visibilityChangeAlert(false)
+    })
+
+    mb.on('show', () => {
+        visibilityChangeAlert(true)
+    })
 })
 
 // mb.on('ready', () => {})

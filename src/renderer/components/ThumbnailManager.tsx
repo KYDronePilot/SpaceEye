@@ -1,3 +1,4 @@
+import { ipcRenderer, remote } from 'electron'
 import * as React from 'react'
 import { ReactNode } from 'react'
 
@@ -7,7 +8,9 @@ import {
     IpcParams,
     IpcResponse,
     SET_WALLPAPER_CHANNEL,
-    SetWallpaperIpcParams
+    SetWallpaperIpcParams,
+    VISIBILITY_CHANGE_ALERT_CHANNEL,
+    VisibilityChangeAlertIpcParams
 } from '../../shared/IpcDefinitions'
 import { ipcRequest } from '../IpcService'
 import Thumbnail from './Thumbnail'
@@ -44,18 +47,24 @@ export default class ThumbnailManager extends React.Component<
 
         this.onSelectImage = this.onSelectImage.bind(this)
         this.getThumbnailInformation = this.getThumbnailInformation.bind(this)
+        this.update = this.update.bind(this)
     }
 
     async componentDidMount(): Promise<void> {
-        const response = await ipcRequest<IpcParams, GetSatelliteConfigIpcResponse>(
-            GET_SATELLITE_CONFIG_CHANNEL,
-            {}
+        ipcRenderer.on(
+            VISIBILITY_CHANGE_ALERT_CHANNEL,
+            (_, params: VisibilityChangeAlertIpcParams) => {
+                if (params.visible) {
+                    this.update()
+                }
+            }
         )
-        this.setState({ satelliteConfig: response.config })
+        await this.update()
     }
 
     /**
      * Action to perform when new image is selected.
+     *
      * @param viewId - ID of the selected image
      */
     async onSelectImage(viewId: number): Promise<void> {
@@ -73,7 +82,9 @@ export default class ThumbnailManager extends React.Component<
         if (this.state.satelliteConfig === undefined) {
             return []
         }
+        const timestamp = new Date().getTime()
         const thumbnails: ThumbnailInformation[] = []
+
         for (const satellite of this.state.satelliteConfig.satellites) {
             for (const view of satellite.views) {
                 for (const imageSource of view.imageSources) {
@@ -83,7 +94,7 @@ export default class ThumbnailManager extends React.Component<
                             viewId: view.id,
                             imageId: imageSource.id,
                             name: `${satellite.name} - ${view.name}`,
-                            url: imageSource.url,
+                            url: `${imageSource.url}#${timestamp}`,
                             dimensions: imageSource.dimensions
                         })
                     }
@@ -91,6 +102,17 @@ export default class ThumbnailManager extends React.Component<
             }
         }
         return thumbnails
+    }
+
+    /**
+     * Update the satellite config, and thus the thumbnails.
+     */
+    async update(): Promise<void> {
+        const response = await ipcRequest<IpcParams, GetSatelliteConfigIpcResponse>(
+            GET_SATELLITE_CONFIG_CHANNEL,
+            {}
+        )
+        this.setState({ satelliteConfig: response.config })
     }
 
     public render(): ReactNode {
