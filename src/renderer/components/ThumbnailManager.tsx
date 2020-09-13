@@ -3,7 +3,9 @@ import * as React from 'react'
 import { ReactNode } from 'react'
 
 import {
+    GET_CURRENT_VIEW_CHANNEL,
     GET_SATELLITE_CONFIG_CHANNEL,
+    GetCurrentViewIpcResponse,
     GetSatelliteConfigIpcResponse,
     IpcParams,
     IpcResponse,
@@ -105,14 +107,17 @@ export default class ThumbnailManager extends React.Component<
     }
 
     /**
-     * Update the satellite config, and thus the thumbnails.
+     * Update the satellite config, thumbnails, and current view.
      */
     async update(): Promise<void> {
-        const response = await ipcRequest<IpcParams, GetSatelliteConfigIpcResponse>(
-            GET_SATELLITE_CONFIG_CHANNEL,
-            {}
-        )
-        this.setState({ satelliteConfig: response.config })
+        const [configResponse, currentViewResponse] = await Promise.all([
+            ipcRequest<IpcParams, GetSatelliteConfigIpcResponse>(GET_SATELLITE_CONFIG_CHANNEL, {}),
+            ipcRequest<IpcParams, GetCurrentViewIpcResponse>(GET_CURRENT_VIEW_CHANNEL, {})
+        ])
+        this.setState({
+            satelliteConfig: configResponse.config,
+            selectedId: currentViewResponse.viewId
+        })
     }
 
     public render(): ReactNode {

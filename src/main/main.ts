@@ -15,7 +15,9 @@ import * as path from 'path'
 import * as url from 'url'
 
 import {
+    GET_CURRENT_VIEW_CHANNEL,
     GET_SATELLITE_CONFIG_CHANNEL,
+    GetCurrentViewIpcResponse,
     GetSatelliteConfigIpcResponse,
     IpcParams,
     IpcRequest,
@@ -204,6 +206,14 @@ ipcMain.on(SET_WALLPAPER_CHANNEL, async (event, params: IpcRequest<SetWallpaperI
     AppConfigStore.currentViewId = params.params.viewId
     await WallpaperManager.update(Initiator.user)
     event.reply(params.responseChannel, {})
+})
+
+ipcMain.on(GET_CURRENT_VIEW_CHANNEL, async (event, params: IpcRequest<IpcParams>) => {
+    log.info('Current view request received')
+    const response: GetCurrentViewIpcResponse = {
+        viewId: AppConfigStore.currentViewId
+    }
+    event.reply(params.responseChannel, response)
 })
 
 if (process.platform === 'darwin') {
