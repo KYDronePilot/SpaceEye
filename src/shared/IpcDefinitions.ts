@@ -37,8 +37,17 @@ export interface GetCurrentViewIpcResponse {
     viewId?: number
 }
 
+export interface DownloadThumbnailIpcResponse {
+    dataUrl?: string
+}
+
+export interface DownloadThumbnailIpcParams {
+    url: string
+}
+
 export const EXAMPLE_CHANNEL = 'EXAMPLE_CHANNEL'
 export const GET_SATELLITE_CONFIG_CHANNEL = 'GET_SATELLITE_CONFIG_CHANNEL'
 export const SET_WALLPAPER_CHANNEL = 'SET_WALLPAPER_CHANNEL'
 export const VISIBILITY_CHANGE_ALERT_CHANNEL = 'VISIBILITY_CHANGE_ALERT_CHANNEL'
 export const GET_CURRENT_VIEW_CHANNEL = 'GET_CURRENT_VIEW_CHANNEL'
+export const DOWNLOAD_THUMBNAIL_CHANNEL = 'DOWNLOAD_THUMBNAIL_CHANNEL'

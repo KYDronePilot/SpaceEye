@@ -1,5 +1,17 @@
+import { ipcRenderer } from 'electron'
 import * as React from 'react'
 import styled from 'styled-components'
+
+import {
+    DOWNLOAD_THUMBNAIL_CHANNEL,
+    DownloadThumbnailIpcParams,
+    DownloadThumbnailIpcResponse,
+    VISIBILITY_CHANGE_ALERT_CHANNEL,
+    VisibilityChangeAlertIpcParams
+} from '../../shared/IpcDefinitions'
+import { ipcRequest } from '../IpcService'
+
+ipcRenderer.setMaxListeners(30)
 
 interface IsSelectedStyleProps {
     readonly isSelected: boolean
@@ -73,20 +85,52 @@ interface ThumbnailProps {
     onClick: (id: number) => void
 }
 
-const Thumbnail: React.FunctionComponent<ThumbnailProps> = props => {
-    const { id, src, name, isSelected, onClick } = props
-    const isSelectedValue = isSelected(id)
-
-    return (
-        <ThumbnailContainer isSelected={isSelectedValue}>
-            <ImageContainerBackground isSelected={isSelectedValue}>
-                <ImageContainer isSelected={isSelectedValue} onClick={() => onClick(id)}>
-                    <Image src={src} />
-                </ImageContainer>
-            </ImageContainerBackground>
-            <ThumbnailName isSelected={isSelectedValue}>{name}</ThumbnailName>
-        </ThumbnailContainer>
-    )
+interface ThumbnailState {
+    b64Image?: string
 }
 
-export default Thumbnail
+export default class Thumbnail extends React.Component<ThumbnailProps, ThumbnailState> {
+    constructor(props: ThumbnailProps) {
+        super(props)
+
+        this.state = {}
+
+        this.update = this.update.bind(this)
+    }
+
+    async componentDidMount(): Promise<void> {
+        ipcRenderer.on(
+            VISIBILITY_CHANGE_ALERT_CHANNEL,
+            (_, params: VisibilityChangeAlertIpcParams) => {
+                if (params.visible) {
+                    this.update()
+                }
+            }
+        )
+        await this.update()
+    }
+
+    async update(): Promise<void> {
+        const response = await ipcRequest<DownloadThumbnailIpcParams, DownloadThumbnailIpcResponse>(
+            DOWNLOAD_THUMBNAIL_CHANNEL,
+            { url: this.props.src }
+        )
+        this.setState({ b64Image: response.dataUrl })
+    }
+
+    public render(): React.ReactNode {
+        const { id, name, isSelected, onClick } = this.props
+        const isSelectedValue = isSelected(id)
+
+        return (
+            <ThumbnailContainer isSelected={isSelectedValue}>
+                <ImageContainerBackground isSelected={isSelectedValue}>
+                    <ImageContainer isSelected={isSelectedValue} onClick={() => onClick(id)}>
+                        <Image src={this.state.b64Image} />
+                    </ImageContainer>
+                </ImageContainerBackground>
+                <ThumbnailName isSelected={isSelectedValue}>{name}</ThumbnailName>
+            </ThumbnailContainer>
+        )
+    }
+}

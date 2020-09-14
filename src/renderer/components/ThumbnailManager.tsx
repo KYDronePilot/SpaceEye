@@ -96,7 +96,7 @@ export default class ThumbnailManager extends React.Component<
                             viewId: view.id,
                             imageId: imageSource.id,
                             name: `${satellite.name} - ${view.name}`,
-                            url: `${imageSource.url}#${timestamp}`,
+                            url: imageSource.url,
                             dimensions: imageSource.dimensions
                         })
                     }

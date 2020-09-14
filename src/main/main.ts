@@ -6,6 +6,9 @@ import * as path from 'path'
 import * as url from 'url'
 
 import {
+    DOWNLOAD_THUMBNAIL_CHANNEL,
+    DownloadThumbnailIpcParams,
+    DownloadThumbnailIpcResponse,
     GET_CURRENT_VIEW_CHANNEL,
     GET_SATELLITE_CONFIG_CHANNEL,
     GetCurrentViewIpcResponse,
@@ -206,6 +209,19 @@ ipcMain.on(GET_CURRENT_VIEW_CHANNEL, async (event, params: IpcRequest<IpcParams>
     }
     event.reply(params.responseChannel, response)
 })
+
+ipcMain.on(
+    DOWNLOAD_THUMBNAIL_CHANNEL,
+    async (event, params: IpcRequest<DownloadThumbnailIpcParams>) => {
+        log.info('Download thumbnail request received')
+        const webResponse = await Axios.get(params.params.url, { responseType: 'arraybuffer' })
+        const b64Image = Buffer.from(webResponse.data, 'binary').toString('base64')
+        const response: DownloadThumbnailIpcResponse = {
+            dataUrl: `data:image/jpeg;base64,${b64Image}`
+        }
+        event.reply(params.responseChannel, response)
+    }
+)
 
 if (process.platform === 'darwin') {
     systemPreferences.subscribeWorkspaceNotification(

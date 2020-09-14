@@ -1,5 +1,4 @@
 import { IpcRenderer } from 'electron'
-import moment from 'moment'
 
 import { IpcParams, IpcRequest, IpcResponse } from '../shared/IpcDefinitions'
 
@@ -15,17 +14,23 @@ function initializeIpcRenderer() {
     ipcRenderer = window.require('electron').ipcRenderer
 }
 
+let counter = 0
+
 /**
  * Generate the response channel ID to send to the main process.
+ *
  * @param channelId - Request channel ID
  * @returns Response channel ID
  */
 function generateResponseChannel(channelId: string): string {
-    return `${channelId}_${moment().valueOf()}`
+    const channel = `${channelId}_${counter}`
+    counter += 1
+    return channel
 }
 
 /**
  * For making IPC requests.
+ *
  * @param id - Channel ID
  * @param params - Request parameters
  * @param wait - Whether to wait for a response
