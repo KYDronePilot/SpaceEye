@@ -1,16 +1,25 @@
 import { dialog } from 'electron'
 import electronLog from 'electron-log'
-import { autoUpdater } from 'electron-updater'
+import { autoUpdater, UpdateInfo } from 'electron-updater'
 import { setInterval } from 'timers'
 
 const log = electronLog.scope('auto-updater')
+
+// Update versions that the user has been alerted of
+const updateAlertVersions: Record<string, boolean> = {}
 
 autoUpdater.logger = log
 autoUpdater.allowPrerelease = true
 autoUpdater.autoDownload = true
 autoUpdater.autoInstallOnAppQuit = true
 
-autoUpdater.on('update-downloaded', async () => {
+autoUpdater.on('update-downloaded', async (info: UpdateInfo) => {
+    // Don't alert the user more than once for an update version
+    if (updateAlertVersions[info.version] === true) {
+        return
+    }
+    updateAlertVersions[info.version] = true
+
     const res = await dialog.showMessageBox({
         type: 'info',
         buttons: ['Restart', 'Later'],
