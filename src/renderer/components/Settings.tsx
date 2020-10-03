@@ -1,3 +1,6 @@
+import { FormControl, FormControlLabel, Switch, withStyles } from '@material-ui/core'
+import { createMuiTheme } from '@material-ui/core/styles'
+import { ThemeProvider } from '@material-ui/styles'
 import * as React from 'react'
 import { Redirect } from 'react-router-dom'
 import styled from 'styled-components'
@@ -7,6 +10,7 @@ import { ipcRequest } from '../IpcService'
 
 interface SettingsState {
     backCLicked: boolean
+    startOnReboot: boolean
 }
 
 const SectionsContainer = styled.div`
@@ -107,6 +111,50 @@ const BackButton = styled.button`
     letter-spacing: 0.15px;
 `
 
+interface SettingsSwitchProps {
+    label: string
+    isChecked: boolean
+    onChange: (isChecked: boolean) => void
+}
+
+const StyledLabel = withStyles({
+    label: {
+        color: 'white'
+    }
+})(FormControlLabel)
+
+const theme = createMuiTheme({
+    palette: {
+        type: 'dark',
+        primary: {
+            main: '#0075ff'
+        }
+    }
+})
+
+const SettingsSwitch: React.FC<SettingsSwitchProps> = props => {
+    const { label, isChecked, onChange } = props
+    return (
+        <ThemeProvider theme={theme}>
+            <FormControl component="fieldset">
+                <StyledLabel
+                    control={
+                        <Switch
+                            checked={isChecked}
+                            onChange={(_, checked) => onChange(checked)}
+                            name={label}
+                            color="primary"
+                        />
+                    }
+                    label={label}
+                    labelPlacement="top"
+                    classes={{ label: 'color: white;' }}
+                />
+            </FormControl>
+        </ThemeProvider>
+    )
+}
+
 export default class Settings extends React.Component<{}, SettingsState> {
     /**
      * Close the application window.
@@ -119,14 +167,20 @@ export default class Settings extends React.Component<{}, SettingsState> {
         super(props)
 
         this.state = {
-            backCLicked: false
+            backCLicked: false,
+            startOnReboot: false
         }
 
         this.onClickBack = this.onClickBack.bind(this)
+        this.onSwitchStartOnReboot = this.onSwitchStartOnReboot.bind(this)
     }
 
     private onClickBack() {
         this.setState({ backCLicked: true })
+    }
+
+    private onSwitchStartOnReboot(isChecked: boolean) {
+        this.setState({ startOnReboot: isChecked })
     }
 
     public render() {
@@ -160,6 +214,14 @@ export default class Settings extends React.Component<{}, SettingsState> {
                     <Row>
                         <Spacer />
                         <SettingsHeader>Settings</SettingsHeader>
+                        <Spacer />
+                    </Row>
+                    <Row>
+                        <SettingsSwitch
+                            isChecked={this.state.startOnReboot}
+                            onChange={this.onSwitchStartOnReboot}
+                            label="Start on Reboot"
+                        />
                         <Spacer />
                     </Row>
                 </SettingsColumn>

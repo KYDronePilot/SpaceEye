@@ -1,7 +1,7 @@
-import 'typeface-roboto/index.css'
+import 'fontsource-roboto'
 
 import * as React from 'react'
-import { BrowserRouter, HashRouter, MemoryRouter, Route, Switch } from 'react-router-dom'
+import { HashRouter, Route } from 'react-router-dom'
 import styled, { ThemeProvider } from 'styled-components'
 
 import { DarkTheme } from '../themes'
