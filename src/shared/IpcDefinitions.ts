@@ -45,9 +45,19 @@ export interface DownloadThumbnailIpcParams {
     url: string
 }
 
+export interface GetStartOnBootIpcResponse {
+    startOnBoot?: boolean
+}
+
+export interface SetStartOnBootIpcParams {
+    startOnBoot: boolean
+}
+
 export const EXAMPLE_CHANNEL = 'EXAMPLE_CHANNEL'
 export const GET_SATELLITE_CONFIG_CHANNEL = 'GET_SATELLITE_CONFIG_CHANNEL'
 export const SET_WALLPAPER_CHANNEL = 'SET_WALLPAPER_CHANNEL'
 export const VISIBILITY_CHANGE_ALERT_CHANNEL = 'VISIBILITY_CHANGE_ALERT_CHANNEL'
 export const GET_CURRENT_VIEW_CHANNEL = 'GET_CURRENT_VIEW_CHANNEL'
 export const DOWNLOAD_THUMBNAIL_CHANNEL = 'DOWNLOAD_THUMBNAIL_CHANNEL'
+export const GET_START_ON_BOOT = 'GET_START_ON_BOOT'
+export const SET_START_ON_BOOT = 'SET_START_ON_BOOT'

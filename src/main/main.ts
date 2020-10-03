@@ -11,12 +11,16 @@ import {
     DownloadThumbnailIpcResponse,
     GET_CURRENT_VIEW_CHANNEL,
     GET_SATELLITE_CONFIG_CHANNEL,
+    GET_START_ON_BOOT,
     GetCurrentViewIpcResponse,
     GetSatelliteConfigIpcResponse,
+    GetStartOnBootIpcResponse,
     IpcParams,
     IpcRequest,
     QUIT_APPLICATION_CHANNEL,
+    SET_START_ON_BOOT,
     SET_WALLPAPER_CHANNEL,
+    SetStartOnBootIpcParams,
     SetWallpaperIpcParams,
     VISIBILITY_CHANGE_ALERT_CHANNEL,
     VisibilityChangeAlertIpcParams
@@ -154,11 +158,18 @@ mb.on('ready', () => {
     }
 })
 
-// Ensure app is configured to open on user login
-const loginItemSettings = app.getLoginItemSettings()
+/**
+ * Configure whether the app should start on login.
+ *
+ * @param shouldStart - Whether the app should start on login
+ */
+function configureStartOnLogin(shouldStart: boolean) {
+    const loginItemSettings = app.getLoginItemSettings()
 
-if (!loginItemSettings.openAtLogin) {
-    app.setLoginItemSettings({ openAtLogin: true })
+    // If not set to what it should be, update it
+    if (loginItemSettings.openAtLogin !== shouldStart) {
+        app.setLoginItemSettings({ openAtLogin: shouldStart })
+    }
 }
 
 app.on('will-quit', () => {
@@ -222,6 +233,18 @@ ipcMain.on(
         event.reply(params.responseChannel, response)
     }
 )
+
+ipcMain.on(GET_START_ON_BOOT, async (event, params: IpcRequest<IpcParams>) => {
+    const response: GetStartOnBootIpcResponse = {
+        startOnBoot: AppConfigStore.startOnBoot
+    }
+    event.reply(params.responseChannel, response)
+})
+
+ipcMain.on(SET_START_ON_BOOT, async (_, params: IpcRequest<SetStartOnBootIpcParams>) => {
+    AppConfigStore.startOnBoot = params.params.startOnBoot
+    configureStartOnLogin(params.params.startOnBoot)
+})
 
 if (process.platform === 'darwin') {
     systemPreferences.subscribeWorkspaceNotification(

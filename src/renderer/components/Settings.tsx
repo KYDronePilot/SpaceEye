@@ -5,7 +5,13 @@ import * as React from 'react'
 import { Redirect } from 'react-router-dom'
 import styled from 'styled-components'
 
-import { QUIT_APPLICATION_CHANNEL } from '../../shared/IpcDefinitions'
+import {
+    GET_START_ON_BOOT,
+    GetStartOnBootIpcResponse,
+    QUIT_APPLICATION_CHANNEL,
+    SET_START_ON_BOOT,
+    SetStartOnBootIpcParams
+} from '../../shared/IpcDefinitions'
 import { ipcRequest } from '../IpcService'
 
 interface SettingsState {
@@ -155,11 +161,14 @@ const SettingsSwitch: React.FC<SettingsSwitchProps> = props => {
     )
 }
 
-export default class Settings extends React.Component<{}, SettingsState> {
-    /**
-     * Close the application window.
-     */
-    private static async closeWindow() {
+interface SettingsManagerState {
+    backCLicked: boolean
+    startOnReboot: boolean
+    isLoaded: boolean
+}
+
+export default class SettingsManager extends React.Component<{}, SettingsManagerState> {
+    private static async onClickQuit() {
         await ipcRequest(QUIT_APPLICATION_CHANNEL, {}, false)
     }
 
@@ -168,64 +177,99 @@ export default class Settings extends React.Component<{}, SettingsState> {
 
         this.state = {
             backCLicked: false,
-            startOnReboot: false
+            startOnReboot: false,
+            isLoaded: false
         }
 
+        this.onChangeStartOnLogin = this.onChangeStartOnLogin.bind(this)
         this.onClickBack = this.onClickBack.bind(this)
-        this.onSwitchStartOnReboot = this.onSwitchStartOnReboot.bind(this)
+    }
+
+    async componentDidMount(): Promise<void> {
+        const response = await ipcRequest<{}, GetStartOnBootIpcResponse>(GET_START_ON_BOOT, {})
+        this.setState({ startOnReboot: response.startOnBoot ?? false }, () => {
+            this.setState({ isLoaded: true })
+        })
+    }
+
+    private async onChangeStartOnLogin(shouldStart: boolean) {
+        this.setState({ startOnReboot: shouldStart })
+        await ipcRequest<SetStartOnBootIpcParams, {}>(
+            SET_START_ON_BOOT,
+            { startOnBoot: shouldStart },
+            false
+        )
     }
 
     private onClickBack() {
         this.setState({ backCLicked: true })
     }
 
-    private onSwitchStartOnReboot(isChecked: boolean) {
-        this.setState({ startOnReboot: isChecked })
-    }
-
-    public render() {
+    render(): React.ReactNode {
         if (this.state.backCLicked) {
             return <Redirect to="/" />
         }
-
+        if (!this.state.isLoaded) {
+            return <div />
+        }
         return (
-            <SettingsContainer>
-                <SectionsContainer>
-                    <SectionsColumn>
-                        <Row>
-                            <Spacer />
-                            <ProductTitle>SpaceEye alpha</ProductTitle>
-                            <Spacer />
-                        </Row>
-                        <Row>
-                            <Spacer />
-                            <BackButton onClick={() => this.onClickBack()}>Back</BackButton>
-                            <Spacer />
-                        </Row>
-                        <Spacer />
-                        <Row>
-                            <Spacer />
-                            <QuitButton onClick={() => Settings.closeWindow()}>Quit</QuitButton>
-                            <Spacer />
-                        </Row>
-                    </SectionsColumn>
-                </SectionsContainer>
-                <SettingsColumn>
-                    <Row>
-                        <Spacer />
-                        <SettingsHeader>Settings</SettingsHeader>
-                        <Spacer />
-                    </Row>
-                    <Row>
-                        <SettingsSwitch
-                            isChecked={this.state.startOnReboot}
-                            onChange={this.onSwitchStartOnReboot}
-                            label="Start on Reboot"
-                        />
-                        <Spacer />
-                    </Row>
-                </SettingsColumn>
-            </SettingsContainer>
+            <Settings
+                onClickBack={this.onClickBack}
+                onClickStartOnLoginSwitch={this.onChangeStartOnLogin}
+                shouldStartOnLogin={this.state.startOnReboot}
+                onClickQuit={SettingsManager.onClickQuit}
+            />
         )
     }
+}
+
+interface SettingsProps {
+    onClickBack: () => void
+    onClickQuit: () => void
+    onClickStartOnLoginSwitch: (shouldStart: boolean) => void
+    shouldStartOnLogin: boolean
+}
+
+const Settings: React.FC<SettingsProps> = props => {
+    const { onClickBack, onClickQuit, onClickStartOnLoginSwitch, shouldStartOnLogin } = props
+
+    return (
+        <SettingsContainer>
+            <SectionsContainer>
+                <SectionsColumn>
+                    <Row>
+                        <Spacer />
+                        <ProductTitle>SpaceEye alpha</ProductTitle>
+                        <Spacer />
+                    </Row>
+                    <Row>
+                        <Spacer />
+                        <BackButton onClick={onClickBack}>Back</BackButton>
+                        <Spacer />
+                    </Row>
+                    <Spacer />
+                    <Row>
+                        <Spacer />
+                        <QuitButton onClick={onClickQuit}>Quit</QuitButton>
+                        <Spacer />
+                    </Row>
+                </SectionsColumn>
+            </SectionsContainer>
+            <SettingsColumn>
+                <Row>
+                    <Spacer />
+                    <SettingsHeader>Settings</SettingsHeader>
+                    <Spacer />
+                </Row>
+                <Row>
+                    <SettingsSwitch
+                        isChecked={shouldStartOnLogin}
+                        onChange={onClickStartOnLoginSwitch}
+                        label="Start on Login"
+                    />
+                    <Spacer />
+                </Row>
+            </SettingsColumn>
+        </SettingsContainer>
+    )
 }
