@@ -112,12 +112,6 @@ const BackButton = styled.button`
     letter-spacing: 0.15px;
 `
 
-interface SettingsSwitchProps {
-    label: string
-    isChecked: boolean
-    onChange: (isChecked: boolean) => void
-}
-
 const theme = createMuiTheme({
     palette: {
         type: 'dark',
@@ -126,6 +120,12 @@ const theme = createMuiTheme({
         }
     }
 })
+
+interface SettingsSwitchProps {
+    label: string
+    isChecked: boolean
+    onChange: (isChecked: boolean) => void
+}
 
 const SettingsSwitch: React.FC<SettingsSwitchProps> = props => {
     const { label, isChecked, onChange } = props
@@ -147,6 +147,57 @@ const SettingsSwitch: React.FC<SettingsSwitchProps> = props => {
                 />
             </FormControl>
         </ThemeProvider>
+    )
+}
+
+interface SettingsProps {
+    onClickBack: () => void
+    onClickQuit: () => void
+    onClickStartOnLoginSwitch: (shouldStart: boolean) => void
+    shouldStartOnLogin: boolean
+}
+
+const Settings: React.FC<SettingsProps> = props => {
+    const { onClickBack, onClickQuit, onClickStartOnLoginSwitch, shouldStartOnLogin } = props
+
+    return (
+        <SettingsContainer>
+            <SectionsContainer>
+                <SectionsColumn>
+                    <Row>
+                        <Spacer />
+                        <ProductTitle>SpaceEye alpha</ProductTitle>
+                        <Spacer />
+                    </Row>
+                    <Row>
+                        <Spacer />
+                        <BackButton onClick={onClickBack}>Back</BackButton>
+                        <Spacer />
+                    </Row>
+                    <Spacer />
+                    <Row>
+                        <Spacer />
+                        <QuitButton onClick={onClickQuit}>Quit</QuitButton>
+                        <Spacer />
+                    </Row>
+                </SectionsColumn>
+            </SectionsContainer>
+            <SettingsColumn>
+                <Row>
+                    <Spacer />
+                    <SettingsHeader>Settings</SettingsHeader>
+                    <Spacer />
+                </Row>
+                <Row>
+                    <SettingsSwitch
+                        isChecked={shouldStartOnLogin}
+                        onChange={onClickStartOnLoginSwitch}
+                        label="Start on Login"
+                    />
+                    <Spacer />
+                </Row>
+            </SettingsColumn>
+        </SettingsContainer>
     )
 }
 
@@ -210,55 +261,4 @@ export default class SettingsManager extends React.Component<{}, SettingsManager
             />
         )
     }
-}
-
-interface SettingsProps {
-    onClickBack: () => void
-    onClickQuit: () => void
-    onClickStartOnLoginSwitch: (shouldStart: boolean) => void
-    shouldStartOnLogin: boolean
-}
-
-const Settings: React.FC<SettingsProps> = props => {
-    const { onClickBack, onClickQuit, onClickStartOnLoginSwitch, shouldStartOnLogin } = props
-
-    return (
-        <SettingsContainer>
-            <SectionsContainer>
-                <SectionsColumn>
-                    <Row>
-                        <Spacer />
-                        <ProductTitle>SpaceEye alpha</ProductTitle>
-                        <Spacer />
-                    </Row>
-                    <Row>
-                        <Spacer />
-                        <BackButton onClick={onClickBack}>Back</BackButton>
-                        <Spacer />
-                    </Row>
-                    <Spacer />
-                    <Row>
-                        <Spacer />
-                        <QuitButton onClick={onClickQuit}>Quit</QuitButton>
-                        <Spacer />
-                    </Row>
-                </SectionsColumn>
-            </SectionsContainer>
-            <SettingsColumn>
-                <Row>
-                    <Spacer />
-                    <SettingsHeader>Settings</SettingsHeader>
-                    <Spacer />
-                </Row>
-                <Row>
-                    <SettingsSwitch
-                        isChecked={shouldStartOnLogin}
-                        onChange={onClickStartOnLoginSwitch}
-                        label="Start on Login"
-                    />
-                    <Spacer />
-                </Row>
-            </SettingsColumn>
-        </SettingsContainer>
-    )
 }
