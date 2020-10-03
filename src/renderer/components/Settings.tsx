@@ -1,4 +1,4 @@
-import { FormControl, FormControlLabel, Switch, withStyles } from '@material-ui/core'
+import { FormControl, FormControlLabel, Switch } from '@material-ui/core'
 import { createMuiTheme } from '@material-ui/core/styles'
 import { ThemeProvider } from '@material-ui/styles'
 import * as React from 'react'
@@ -13,11 +13,6 @@ import {
     SetStartOnLoginIpcParams
 } from '../../shared/IpcDefinitions'
 import { ipcRequest } from '../IpcService'
-
-interface SettingsState {
-    backCLicked: boolean
-    startOnLogin: boolean
-}
 
 const SectionsContainer = styled.div`
     display: flex;
@@ -123,12 +118,6 @@ interface SettingsSwitchProps {
     onChange: (isChecked: boolean) => void
 }
 
-const StyledLabel = withStyles({
-    label: {
-        color: 'white'
-    }
-})(FormControlLabel)
-
 const theme = createMuiTheme({
     palette: {
         type: 'dark',
@@ -143,7 +132,7 @@ const SettingsSwitch: React.FC<SettingsSwitchProps> = props => {
     return (
         <ThemeProvider theme={theme}>
             <FormControl component="fieldset">
-                <StyledLabel
+                <FormControlLabel
                     control={
                         <Switch
                             checked={isChecked}
