@@ -74,6 +74,14 @@ export class WallpaperManager {
         monitor: Display,
         sources: ImageSource[]
     ): ImageSource {
+        for (const source of sources) {
+            if (
+                source.dimensions[0] > monitor.scaleFactor * monitor.size.width &&
+                source.dimensions[1] > monitor.scaleFactor * monitor.size.height
+            ) {
+                return source
+            }
+        }
         return sources[sources.length - 1]
     }
 
@@ -92,7 +100,9 @@ export class WallpaperManager {
             WallpaperManager.selectImageSourceForMonitor(monitor, view.imageSources)
         )
         // Pick the biggest one
-        return maxBy(possibleImages, image => image.dimensions[0] * image.dimensions[1])!
+        const bestImage = maxBy(possibleImages, image => image.dimensions[0] * image.dimensions[1])!
+        log.debug(`Optimal image for view "${view.id}": ${bestImage.id}`)
+        return bestImage
     }
 
     /**

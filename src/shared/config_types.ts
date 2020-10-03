@@ -4,6 +4,7 @@
 interface ImageSource {
     id: number
     url: string
+    estimatedSize: string
     updateInterval: number
     dimensions: [number, number]
     isThumbnail?: boolean
