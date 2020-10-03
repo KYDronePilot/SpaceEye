@@ -118,6 +118,11 @@ const theme = createMuiTheme({
         primary: {
             main: '#0075ff'
         }
+    },
+    typography: {
+        allVariants: {
+            color: 'white'
+        }
     }
 })
 
@@ -143,7 +148,6 @@ const SettingsSwitch: React.FC<SettingsSwitchProps> = props => {
                     }
                     label={label}
                     labelPlacement="top"
-                    classes={{ label: 'color: white;' }}
                 />
             </FormControl>
         </ThemeProvider>
