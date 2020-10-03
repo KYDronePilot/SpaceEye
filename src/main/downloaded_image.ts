@@ -5,7 +5,7 @@ import moment, { Moment } from 'moment'
 import * as Path from 'path'
 import { promisify } from 'util'
 
-import { UPDATE_INTERVAL_MIN } from './consts'
+import { IMAGE_RETENTION_TIME } from './consts'
 import { IMAGES_DIR } from './paths'
 
 const log = electronLog.scope('downloaded-image')
@@ -81,7 +81,7 @@ export class DownloadedImage {
         const downloadedImages = await DownloadedImage.getDownloadedImages()
         const now = moment.utc()
         const oldImages = downloadedImages.filter(
-            image => now.diff(image.timestamp, 'minutes') > UPDATE_INTERVAL_MIN
+            image => now.diff(image.timestamp, 'minutes') > IMAGE_RETENTION_TIME
         )
         log.debug(
             'Deleting old images:',

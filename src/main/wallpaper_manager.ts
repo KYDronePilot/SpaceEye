@@ -9,7 +9,6 @@ import { maxBy } from 'lodash'
 import moment from 'moment'
 
 import { AppConfigStore } from './app_config_store'
-import { UPDATE_INTERVAL_MIN } from './consts'
 import { DownloadedImage } from './downloaded_image'
 import {
     LockInvalidatedError,
@@ -176,7 +175,7 @@ export class WallpaperManager {
         // If there isn't a downloaded image or it's too old, download a new one
         if (
             imageToSet === undefined ||
-            moment.utc().diff(imageToSet.timestamp, 'minutes') > UPDATE_INTERVAL_MIN
+            moment.utc().diff(imageToSet.timestamp, 'seconds') > imageConfig.updateInterval
         ) {
             log.info('New image must be downloaded')
             imageToSet = await downloadImage(imageConfig, lock.generateCancelToken(), lock)
