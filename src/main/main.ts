@@ -172,6 +172,14 @@ function configureStartOnLogin(shouldStart: boolean) {
     }
 }
 
+// Default to start on login
+if (AppConfigStore.startOnLogin === undefined) {
+    AppConfigStore.startOnLogin = true
+}
+
+// Ensure configured on startup
+configureStartOnLogin(AppConfigStore.startOnLogin ?? true)
+
 app.on('will-quit', () => {
     log.info('Application will quit')
     clearInterval(heartbeatHandle)
