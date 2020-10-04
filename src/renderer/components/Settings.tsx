@@ -1,13 +1,26 @@
+import {
+    Box,
+    Button,
+    Divider,
+    FormControl,
+    FormControlLabel,
+    Grid,
+    Switch,
+    Typography
+} from '@material-ui/core'
+import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles'
 import * as React from 'react'
 import { Redirect } from 'react-router-dom'
 import styled from 'styled-components'
 
-import { QUIT_APPLICATION_CHANNEL } from '../../shared/IpcDefinitions'
+import {
+    GET_START_ON_LOGIN,
+    GetStartOnLoginIpcResponse,
+    QUIT_APPLICATION_CHANNEL,
+    SET_START_ON_LOGIN,
+    SetStartOnLoginIpcParams
+} from '../../shared/IpcDefinitions'
 import { ipcRequest } from '../IpcService'
-
-interface SettingsState {
-    backCLicked: boolean
-}
 
 const SectionsContainer = styled.div`
     display: flex;
@@ -107,11 +120,109 @@ const BackButton = styled.button`
     letter-spacing: 0.15px;
 `
 
-export default class Settings extends React.Component<{}, SettingsState> {
-    /**
-     * Close the application window.
-     */
-    private static async closeWindow() {
+const theme = createMuiTheme({
+    palette: {
+        type: 'dark',
+        primary: {
+            main: '#5297ff'
+        }
+    },
+    typography: {
+        allVariants: {
+            color: 'white'
+        }
+    }
+})
+
+interface SettingsSwitchProps {
+    label: string
+    isChecked: boolean
+    onChange: (isChecked: boolean) => void
+}
+
+const SettingsSwitch: React.FC<SettingsSwitchProps> = props => {
+    const { label, isChecked, onChange } = props
+    return (
+        <FormControl component="fieldset">
+            <FormControlLabel
+                control={
+                    <Switch
+                        checked={isChecked}
+                        onChange={(_, checked) => onChange(checked)}
+                        name={label}
+                        color="primary"
+                    />
+                }
+                label={label}
+                labelPlacement="top"
+            />
+        </FormControl>
+    )
+}
+
+interface SettingsProps {
+    onClickBack: () => void
+    onClickQuit: () => void
+    onClickStartOnLoginSwitch: (shouldStart: boolean) => void
+    shouldStartOnLogin: boolean
+}
+
+const Settings: React.FC<SettingsProps> = props => {
+    const { onClickBack, onClickQuit, onClickStartOnLoginSwitch, shouldStartOnLogin } = props
+
+    return (
+        <ThemeProvider theme={theme}>
+            <SettingsContainer>
+                <SectionsContainer>
+                    <SectionsColumn>
+                        <Box my={1} />
+                        <Grid container direction="row" justify="center">
+                            <Typography variant="h5">SpaceEye</Typography>
+                        </Grid>
+                        <Box my={1} />
+                        <Grid container direction="row" justify="center">
+                            <Button variant="outlined" color="primary" onClick={onClickBack}>
+                                Back
+                            </Button>
+                        </Grid>
+                        <Spacer />
+                        <Grid container direction="row" justify="center">
+                            <Button variant="outlined" color="secondary" onClick={onClickQuit}>
+                                Quit
+                            </Button>
+                        </Grid>
+                        <Box my={1} />
+                    </SectionsColumn>
+                </SectionsContainer>
+                <SettingsColumn>
+                    <Box my={2} />
+                    <Grid container direction="row" justify="center">
+                        <Typography variant="h6">Settings</Typography>
+                    </Grid>
+                    <Box my={2} mx={1}>
+                        <Divider variant="fullWidth" />
+                    </Box>
+                    <Grid container direction="row" justify="flex-start">
+                        <SettingsSwitch
+                            isChecked={shouldStartOnLogin}
+                            onChange={onClickStartOnLoginSwitch}
+                            label="Start on Login"
+                        />
+                    </Grid>
+                </SettingsColumn>
+            </SettingsContainer>
+        </ThemeProvider>
+    )
+}
+
+interface SettingsManagerState {
+    backCLicked: boolean
+    startOnLogin: boolean
+    isLoaded: boolean
+}
+
+export default class SettingsManager extends React.Component<{}, SettingsManagerState> {
+    private static async onClickQuit() {
         await ipcRequest(QUIT_APPLICATION_CHANNEL, {}, false)
     }
 
@@ -119,51 +230,49 @@ export default class Settings extends React.Component<{}, SettingsState> {
         super(props)
 
         this.state = {
-            backCLicked: false
+            backCLicked: false,
+            startOnLogin: false,
+            isLoaded: false
         }
 
+        this.onChangeStartOnLogin = this.onChangeStartOnLogin.bind(this)
         this.onClickBack = this.onClickBack.bind(this)
+    }
+
+    async componentDidMount(): Promise<void> {
+        const response = await ipcRequest<{}, GetStartOnLoginIpcResponse>(GET_START_ON_LOGIN, {})
+        this.setState({ startOnLogin: response.startOnLogin ?? false }, () => {
+            this.setState({ isLoaded: true })
+        })
+    }
+
+    private async onChangeStartOnLogin(shouldStart: boolean) {
+        this.setState({ startOnLogin: shouldStart })
+        await ipcRequest<SetStartOnLoginIpcParams, {}>(
+            SET_START_ON_LOGIN,
+            { startOnLogin: shouldStart },
+            false
+        )
     }
 
     private onClickBack() {
         this.setState({ backCLicked: true })
     }
 
-    public render() {
+    render(): React.ReactNode {
         if (this.state.backCLicked) {
             return <Redirect to="/" />
         }
-
+        if (!this.state.isLoaded) {
+            return <div />
+        }
         return (
-            <SettingsContainer>
-                <SectionsContainer>
-                    <SectionsColumn>
-                        <Row>
-                            <Spacer />
-                            <ProductTitle>SpaceEye alpha</ProductTitle>
-                            <Spacer />
-                        </Row>
-                        <Row>
-                            <Spacer />
-                            <BackButton onClick={() => this.onClickBack()}>Back</BackButton>
-                            <Spacer />
-                        </Row>
-                        <Spacer />
-                        <Row>
-                            <Spacer />
-                            <QuitButton onClick={() => Settings.closeWindow()}>Quit</QuitButton>
-                            <Spacer />
-                        </Row>
-                    </SectionsColumn>
-                </SectionsContainer>
-                <SettingsColumn>
-                    <Row>
-                        <Spacer />
-                        <SettingsHeader>Settings</SettingsHeader>
-                        <Spacer />
-                    </Row>
-                </SettingsColumn>
-            </SettingsContainer>
+            <Settings
+                onClickBack={this.onClickBack}
+                onClickStartOnLoginSwitch={this.onChangeStartOnLogin}
+                shouldStartOnLogin={this.state.startOnLogin}
+                onClickQuit={SettingsManager.onClickQuit}
+            />
         )
     }
 }

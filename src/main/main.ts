@@ -11,12 +11,16 @@ import {
     DownloadThumbnailIpcResponse,
     GET_CURRENT_VIEW_CHANNEL,
     GET_SATELLITE_CONFIG_CHANNEL,
+    GET_START_ON_LOGIN,
     GetCurrentViewIpcResponse,
     GetSatelliteConfigIpcResponse,
+    GetStartOnLoginIpcResponse,
     IpcParams,
     IpcRequest,
     QUIT_APPLICATION_CHANNEL,
+    SET_START_ON_LOGIN,
     SET_WALLPAPER_CHANNEL,
+    SetStartOnLoginIpcParams,
     SetWallpaperIpcParams,
     VISIBILITY_CHANGE_ALERT_CHANNEL,
     VisibilityChangeAlertIpcParams
@@ -155,12 +159,27 @@ mb.on('ready', () => {
     }
 })
 
-// Ensure app is configured to open on user login
-const loginItemSettings = app.getLoginItemSettings()
+/**
+ * Configure whether the app should start on login.
+ *
+ * @param shouldStart - Whether the app should start on login
+ */
+function configureStartOnLogin(shouldStart: boolean) {
+    const loginItemSettings = app.getLoginItemSettings()
 
-if (!loginItemSettings.openAtLogin) {
-    app.setLoginItemSettings({ openAtLogin: true })
+    // If not set to what it should be, update it
+    if (loginItemSettings.openAtLogin !== shouldStart) {
+        app.setLoginItemSettings({ openAtLogin: shouldStart })
+    }
 }
+
+// Default to start on login
+if (AppConfigStore.startOnLogin === undefined) {
+    AppConfigStore.startOnLogin = true
+}
+
+// Ensure configured on startup
+configureStartOnLogin(AppConfigStore.startOnLogin ?? true)
 
 app.on('will-quit', () => {
     log.info('Application will quit')
@@ -223,6 +242,18 @@ ipcMain.on(
         event.reply(params.responseChannel, response)
     }
 )
+
+ipcMain.on(GET_START_ON_LOGIN, async (event, params: IpcRequest<IpcParams>) => {
+    const response: GetStartOnLoginIpcResponse = {
+        startOnLogin: AppConfigStore.startOnLogin
+    }
+    event.reply(params.responseChannel, response)
+})
+
+ipcMain.on(SET_START_ON_LOGIN, async (_, params: IpcRequest<SetStartOnLoginIpcParams>) => {
+    AppConfigStore.startOnLogin = params.params.startOnLogin
+    configureStartOnLogin(params.params.startOnLogin)
+})
 
 if (process.platform === 'darwin') {
     systemPreferences.subscribeWorkspaceNotification(
