@@ -48,6 +48,10 @@ startUpdateChecking()
  */
 async function heartbeat() {
     log.debug('Heartbeat triggered')
+    if (powerMonitor.getSystemIdleState(100) === 'locked') {
+        log.debug('Not updating from heartbeat because screen locked')
+        return
+    }
     await WallpaperManager.update(Initiator.heartbeatFunction)
 }
 
