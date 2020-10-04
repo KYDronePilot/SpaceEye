@@ -7,6 +7,10 @@ files:
   - dist/
   - node_modules/
   - package.json
+  - "!**/dist/legal_notices.txt"
+extraResources:
+  - from: dist/legal_notices.txt
+    to: ./
 afterSign: electron-builder-notarize
 mac:
   category: public.app-category.utilities
