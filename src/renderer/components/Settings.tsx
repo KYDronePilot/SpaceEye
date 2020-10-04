@@ -1,6 +1,14 @@
-import { FormControl, FormControlLabel, Switch } from '@material-ui/core'
-import { createMuiTheme } from '@material-ui/core/styles'
-import { ThemeProvider } from '@material-ui/styles'
+import {
+    Box,
+    Button,
+    Divider,
+    FormControl,
+    FormControlLabel,
+    Grid,
+    Switch,
+    Typography
+} from '@material-ui/core'
+import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles'
 import * as React from 'react'
 import { Redirect } from 'react-router-dom'
 import styled from 'styled-components'
@@ -116,7 +124,7 @@ const theme = createMuiTheme({
     palette: {
         type: 'dark',
         primary: {
-            main: '#0075ff'
+            main: '#5297ff'
         }
     },
     typography: {
@@ -135,22 +143,20 @@ interface SettingsSwitchProps {
 const SettingsSwitch: React.FC<SettingsSwitchProps> = props => {
     const { label, isChecked, onChange } = props
     return (
-        <ThemeProvider theme={theme}>
-            <FormControl component="fieldset">
-                <FormControlLabel
-                    control={
-                        <Switch
-                            checked={isChecked}
-                            onChange={(_, checked) => onChange(checked)}
-                            name={label}
-                            color="primary"
-                        />
-                    }
-                    label={label}
-                    labelPlacement="top"
-                />
-            </FormControl>
-        </ThemeProvider>
+        <FormControl component="fieldset">
+            <FormControlLabel
+                control={
+                    <Switch
+                        checked={isChecked}
+                        onChange={(_, checked) => onChange(checked)}
+                        name={label}
+                        color="primary"
+                    />
+                }
+                label={label}
+                labelPlacement="top"
+            />
+        </FormControl>
     )
 }
 
@@ -165,43 +171,47 @@ const Settings: React.FC<SettingsProps> = props => {
     const { onClickBack, onClickQuit, onClickStartOnLoginSwitch, shouldStartOnLogin } = props
 
     return (
-        <SettingsContainer>
-            <SectionsContainer>
-                <SectionsColumn>
-                    <Row>
+        <ThemeProvider theme={theme}>
+            <SettingsContainer>
+                <SectionsContainer>
+                    <SectionsColumn>
+                        <Box my={1} />
+                        <Grid container direction="row" justify="center">
+                            <Typography variant="h5">SpaceEye</Typography>
+                        </Grid>
+                        <Box my={1} />
+                        <Grid container direction="row" justify="center">
+                            <Button variant="outlined" color="primary" onClick={onClickBack}>
+                                Back
+                            </Button>
+                        </Grid>
                         <Spacer />
-                        <ProductTitle>SpaceEye alpha</ProductTitle>
-                        <Spacer />
-                    </Row>
-                    <Row>
-                        <Spacer />
-                        <BackButton onClick={onClickBack}>Back</BackButton>
-                        <Spacer />
-                    </Row>
-                    <Spacer />
-                    <Row>
-                        <Spacer />
-                        <QuitButton onClick={onClickQuit}>Quit</QuitButton>
-                        <Spacer />
-                    </Row>
-                </SectionsColumn>
-            </SectionsContainer>
-            <SettingsColumn>
-                <Row>
-                    <Spacer />
-                    <SettingsHeader>Settings</SettingsHeader>
-                    <Spacer />
-                </Row>
-                <Row>
-                    <SettingsSwitch
-                        isChecked={shouldStartOnLogin}
-                        onChange={onClickStartOnLoginSwitch}
-                        label="Start on Login"
-                    />
-                    <Spacer />
-                </Row>
-            </SettingsColumn>
-        </SettingsContainer>
+                        <Grid container direction="row" justify="center">
+                            <Button variant="outlined" color="secondary" onClick={onClickQuit}>
+                                Quit
+                            </Button>
+                        </Grid>
+                        <Box my={1} />
+                    </SectionsColumn>
+                </SectionsContainer>
+                <SettingsColumn>
+                    <Box my={2} />
+                    <Grid container direction="row" justify="center">
+                        <Typography variant="h6">Settings</Typography>
+                    </Grid>
+                    <Box my={2} mx={1}>
+                        <Divider variant="fullWidth" />
+                    </Box>
+                    <Grid container direction="row" justify="flex-start">
+                        <SettingsSwitch
+                            isChecked={shouldStartOnLogin}
+                            onChange={onClickStartOnLoginSwitch}
+                            label="Start on Login"
+                        />
+                    </Grid>
+                </SettingsColumn>
+            </SettingsContainer>
+        </ThemeProvider>
     )
 }
 
