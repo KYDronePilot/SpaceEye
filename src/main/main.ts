@@ -161,6 +161,9 @@ mb.on('ready', () => {
             await WallpaperManager.update(Initiator.displayChangeWatcher)
         })
     }
+
+    // Run an update on start
+    WallpaperManager.update(Initiator.user)
 })
 
 /**
