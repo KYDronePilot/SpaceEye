@@ -44,7 +44,7 @@ const FloatingHeader = styled.div`
     width: 100%;
     z-index: 10;
     display: flex;
-    -webkit-app-region: drag;
+    /* -webkit-app-region: drag; */
 `
 
 /**
