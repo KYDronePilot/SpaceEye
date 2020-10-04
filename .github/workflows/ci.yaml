@@ -23,11 +23,11 @@ jobs:
           node-version: 13
 
       # If macOS, install Mac Node API
-      - run: npm install git+https://github.com/KYDronePilot/space-eye-mac-node-api.git
+      - run: yarn install git+https://github.com/KYDronePilot/space-eye-mac-node-api.git
         if: startsWith(matrix.os, 'macos')
 
       # If Windows, install Windows Node API
-      - run: npm install git+https://github.com/KYDronePilot/space-eye-windows-node-api.git
+      - run: yarn install git+https://github.com/KYDronePilot/space-eye-windows-node-api.git
         if: startsWith(matrix.os, 'windows')
 
       - name: Prepare for app notarization
