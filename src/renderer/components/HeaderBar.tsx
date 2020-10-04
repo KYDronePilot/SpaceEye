@@ -1,10 +1,7 @@
-import 'typeface-roboto/index.css'
-
 import * as React from 'react'
 import styled from 'styled-components'
 
 import EllipsisButton from './EllipsisButton'
-import WallpaperModeSelector from './WallpaperModeSelector'
 
 /**
  * Blurs the background when scrolling.

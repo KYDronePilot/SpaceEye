@@ -127,11 +127,7 @@
     "dependencies": {
         "@material-ui/core": "^4.11.0",
         "@material-ui/icons": "^4.9.1",
-        "@types/async-lock": "^1.1.2",
-        "@types/deep-equal": "^1.0.1",
-        "async-lock": "^1.2.4",
         "axios": "^0.19.2",
-        "deep-equal": "^2.0.3",
         "electron-log": "^4.2.4",
         "electron-store": "^6.0.0",
         "electron-updater": "^4.3.4",
@@ -141,11 +137,8 @@
         "moment": "^2.26.0",
         "react": "^16.8.6",
         "react-dom": "^16.8.6",
-        "react-redux": "^7.0.3",
         "react-router-dom": "^5.2.0",
-        "redux": "^4.0.1",
         "simplebar-react": "^2.2.0",
-        "styled-components": "^5.1.0",
-        "typeface-roboto": "0.0.75"
+        "styled-components": "^5.1.0"
     }
 }

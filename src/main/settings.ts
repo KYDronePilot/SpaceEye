@@ -1,7 +1,7 @@
 import { app, Size } from 'electron'
-import * as path from 'path'
 import * as fs from 'fs'
-import deepEqual from 'deep-equal'
+import * as path from 'path'
+// import deepEqual from 'deep-equal'
 
 /**
  * Settings directory.
@@ -53,7 +53,7 @@ function scoreDisplayVsSettings(display: DisplayInformation, settings: DisplaySe
 
     // Else, check size and color depth, with less confidence
     if (
-        deepEqual(display.size, settings.size, { strict: true }) &&
+        // deepEqual(display.size, settings.size, { strict: true }) &&
         display.colorDepth === settings.colorDepth
     ) {
         return 1
