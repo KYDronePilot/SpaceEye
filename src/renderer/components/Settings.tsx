@@ -6,17 +6,17 @@ import { Redirect } from 'react-router-dom'
 import styled from 'styled-components'
 
 import {
-    GET_START_ON_BOOT,
-    GetStartOnBootIpcResponse,
+    GET_START_ON_LOGIN,
+    GetStartOnLoginIpcResponse,
     QUIT_APPLICATION_CHANNEL,
-    SET_START_ON_BOOT,
-    SetStartOnBootIpcParams
+    SET_START_ON_LOGIN,
+    SetStartOnLoginIpcParams
 } from '../../shared/IpcDefinitions'
 import { ipcRequest } from '../IpcService'
 
 interface SettingsState {
     backCLicked: boolean
-    startOnReboot: boolean
+    startOnLogin: boolean
 }
 
 const SectionsContainer = styled.div`
@@ -163,7 +163,7 @@ const SettingsSwitch: React.FC<SettingsSwitchProps> = props => {
 
 interface SettingsManagerState {
     backCLicked: boolean
-    startOnReboot: boolean
+    startOnLogin: boolean
     isLoaded: boolean
 }
 
@@ -177,7 +177,7 @@ export default class SettingsManager extends React.Component<{}, SettingsManager
 
         this.state = {
             backCLicked: false,
-            startOnReboot: false,
+            startOnLogin: false,
             isLoaded: false
         }
 
@@ -186,17 +186,17 @@ export default class SettingsManager extends React.Component<{}, SettingsManager
     }
 
     async componentDidMount(): Promise<void> {
-        const response = await ipcRequest<{}, GetStartOnBootIpcResponse>(GET_START_ON_BOOT, {})
-        this.setState({ startOnReboot: response.startOnBoot ?? false }, () => {
+        const response = await ipcRequest<{}, GetStartOnLoginIpcResponse>(GET_START_ON_LOGIN, {})
+        this.setState({ startOnLogin: response.startOnLogin ?? false }, () => {
             this.setState({ isLoaded: true })
         })
     }
 
     private async onChangeStartOnLogin(shouldStart: boolean) {
-        this.setState({ startOnReboot: shouldStart })
-        await ipcRequest<SetStartOnBootIpcParams, {}>(
-            SET_START_ON_BOOT,
-            { startOnBoot: shouldStart },
+        this.setState({ startOnLogin: shouldStart })
+        await ipcRequest<SetStartOnLoginIpcParams, {}>(
+            SET_START_ON_LOGIN,
+            { startOnLogin: shouldStart },
             false
         )
     }
@@ -216,7 +216,7 @@ export default class SettingsManager extends React.Component<{}, SettingsManager
             <Settings
                 onClickBack={this.onClickBack}
                 onClickStartOnLoginSwitch={this.onChangeStartOnLogin}
-                shouldStartOnLogin={this.state.startOnReboot}
+                shouldStartOnLogin={this.state.startOnLogin}
                 onClickQuit={SettingsManager.onClickQuit}
             />
         )

@@ -11,16 +11,16 @@ import {
     DownloadThumbnailIpcResponse,
     GET_CURRENT_VIEW_CHANNEL,
     GET_SATELLITE_CONFIG_CHANNEL,
-    GET_START_ON_BOOT,
+    GET_START_ON_LOGIN,
     GetCurrentViewIpcResponse,
     GetSatelliteConfigIpcResponse,
-    GetStartOnBootIpcResponse,
+    GetStartOnLoginIpcResponse,
     IpcParams,
     IpcRequest,
     QUIT_APPLICATION_CHANNEL,
-    SET_START_ON_BOOT,
+    SET_START_ON_LOGIN,
     SET_WALLPAPER_CHANNEL,
-    SetStartOnBootIpcParams,
+    SetStartOnLoginIpcParams,
     SetWallpaperIpcParams,
     VISIBILITY_CHANGE_ALERT_CHANNEL,
     VisibilityChangeAlertIpcParams
@@ -234,16 +234,16 @@ ipcMain.on(
     }
 )
 
-ipcMain.on(GET_START_ON_BOOT, async (event, params: IpcRequest<IpcParams>) => {
-    const response: GetStartOnBootIpcResponse = {
-        startOnBoot: AppConfigStore.startOnBoot
+ipcMain.on(GET_START_ON_LOGIN, async (event, params: IpcRequest<IpcParams>) => {
+    const response: GetStartOnLoginIpcResponse = {
+        startOnLogin: AppConfigStore.startOnLogin
     }
     event.reply(params.responseChannel, response)
 })
 
-ipcMain.on(SET_START_ON_BOOT, async (_, params: IpcRequest<SetStartOnBootIpcParams>) => {
-    AppConfigStore.startOnBoot = params.params.startOnBoot
-    configureStartOnLogin(params.params.startOnBoot)
+ipcMain.on(SET_START_ON_LOGIN, async (_, params: IpcRequest<SetStartOnLoginIpcParams>) => {
+    AppConfigStore.startOnLogin = params.params.startOnLogin
+    configureStartOnLogin(params.params.startOnLogin)
 })
 
 if (process.platform === 'darwin') {

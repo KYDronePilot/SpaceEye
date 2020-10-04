@@ -8,7 +8,7 @@ import Store from 'electron-store'
 const log = electronLog.scope('app-config-store')
 
 const CURRENT_VIEW_ID_KEY = 'CURRENT_VIEW_ID'
-const START_ON_BOOT_KEY = 'START_ON_BOOT'
+const START_ON_LOGIN_KEY = 'START_ON_LOGIN'
 
 export class AppConfigStore {
     private static store = new Store()
@@ -24,14 +24,14 @@ export class AppConfigStore {
         AppConfigStore.store.set(CURRENT_VIEW_ID_KEY, value)
     }
 
-    public static get startOnBoot(): boolean | undefined {
-        const startOnBoot = AppConfigStore.store.get(START_ON_BOOT_KEY) as boolean | undefined
-        log.debug('Start on boot retrieved:', startOnBoot)
-        return startOnBoot
+    public static get startOnLogin(): boolean | undefined {
+        const startOnLogin = AppConfigStore.store.get(START_ON_LOGIN_KEY) as boolean | undefined
+        log.debug('Start on login retrieved:', startOnLogin)
+        return startOnLogin
     }
 
-    public static set startOnBoot(value: boolean | undefined) {
-        log.debug('Setting start on boot to:', value)
-        AppConfigStore.store.set(START_ON_BOOT_KEY, value)
+    public static set startOnLogin(value: boolean | undefined) {
+        log.debug('Setting start on login to:', value)
+        AppConfigStore.store.set(START_ON_LOGIN_KEY, value)
     }
 }
