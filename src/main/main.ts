@@ -81,6 +81,19 @@ const mb = menubar({
     windowPosition
 })
 
+// Only let one instance be opened
+if (!app.requestSingleInstanceLock()) {
+    app.quit()
+} else {
+    // If another instance is opened (and then closed), focus on this one
+    app.on('second-instance', () => {
+        mb.showWindow()
+        if (mb.window) {
+            mb.window.focus()
+        }
+    })
+}
+
 /**
  * Alert the renderer that the window visibility has changed.
  *
