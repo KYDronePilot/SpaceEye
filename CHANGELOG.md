@@ -6,7 +6,27 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic
 Versioning](https://semver.org/spec/v2.0.0.html).
 
-<!-- ## [Unreleased] -->
+## [Unreleased]
+
+### Added
+
+- Option to enabled/disable start on login.
+
+### Changed
+
+- Image update interval now comes from satellite config.
+- Window is no longer draggable.
+- Improved look of settings page.
+- Don't update image if screen is locked.
+- Update the image on app start.
+- Removed dependencies that were not needed.
+- Switched to using Yarn as the package manager.
+
+### Fixed
+
+- Optimal image size for all monitors will now be downloaded, instead of just
+  the largest.
+- Updated packages with security vulnerabilities.
 
 ## [0.1.0]
 
