@@ -1,5 +1,5 @@
 import Axios from 'axios'
-import { app, ipcMain, powerMonitor, screen, systemPreferences } from 'electron'
+import { app, ipcMain, powerMonitor, Rectangle, screen, systemPreferences } from 'electron'
 import electronLog from 'electron-log'
 import { menubar } from 'menubar'
 import * as path from 'path'
@@ -61,6 +61,7 @@ const index = url.format({
     slashes: true
 })
 
+// Initial window positioning (subject to change on Windows depending on taskbar location)
 const windowPosition = process.platform === 'darwin' ? 'trayRight' : 'trayBottomRight'
 
 const mb = menubar({
@@ -80,6 +81,36 @@ const mb = menubar({
     },
     windowPosition
 })
+
+/**
+ * Different locations of the Windows taskbar, with respective window positions.
+ */
+enum WindowsTaskbarPosition {
+    Right = 'trayBottomRight',
+    Left = 'trayBottomLeft',
+    Top = 'trayCenter',
+    Bottom = 'trayBottomCenter'
+}
+
+/**
+ * Get the position of the Windows taskbar based on the tray bounds.
+ *
+ * @param trayBounds - Current bounds of menubar tray
+ * @returns Position of taskbar
+ */
+function getWindowsTaskbarLocation(trayBounds: Rectangle): WindowsTaskbarPosition {
+    if (trayBounds.y === 0) {
+        return WindowsTaskbarPosition.Top
+    }
+    if (trayBounds.x < 50) {
+        return WindowsTaskbarPosition.Left
+    }
+    const currentScreen = screen.getDisplayMatching(trayBounds)
+    if (trayBounds.y + trayBounds.height === currentScreen.bounds.height) {
+        return WindowsTaskbarPosition.Bottom
+    }
+    return WindowsTaskbarPosition.Right
+}
 
 // Only let one instance be opened
 if (!app.requestSingleInstanceLock()) {
@@ -133,6 +164,15 @@ mb.on('after-create-window', () => {
 
     mb.on('show', () => {
         visibilityChangeAlert(true)
+
+        // If on Windows, make sure window position matches toolbar location
+        if (process.platform === 'win32') {
+            const newPosition = getWindowsTaskbarLocation(mb.tray.getBounds())
+            const currentPosition = mb.getOption('windowPosition')
+            if (newPosition !== currentPosition) {
+                mb.setOption('windowPosition', newPosition)
+            }
+        }
     })
 })
 
