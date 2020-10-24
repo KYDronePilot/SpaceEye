@@ -1,7 +1,9 @@
 import Axios from 'axios'
 import { app, ipcMain, powerMonitor, Rectangle, screen, systemPreferences } from 'electron'
 import electronLog from 'electron-log'
+import { cloneDeep } from 'lodash'
 import { menubar } from 'menubar'
+import net from 'net'
 import * as path from 'path'
 import * as url from 'url'
 
@@ -26,6 +28,7 @@ import {
     VisibilityChangeAlertIpcParams
 } from '../shared/IpcDefinitions'
 import { AppConfigStore } from './app_config_store'
+import { resolveDns } from './dns_handler'
 import { SatelliteConfigStore } from './satellite_config_store'
 import { Initiator } from './update_lock'
 import { startUpdateChecking } from './updater'
@@ -39,6 +42,21 @@ let heartbeatHandle: number
 const log = electronLog.scope('main')
 
 Axios.defaults.adapter = require('axios/lib/adapters/http')
+
+// Send HEAD requests to each DNS IP, using the IP first to respond
+Axios.interceptors.request.use(async config => {
+    const newConfig = cloneDeep(config)
+    const requestUrl = new url.URL(config.url!)
+    if (net.isIP(requestUrl.hostname)) {
+        return config
+    }
+    const ip = await resolveDns(requestUrl)
+    newConfig.headers = config.headers ?? {}
+    newConfig.headers.Host = requestUrl.hostname
+    requestUrl.hostname = ip
+    newConfig.url = requestUrl.toString()
+    return newConfig
+})
 
 startUpdateChecking()
 
