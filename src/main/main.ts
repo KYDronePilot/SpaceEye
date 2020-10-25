@@ -32,6 +32,7 @@ import { resolveDns } from './dns_handler'
 import { SatelliteConfigStore } from './satellite_config_store'
 import { Initiator } from './update_lock'
 import { startUpdateChecking } from './updater'
+import { formatAxiosError } from './utils'
 import { WallpaperManager } from './wallpaper_manager'
 
 const HEARTBEAT_INTERVAL = 600000
@@ -312,7 +313,17 @@ ipcMain.on(
     DOWNLOAD_THUMBNAIL_CHANNEL,
     async (event, params: IpcRequest<DownloadThumbnailIpcParams>) => {
         log.info('Download thumbnail request received')
-        const webResponse = await Axios.get(params.params.url, { responseType: 'arraybuffer' })
+        let webResponse
+        try {
+            webResponse = await Axios.get(params.params.url, { responseType: 'arraybuffer' })
+        } catch (error) {
+            log.error('Error while downloading thumbnail:', formatAxiosError(error))
+            const response: DownloadThumbnailIpcResponse = {
+                dataUrl: undefined
+            }
+            event.reply(params.responseChannel, response)
+            return
+        }
         const b64Image = Buffer.from(webResponse.data, 'binary').toString('base64')
         const response: DownloadThumbnailIpcResponse = {
             dataUrl: `data:image/jpeg;base64,${b64Image}`

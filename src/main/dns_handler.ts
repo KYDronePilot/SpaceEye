@@ -5,19 +5,10 @@ import Url from 'url'
 import { promisify } from 'util'
 
 import { RequestError } from './errors'
+import { formatAxiosError } from './utils'
 
 const asyncLookup = promisify(Dns.lookup)
 const log = electronLog.scope('dns-handler')
-
-/**
- * Format an Axios error object.
- *
- * @param error - Error to format
- * @returns Formatted error
- */
-function formatAxiosError(error: AxiosError): string {
-    return `${error.code}\n${error.message}\n${error.stack}`
-}
 
 /**
  * Resolve the IP of a request URL by sending a HEAD request to each A record,
