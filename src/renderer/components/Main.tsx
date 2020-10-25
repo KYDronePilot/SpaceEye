@@ -1,5 +1,6 @@
 import 'fontsource-roboto'
 
+import { createMuiTheme, ThemeProvider as MuiThemeProvider } from '@material-ui/core/styles'
 import * as React from 'react'
 import { HashRouter, Route } from 'react-router-dom'
 import styled, { ThemeProvider } from 'styled-components'
@@ -25,6 +26,20 @@ const Container = styled.div`
     flex-direction: column;
 `
 
+const theme = createMuiTheme({
+    palette: {
+        type: 'dark',
+        primary: {
+            main: '#5297ff'
+        }
+    },
+    typography: {
+        allVariants: {
+            color: 'white'
+        }
+    }
+})
+
 const ImagePickerPage: React.FC = () => (
     <Container>
         <HeaderBar />
@@ -40,10 +55,12 @@ function Main() {
     return (
         <HashRouter>
             <ThemeProvider theme={DarkTheme}>
-                <div>
-                    <Route exact path="/" component={ImagePickerPage} />
-                    <Route path="/settings" component={Settings} />
-                </div>
+                <MuiThemeProvider theme={theme}>
+                    <div>
+                        <Route exact path="/" component={ImagePickerPage} />
+                        <Route path="/settings" component={Settings} />
+                    </div>
+                </MuiThemeProvider>
             </ThemeProvider>
         </HashRouter>
     )

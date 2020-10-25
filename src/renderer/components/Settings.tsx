@@ -8,7 +8,6 @@ import {
     Switch,
     Typography
 } from '@material-ui/core'
-import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles'
 import * as React from 'react'
 import { Redirect } from 'react-router-dom'
 import styled from 'styled-components'
@@ -120,20 +119,6 @@ const BackButton = styled.button`
     letter-spacing: 0.15px;
 `
 
-const theme = createMuiTheme({
-    palette: {
-        type: 'dark',
-        primary: {
-            main: '#5297ff'
-        }
-    },
-    typography: {
-        allVariants: {
-            color: 'white'
-        }
-    }
-})
-
 interface SettingsSwitchProps {
     label: string
     isChecked: boolean
@@ -171,47 +156,45 @@ const Settings: React.FC<SettingsProps> = props => {
     const { onClickBack, onClickQuit, onClickStartOnLoginSwitch, shouldStartOnLogin } = props
 
     return (
-        <ThemeProvider theme={theme}>
-            <SettingsContainer>
-                <SectionsContainer>
-                    <SectionsColumn>
-                        <Box my={1} />
-                        <Grid container direction="row" justify="center">
-                            <Typography variant="h5">SpaceEye</Typography>
-                        </Grid>
-                        <Box my={1} />
-                        <Grid container direction="row" justify="center">
-                            <Button variant="outlined" color="primary" onClick={onClickBack}>
-                                Back
-                            </Button>
-                        </Grid>
-                        <Spacer />
-                        <Grid container direction="row" justify="center">
-                            <Button variant="outlined" color="secondary" onClick={onClickQuit}>
-                                Quit
-                            </Button>
-                        </Grid>
-                        <Box my={1} />
-                    </SectionsColumn>
-                </SectionsContainer>
-                <SettingsColumn>
-                    <Box my={2} />
+        <SettingsContainer>
+            <SectionsContainer>
+                <SectionsColumn>
+                    <Box my={1} />
                     <Grid container direction="row" justify="center">
-                        <Typography variant="h6">Settings</Typography>
+                        <Typography variant="h5">SpaceEye</Typography>
                     </Grid>
-                    <Box my={2} mx={1}>
-                        <Divider variant="fullWidth" />
-                    </Box>
-                    <Grid container direction="row" justify="flex-start">
-                        <SettingsSwitch
-                            isChecked={shouldStartOnLogin}
-                            onChange={onClickStartOnLoginSwitch}
-                            label="Start on Login"
-                        />
+                    <Box my={1} />
+                    <Grid container direction="row" justify="center">
+                        <Button variant="outlined" color="primary" onClick={onClickBack}>
+                            Back
+                        </Button>
                     </Grid>
-                </SettingsColumn>
-            </SettingsContainer>
-        </ThemeProvider>
+                    <Spacer />
+                    <Grid container direction="row" justify="center">
+                        <Button variant="outlined" color="secondary" onClick={onClickQuit}>
+                            Quit
+                        </Button>
+                    </Grid>
+                    <Box my={1} />
+                </SectionsColumn>
+            </SectionsContainer>
+            <SettingsColumn>
+                <Box my={2} />
+                <Grid container direction="row" justify="center">
+                    <Typography variant="h6">Settings</Typography>
+                </Grid>
+                <Box my={2} mx={1}>
+                    <Divider variant="fullWidth" />
+                </Box>
+                <Grid container direction="row" justify="flex-start">
+                    <SettingsSwitch
+                        isChecked={shouldStartOnLogin}
+                        onChange={onClickStartOnLoginSwitch}
+                        label="Start on Login"
+                    />
+                </Grid>
+            </SettingsColumn>
+        </SettingsContainer>
     )
 }
 

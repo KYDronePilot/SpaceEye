@@ -1,6 +1,8 @@
+import { Box, CircularProgress, Grid, Typography } from '@material-ui/core'
 import { ipcRenderer } from 'electron'
 import * as React from 'react'
 import { ReactNode } from 'react'
+import styled from 'styled-components'
 
 import {
     GET_CURRENT_VIEW_CHANNEL,
@@ -34,6 +36,15 @@ export interface ThumbnailManagerState {
     satelliteConfig?: RootSatelliteConfig
     selectedId?: number
 }
+
+const ContentContainer = styled.div`
+    position: absolute;
+    top: var(--header-height);
+    left: 0;
+    width: 100%;
+    height: calc(100vh - var(--header-height));
+    user-select: none;
+`
 
 export default class ThumbnailManager extends React.Component<
     Record<string, unknown>,
@@ -121,6 +132,29 @@ export default class ThumbnailManager extends React.Component<
     }
 
     public render(): ReactNode {
+        // Show loading symbol if config not loaded
+        if (!this.state.satelliteConfig) {
+            return (
+                <ContentContainer>
+                    <Box my={25} />
+                    <Box mx={7}>
+                        <Grid
+                            container
+                            direction="column"
+                            alignContent="center"
+                            alignItems="center"
+                        >
+                            <CircularProgress />
+                            <Box my={1} />
+                            <Typography variant="body1" color="textSecondary">
+                                Loading satellite config
+                            </Typography>
+                        </Grid>
+                    </Box>
+                </ContentContainer>
+            )
+        }
+
         return (
             <ThumbnailsContainer>
                 {this.getThumbnailInformation().map(image => (
