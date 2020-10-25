@@ -50,7 +50,7 @@ Axios.interceptors.request.use(async config => {
     if (net.isIP(requestUrl.hostname)) {
         return config
     }
-    const ip = await resolveDns(requestUrl)
+    const ip = await resolveDns(requestUrl, config.cancelToken)
     newConfig.headers = config.headers ?? {}
     newConfig.headers.Host = requestUrl.hostname
     requestUrl.hostname = ip
