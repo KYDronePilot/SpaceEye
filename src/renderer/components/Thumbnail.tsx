@@ -1,3 +1,5 @@
+import { Grid, LinearProgress, Typography } from '@material-ui/core'
+import ErrorIcon from '@material-ui/icons/Error'
 import { ipcRenderer } from 'electron'
 import * as React from 'react'
 import styled from 'styled-components'
@@ -31,13 +33,15 @@ const Image = styled.img`
  */
 const ImageContainer = styled.div<IsSelectedStyleProps>`
     --width: 200px;
+    --height: calc((var(--width) * 3) / 5);
     width: var(--width);
-    height: calc((var(--width) * 3) / 5);
+    height: var(--height);
     background-color: black;
     border-radius: var(--image-border-radius);
     box-shadow: ${props => (!props.isSelected ? '0 3px 10px rgba(0, 0, 0, 0.3)' : 'none')};
     transition: box-shadow var(--transition-time);
     overflow: hidden;
+    position: relative;
 `
 
 /**
@@ -77,6 +81,51 @@ const ThumbnailContainer = styled.div<IsSelectedStyleProps>`
     user-select: none;
 `
 
+enum ThumbnailLoadingState {
+    loading,
+    loaded,
+    failed
+}
+
+const BottomProgress = styled(LinearProgress)`
+    margin-top: calc(var(--height) - 4.12px);
+`
+
+const VerticalCenterContainer = styled.div`
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+`
+
+interface ImageSwitcherProps {
+    src: string
+    loadingState: ThumbnailLoadingState
+}
+
+// eslint-disable-next-line consistent-return
+const ImageSwitcher: React.FC<ImageSwitcherProps> = props => {
+    const { src, loadingState } = props
+    // eslint-disable-next-line default-case
+    switch (loadingState) {
+        case ThumbnailLoadingState.loading:
+            return <BottomProgress />
+        case ThumbnailLoadingState.loaded:
+            return <Image src={src} />
+        case ThumbnailLoadingState.failed:
+            return (
+                <VerticalCenterContainer>
+                    <Grid container direction="column" alignItems="center">
+                        <ErrorIcon color="disabled" fontSize="large" />
+                        <Typography variant="body2" color="textSecondary">
+                            Error downloading
+                        </Typography>
+                    </Grid>
+                </VerticalCenterContainer>
+            )
+    }
+}
+
 interface ThumbnailProps {
     id: number
     src: string
@@ -87,13 +136,16 @@ interface ThumbnailProps {
 
 interface ThumbnailState {
     b64Image?: string
+    loadingState: ThumbnailLoadingState
 }
 
 export default class Thumbnail extends React.Component<ThumbnailProps, ThumbnailState> {
     constructor(props: ThumbnailProps) {
         super(props)
 
-        this.state = {}
+        this.state = {
+            loadingState: ThumbnailLoadingState.loading
+        }
 
         this.update = this.update.bind(this)
     }
@@ -111,10 +163,16 @@ export default class Thumbnail extends React.Component<ThumbnailProps, Thumbnail
     }
 
     async update(): Promise<void> {
+        this.setState({ loadingState: ThumbnailLoadingState.loading })
         const response = await ipcRequest<DownloadThumbnailIpcParams, DownloadThumbnailIpcResponse>(
             DOWNLOAD_THUMBNAIL_CHANNEL,
             { url: this.props.src }
         )
+        if (response.dataUrl === undefined) {
+            this.setState({ loadingState: ThumbnailLoadingState.failed })
+        } else {
+            this.setState({ loadingState: ThumbnailLoadingState.loaded })
+        }
         this.setState({ b64Image: response.dataUrl })
     }
 
@@ -126,7 +184,10 @@ export default class Thumbnail extends React.Component<ThumbnailProps, Thumbnail
             <ThumbnailContainer isSelected={isSelectedValue}>
                 <ImageContainerBackground isSelected={isSelectedValue}>
                     <ImageContainer isSelected={isSelectedValue} onClick={() => onClick(id)}>
-                        <Image src={this.state.b64Image} />
+                        <ImageSwitcher
+                            src={this.state.b64Image ?? ''}
+                            loadingState={this.state.loadingState}
+                        />
                     </ImageContainer>
                 </ImageContainerBackground>
                 <ThumbnailName isSelected={isSelectedValue}>{name}</ThumbnailName>
