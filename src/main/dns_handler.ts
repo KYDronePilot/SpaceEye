@@ -1,4 +1,4 @@
-import Axios, { CancelToken } from 'axios'
+import Axios, { AxiosError, CancelToken } from 'axios'
 import Dns from 'dns'
 import electronLog from 'electron-log'
 import Url from 'url'
@@ -8,6 +8,16 @@ import { RequestError } from './errors'
 
 const asyncLookup = promisify(Dns.lookup)
 const log = electronLog.scope('dns-handler')
+
+/**
+ * Format an Axios error object.
+ *
+ * @param error - Error to format
+ * @returns Formatted error
+ */
+function formatAxiosError(error: AxiosError): string {
+    return `${error.code}\n${error.message}\n${error.stack}`
+}
 
 /**
  * Resolve the IP of a request URL by sending a HEAD request to each A record,
@@ -48,20 +58,22 @@ export async function resolveDns(requestUrl: Url.URL, cancelToken?: CancelToken)
                     if (Axios.isCancel(error)) {
                         return undefined
                     }
-                    return error
+                    return error as AxiosError
                 })
         })
         Promise.all(requests).then(responses => {
+            const errors = responses.filter(response => response !== undefined) as AxiosError[]
             // If all failed, throw an error
             if (!complete) {
-                log.info('All failed DNS HEAD probe responses:', responses)
+                log.info('All failed DNS HEAD probe responses:')
+                errors.forEach(response => log.info(formatAxiosError(response)))
                 reject(new RequestError('All DNS HEAD probes failed. Check logs.'))
                 return
             }
             // Check if some failed and warn
-            const errors = responses.filter(response => response !== undefined)
             if (errors.length > 0) {
-                log.warn('Some DNS HEAD probes failed:', errors)
+                log.warn('Some DNS HEAD probes failed:')
+                errors.forEach(response => log.warn(formatAxiosError(response)))
             }
         })
     })
