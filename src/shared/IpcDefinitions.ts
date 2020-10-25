@@ -39,6 +39,7 @@ export interface GetCurrentViewIpcResponse {
 
 export interface DownloadThumbnailIpcResponse {
     dataUrl?: string
+    expiration?: number
 }
 
 export interface DownloadThumbnailIpcParams {

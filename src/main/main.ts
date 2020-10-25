@@ -3,6 +3,7 @@ import { app, ipcMain, powerMonitor, Rectangle, screen, systemPreferences } from
 import electronLog from 'electron-log'
 import { cloneDeep } from 'lodash'
 import { menubar } from 'menubar'
+import moment from 'moment'
 import net from 'net'
 import * as path from 'path'
 import * as url from 'url'
@@ -325,8 +326,12 @@ ipcMain.on(
             return
         }
         const b64Image = Buffer.from(webResponse.data, 'binary').toString('base64')
+        const contentType = webResponse.headers['content-type'] ?? 'image/jpeg'
         const response: DownloadThumbnailIpcResponse = {
-            dataUrl: `data:image/jpeg;base64,${b64Image}`
+            dataUrl: `data:${contentType};base64,${b64Image}`,
+            expiration: moment(
+                webResponse.headers.expires ?? moment.utc().add(10, 'minutes')
+            ).valueOf()
         }
         event.reply(params.responseChannel, response)
     }

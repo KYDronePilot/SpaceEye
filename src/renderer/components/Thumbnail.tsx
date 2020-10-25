@@ -1,6 +1,8 @@
 import { Grid, LinearProgress, Typography } from '@material-ui/core'
 import ErrorIcon from '@material-ui/icons/Error'
 import { ipcRenderer } from 'electron'
+import electronLog from 'electron-log'
+import moment, { Moment } from 'moment'
 import * as React from 'react'
 import styled from 'styled-components'
 
@@ -14,6 +16,7 @@ import {
 import { ipcRequest } from '../IpcService'
 
 ipcRenderer.setMaxListeners(30)
+const log = electronLog.scope('thumbnail-component')
 
 interface IsSelectedStyleProps {
     readonly isSelected: boolean
@@ -126,6 +129,11 @@ const ImageSwitcher: React.FC<ImageSwitcherProps> = props => {
     }
 }
 
+interface CachedImage {
+    dataUrl: string
+    expiration: Moment
+}
+
 interface ThumbnailProps {
     id: number
     src: string
@@ -139,7 +147,11 @@ interface ThumbnailState {
     loadingState: ThumbnailLoadingState
 }
 
+const thumbnailCache: { [key: number]: CachedImage } = {}
+
 export default class Thumbnail extends React.Component<ThumbnailProps, ThumbnailState> {
+    updateLock: boolean
+
     constructor(props: ThumbnailProps) {
         super(props)
 
@@ -148,6 +160,7 @@ export default class Thumbnail extends React.Component<ThumbnailProps, Thumbnail
         }
 
         this.update = this.update.bind(this)
+        this.updateLock = false
     }
 
     async componentDidMount(): Promise<void> {
@@ -163,17 +176,44 @@ export default class Thumbnail extends React.Component<ThumbnailProps, Thumbnail
     }
 
     async update(): Promise<void> {
-        this.setState({ loadingState: ThumbnailLoadingState.loading })
+        // Don't allow concurrent updates for the same instance
+        if (this.updateLock) {
+            return
+        }
+        this.updateLock = true
+
+        if (this.props.id in thumbnailCache) {
+            // If cached image is still in date, use it
+            const cachedImage = thumbnailCache[this.props.id]
+            if (moment.utc().diff(cachedImage.expiration, 'seconds') < 0) {
+                this.setState({
+                    b64Image: cachedImage.dataUrl,
+                    loadingState: ThumbnailLoadingState.loaded
+                })
+                return
+            }
+        }
+        // If no image exists, set the loading icon
+        if (this.state.b64Image === undefined) {
+            this.setState({ loadingState: ThumbnailLoadingState.loading })
+        }
+        // Fetch a new image and cache it
         const response = await ipcRequest<DownloadThumbnailIpcParams, DownloadThumbnailIpcResponse>(
             DOWNLOAD_THUMBNAIL_CHANNEL,
             { url: this.props.src }
         )
+        // If it failed, report and exit
         if (response.dataUrl === undefined) {
             this.setState({ loadingState: ThumbnailLoadingState.failed })
-        } else {
-            this.setState({ loadingState: ThumbnailLoadingState.loaded })
+            return
         }
-        this.setState({ b64Image: response.dataUrl })
+        // If successful, update cache and state
+        thumbnailCache[this.props.id] = {
+            dataUrl: response.dataUrl,
+            expiration: moment(response.expiration)
+        }
+        this.setState({ loadingState: ThumbnailLoadingState.loaded, b64Image: response.dataUrl })
+        this.updateLock = false
     }
 
     public render(): React.ReactNode {
