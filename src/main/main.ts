@@ -1,7 +1,10 @@
 import Axios from 'axios'
 import { app, ipcMain, powerMonitor, Rectangle, screen, systemPreferences } from 'electron'
 import electronLog from 'electron-log'
+import { cloneDeep } from 'lodash'
 import { menubar } from 'menubar'
+import moment from 'moment'
+import net from 'net'
 import * as path from 'path'
 import * as url from 'url'
 
@@ -26,9 +29,11 @@ import {
     VisibilityChangeAlertIpcParams
 } from '../shared/IpcDefinitions'
 import { AppConfigStore } from './app_config_store'
+import { resolveDns } from './dns_handler'
 import { SatelliteConfigStore } from './satellite_config_store'
 import { Initiator } from './update_lock'
 import { startUpdateChecking } from './updater'
+import { formatAxiosError } from './utils'
 import { WallpaperManager } from './wallpaper_manager'
 
 const HEARTBEAT_INTERVAL = 600000
@@ -39,6 +44,21 @@ let heartbeatHandle: number
 const log = electronLog.scope('main')
 
 Axios.defaults.adapter = require('axios/lib/adapters/http')
+
+// Send HEAD requests to each DNS IP, using the IP first to respond
+Axios.interceptors.request.use(async config => {
+    const newConfig = cloneDeep(config)
+    const requestUrl = new url.URL(config.url!)
+    if (net.isIP(requestUrl.hostname)) {
+        return config
+    }
+    const ip = await resolveDns(requestUrl, config.cancelToken)
+    newConfig.headers = config.headers ?? {}
+    newConfig.headers.Host = requestUrl.hostname
+    requestUrl.hostname = ip
+    newConfig.url = requestUrl.toString()
+    return newConfig
+})
 
 startUpdateChecking()
 
@@ -294,10 +314,24 @@ ipcMain.on(
     DOWNLOAD_THUMBNAIL_CHANNEL,
     async (event, params: IpcRequest<DownloadThumbnailIpcParams>) => {
         log.info('Download thumbnail request received')
-        const webResponse = await Axios.get(params.params.url, { responseType: 'arraybuffer' })
+        let webResponse
+        try {
+            webResponse = await Axios.get(params.params.url, { responseType: 'arraybuffer' })
+        } catch (error) {
+            log.error('Error while downloading thumbnail:', formatAxiosError(error))
+            const response: DownloadThumbnailIpcResponse = {
+                dataUrl: undefined
+            }
+            event.reply(params.responseChannel, response)
+            return
+        }
         const b64Image = Buffer.from(webResponse.data, 'binary').toString('base64')
+        const contentType = webResponse.headers['content-type'] ?? 'image/jpeg'
         const response: DownloadThumbnailIpcResponse = {
-            dataUrl: `data:image/jpeg;base64,${b64Image}`
+            dataUrl: `data:${contentType};base64,${b64Image}`,
+            expiration: moment(
+                webResponse.headers.expires ?? moment.utc().add(10, 'minutes')
+            ).valueOf()
         }
         event.reply(params.responseChannel, response)
     }
