@@ -13,6 +13,7 @@ import { DownloadedImage } from './downloaded_image'
 import {
     LockInvalidatedError,
     MonitorConfigChangedError,
+    RequestCancelledError,
     RequestError,
     ViewConfigAccessError,
     ViewNotSetError
@@ -223,6 +224,10 @@ export class WallpaperManager {
             await DownloadedImage.cleanupOldImages()
             return true
         } catch (error) {
+            if (error instanceof RequestCancelledError) {
+                log.info('Image download request cancelled')
+                return false
+            }
             log.error('Error while updating. Invalidating lock.', error)
             lock.invalidate()
             // If there was an error, we couldn't complete successfully
