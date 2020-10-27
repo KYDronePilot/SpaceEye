@@ -22,6 +22,9 @@ jobs:
         with:
           node-version: 13
 
+      - name: Install packages
+        run: yarn install --frozen-lockfile
+
       # If macOS, install Mac Node API
       - run: yarn add git+https://github.com/KYDronePilot/space-eye-mac-node-api.git
         if: startsWith(matrix.os, 'macos')
