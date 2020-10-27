@@ -1,6 +1,7 @@
 /**
  * For storing/caching the satellite config.
  */
+import AsyncLock from 'async-lock'
 import Axios from 'axios'
 import electronLog from 'electron-log'
 import moment, { Moment } from 'moment'
@@ -14,6 +15,9 @@ const INVALIDATION_TIMEOUT = 60
 
 // URL to download the config
 const CONFIG_URL = 'https://kydronepilot.github.io/SpaceEyeSatelliteConfig/config.json'
+
+// Async lock
+const lock = new AsyncLock()
 
 export class SatelliteConfigStore {
     private static instance?: SatelliteConfigStore
@@ -52,7 +56,7 @@ export class SatelliteConfigStore {
     }
 
     /**
-     * Get the satellite config.
+     * Get the satellite config, no locking mechanism.
      *
      * Checks the cache first. If the config doesn't exist there or is invalid,
      * a new config is downloaded.
@@ -60,7 +64,7 @@ export class SatelliteConfigStore {
      * @throws {RequestError} if there is an error while fetching the config
      * @returns Satellite config
      */
-    public async getConfig(): Promise<RootSatelliteConfig> {
+    private async getConfigUnsafe(): Promise<RootSatelliteConfig> {
         // Update if old or cached config doesn't exist
         if (
             this.config === undefined ||
@@ -69,6 +73,19 @@ export class SatelliteConfigStore {
             await this.updateConfig()
         }
         return this.config!
+    }
+
+    /**
+     * Wrapper for `getConfigUnsafe` with locking mechanism to prevent
+     * concurrent updates.
+     *
+     * @throws {RequestError} if there is an error while fetching the config
+     * @returns Satellite config
+     */
+    public async getConfig(): Promise<RootSatelliteConfig> {
+        return lock.acquire('get-config', async () => {
+            return this.getConfigUnsafe()
+        })
     }
 
     /**

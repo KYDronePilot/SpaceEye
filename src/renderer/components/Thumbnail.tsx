@@ -1,5 +1,6 @@
 import { Grid, LinearProgress, Typography } from '@material-ui/core'
 import ErrorIcon from '@material-ui/icons/Error'
+import AsyncLock from 'async-lock'
 import { ipcRenderer } from 'electron'
 import electronLog from 'electron-log'
 import moment, { Moment } from 'moment'
@@ -134,6 +135,8 @@ interface CachedImage {
     expiration: Moment
 }
 
+const lock = new AsyncLock()
+
 interface ThumbnailProps {
     id: number
     src: string
@@ -150,8 +153,6 @@ interface ThumbnailState {
 const thumbnailCache: { [key: number]: CachedImage } = {}
 
 export default class Thumbnail extends React.Component<ThumbnailProps, ThumbnailState> {
-    updateLock: boolean
-
     constructor(props: ThumbnailProps) {
         super(props)
 
@@ -159,8 +160,8 @@ export default class Thumbnail extends React.Component<ThumbnailProps, Thumbnail
             loadingState: ThumbnailLoadingState.loading
         }
 
+        this.updateUnsafe = this.updateUnsafe.bind(this)
         this.update = this.update.bind(this)
-        this.updateLock = false
     }
 
     async componentDidMount(): Promise<void> {
@@ -175,13 +176,10 @@ export default class Thumbnail extends React.Component<ThumbnailProps, Thumbnail
         await this.update()
     }
 
-    async update(): Promise<void> {
-        // Don't allow concurrent updates for the same instance
-        if (this.updateLock) {
-            return
-        }
-        this.updateLock = true
-
+    /**
+     * Update the thumbnail with no concurrent locking mechanism.
+     */
+    private async updateUnsafe(): Promise<void> {
         if (this.props.id in thumbnailCache) {
             // If cached image is still in date, use it
             const cachedImage = thumbnailCache[this.props.id]
@@ -213,7 +211,15 @@ export default class Thumbnail extends React.Component<ThumbnailProps, Thumbnail
             expiration: moment(response.expiration)
         }
         this.setState({ loadingState: ThumbnailLoadingState.loaded, b64Image: response.dataUrl })
-        this.updateLock = false
+    }
+
+    /**
+     * Update the thumbnail with a locking mechanism.
+     */
+    async update(): Promise<void> {
+        await lock.acquire(this.props.id.toString(), async () => {
+            await this.updateUnsafe()
+        })
     }
 
     public render(): React.ReactNode {

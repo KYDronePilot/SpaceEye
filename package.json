@@ -67,6 +67,7 @@
         "@babel/preset-react": "^7.0.0",
         "@babel/preset-typescript": "^7.10.4",
         "@hot-loader/react-dom": "^16.8.6",
+        "@types/async-lock": "^1.1.2",
         "@types/jest": "^24.0.13",
         "@types/lodash": "^4.14.158",
         "@types/node": "^12.12.47",
@@ -122,6 +123,7 @@
     "dependencies": {
         "@material-ui/core": "^4.11.0",
         "@material-ui/icons": "^4.9.1",
+        "async-lock": "^1.2.4",
         "axios": "^0.19.2",
         "electron-log": "^4.2.4",
         "electron-store": "^6.0.0",
