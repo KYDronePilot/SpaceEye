@@ -33,6 +33,5 @@ interface Satellite {
  * Root satellite config object.
  */
 interface RootSatelliteConfig {
-    version: string
     satellites: Satellite[]
 }

@@ -14,7 +14,7 @@ const log = electronLog.scope('satellite-config-store')
 const INVALIDATION_TIMEOUT = 60
 
 // URL to download the config
-const CONFIG_URL = 'https://kydronepilot.github.io/SpaceEyeSatelliteConfig/config.json'
+const CONFIG_URL = 'https://spaceeye-satellite-configs.s3.us-east-2.amazonaws.com/1.0.1/config.json'
 
 // Async lock
 const lock = new AsyncLock()
