@@ -9,7 +9,6 @@ const log = electronLog.scope('auto-updater')
 const updateAlertVersions: Record<string, boolean> = {}
 
 autoUpdater.logger = log
-autoUpdater.allowPrerelease = true
 autoUpdater.autoDownload = true
 autoUpdater.autoInstallOnAppQuit = true
 
