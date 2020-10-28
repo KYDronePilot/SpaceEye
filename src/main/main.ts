@@ -1,4 +1,5 @@
 import Axios from 'axios'
+import { spawn } from 'child_process'
 import { app, ipcMain, powerMonitor, Rectangle, screen, systemPreferences } from 'electron'
 import electronLog from 'electron-log'
 import { cloneDeep } from 'lodash'
@@ -13,16 +14,21 @@ import {
     DownloadThumbnailIpcParams,
     DownloadThumbnailIpcResponse,
     GET_CURRENT_VIEW_CHANNEL,
+    GET_FIRST_RUN,
     GET_SATELLITE_CONFIG_CHANNEL,
     GET_START_ON_LOGIN,
     GetCurrentViewIpcResponse,
+    GetFirstRunIpcResponse,
     GetSatelliteConfigIpcResponse,
     GetStartOnLoginIpcResponse,
     IpcParams,
     IpcRequest,
+    OPEN_WINDOWS_ICON_SETTINGS,
     QUIT_APPLICATION_CHANNEL,
+    SET_FIRST_RUN,
     SET_START_ON_LOGIN,
     SET_WALLPAPER_CHANNEL,
+    SetFirstRunIpcParams,
     SetStartOnLoginIpcParams,
     SetWallpaperIpcParams,
     VISIBILITY_CHANGE_ALERT_CHANNEL,
@@ -347,6 +353,36 @@ ipcMain.on(GET_START_ON_LOGIN, async (event, params: IpcRequest<IpcParams>) => {
 ipcMain.on(SET_START_ON_LOGIN, async (_, params: IpcRequest<SetStartOnLoginIpcParams>) => {
     AppConfigStore.startOnLogin = params.params.startOnLogin
     configureStartOnLogin(params.params.startOnLogin)
+})
+
+ipcMain.on(GET_FIRST_RUN, async (event, params: IpcRequest<IpcParams>) => {
+    const response: GetFirstRunIpcResponse = {
+        firstRun: AppConfigStore.firstRun
+    }
+    event.reply(params.responseChannel, response)
+})
+
+ipcMain.on(SET_FIRST_RUN, async (_, params: IpcRequest<SetFirstRunIpcParams>) => {
+    AppConfigStore.firstRun = params.params.firstRun
+})
+
+ipcMain.on(OPEN_WINDOWS_ICON_SETTINGS, () => {
+    log.info('Opening Windows icon settings')
+    // Special command that opens Windows notification area icon settings
+    const command = spawn('cmd.exe', [
+        '/c',
+        'explorer shell:::{05d7b0f4-2121-4eff-bf6b-ed3f69b894d9}'
+    ])
+
+    command.stdout.on('data', data => {
+        log.debug('Windows icon settings stdout:', data)
+    })
+    command.stderr.on('data', data => {
+        log.error('Windows icon settings stderr:', data)
+    })
+    command.on('exit', code => {
+        log.info('Windows icon settings cmd exited with:', code)
+    })
 })
 
 if (process.platform === 'darwin') {
