@@ -65,7 +65,7 @@ interface WindowsOnboardingDialogProps {
 }
 
 const WindowsOnboardingDialog: React.FC<WindowsOnboardingDialogProps> = props => (
-    <Dialog open={props.show}>
+    <Dialog open={props.show} style={{ userSelect: 'none' }}>
         <DialogTitle>Welcome to SpaceEye!</DialogTitle>
         <DialogContent>
             <DialogContentText>
@@ -73,7 +73,7 @@ const WindowsOnboardingDialog: React.FC<WindowsOnboardingDialogProps> = props =>
                 and select &quot;Show icon and notifications&quot; for &quot;SpaceEye&quot;.
             </DialogContentText>
             <DialogContentText>
-                You can do this later by Windows Searching for &quot;Select which icons appear on
+                You can do this later by Windows searching for &quot;Select which icons appear on
                 the taskbar&quot;
             </DialogContentText>
         </DialogContent>
