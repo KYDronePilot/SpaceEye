@@ -241,6 +241,15 @@ mb.on('ready', () => {
         })
     }
 
+    // If first run, show user the window
+    if (AppConfigStore.firstRun) {
+        mb.showWindow()
+        // If macOS, no onboarding, so first run must be reset here
+        if (process.platform === 'darwin') {
+            AppConfigStore.firstRun = false
+        }
+    }
+
     // Run an update on start
     WallpaperManager.update(Initiator.user)
 })
