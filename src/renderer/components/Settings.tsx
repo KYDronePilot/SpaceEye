@@ -13,10 +13,14 @@ import { Redirect } from 'react-router-dom'
 import styled from 'styled-components'
 
 import {
+    GET_AUTO_UPDATE,
     GET_START_ON_LOGIN,
+    GetAutoUpdateIpcResponse,
     GetStartOnLoginIpcResponse,
     QUIT_APPLICATION_CHANNEL,
+    SET_AUTO_UPDATE,
     SET_START_ON_LOGIN,
+    SetAutoUpdateIpcParams,
     SetStartOnLoginIpcParams
 } from '../../shared/IpcDefinitions'
 import { ipcRequest } from '../IpcService'
@@ -149,11 +153,20 @@ interface SettingsProps {
     onClickBack: () => void
     onClickQuit: () => void
     onClickStartOnLoginSwitch: (shouldStart: boolean) => void
+    onClickAutoUpdateSwitch: (autoUpdate: boolean) => void
     shouldStartOnLogin: boolean
+    autoUpdate: boolean
 }
 
 const Settings: React.FC<SettingsProps> = props => {
-    const { onClickBack, onClickQuit, onClickStartOnLoginSwitch, shouldStartOnLogin } = props
+    const {
+        onClickBack,
+        onClickQuit,
+        onClickStartOnLoginSwitch,
+        onClickAutoUpdateSwitch,
+        shouldStartOnLogin,
+        autoUpdate
+    } = props
 
     return (
         <SettingsContainer>
@@ -186,12 +199,20 @@ const Settings: React.FC<SettingsProps> = props => {
                 <Box my={2} mx={1}>
                     <Divider variant="fullWidth" />
                 </Box>
-                <Grid container direction="row" justify="flex-start">
+                <Grid container direction="column" justify="flex-start" alignContent="flex-start">
                     <SettingsSwitch
                         isChecked={shouldStartOnLogin}
                         onChange={onClickStartOnLoginSwitch}
                         label="Start on Login"
                     />
+                    {/* Don't show auto-update option if downloaded from an app store */}
+                    {!process.mas && !process.windowsStore && (
+                        <SettingsSwitch
+                            isChecked={autoUpdate}
+                            onChange={onClickAutoUpdateSwitch}
+                            label="Auto update"
+                        />
+                    )}
                 </Grid>
             </SettingsColumn>
         </SettingsContainer>
@@ -201,6 +222,7 @@ const Settings: React.FC<SettingsProps> = props => {
 interface SettingsManagerState {
     backCLicked: boolean
     startOnLogin: boolean
+    autoUpdate: boolean
     isLoaded: boolean
 }
 
@@ -215,17 +237,24 @@ export default class SettingsManager extends React.Component<{}, SettingsManager
         this.state = {
             backCLicked: false,
             startOnLogin: false,
+            autoUpdate: false,
             isLoaded: false
         }
 
         this.onChangeStartOnLogin = this.onChangeStartOnLogin.bind(this)
+        this.onChangeAutoUpdate = this.onChangeAutoUpdate.bind(this)
         this.onClickBack = this.onClickBack.bind(this)
     }
 
     async componentDidMount(): Promise<void> {
-        const response = await ipcRequest<{}, GetStartOnLoginIpcResponse>(GET_START_ON_LOGIN, {})
-        this.setState({ startOnLogin: response.startOnLogin ?? false }, () => {
-            this.setState({ isLoaded: true })
+        const [startOnLogin, autoUpdate] = await Promise.all([
+            ipcRequest<{}, GetStartOnLoginIpcResponse>(GET_START_ON_LOGIN, {}),
+            ipcRequest<{}, GetAutoUpdateIpcResponse>(GET_AUTO_UPDATE, {})
+        ])
+        this.setState({
+            startOnLogin: startOnLogin.startOnLogin ?? false,
+            autoUpdate: autoUpdate.autoUpdate,
+            isLoaded: true
         })
     }
 
@@ -236,6 +265,11 @@ export default class SettingsManager extends React.Component<{}, SettingsManager
             { startOnLogin: shouldStart },
             false
         )
+    }
+
+    private async onChangeAutoUpdate(autoUpdate: boolean) {
+        this.setState({ autoUpdate })
+        await ipcRequest<SetAutoUpdateIpcParams, {}>(SET_AUTO_UPDATE, { autoUpdate }, false)
     }
 
     private onClickBack() {
@@ -253,7 +287,9 @@ export default class SettingsManager extends React.Component<{}, SettingsManager
             <Settings
                 onClickBack={this.onClickBack}
                 onClickStartOnLoginSwitch={this.onChangeStartOnLogin}
+                onClickAutoUpdateSwitch={this.onChangeAutoUpdate}
                 shouldStartOnLogin={this.state.startOnLogin}
+                autoUpdate={this.state.autoUpdate}
                 onClickQuit={SettingsManager.onClickQuit}
             />
         )

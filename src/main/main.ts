@@ -13,10 +13,12 @@ import {
     DOWNLOAD_THUMBNAIL_CHANNEL,
     DownloadThumbnailIpcParams,
     DownloadThumbnailIpcResponse,
+    GET_AUTO_UPDATE,
     GET_CURRENT_VIEW_CHANNEL,
     GET_FIRST_RUN,
     GET_SATELLITE_CONFIG_CHANNEL,
     GET_START_ON_LOGIN,
+    GetAutoUpdateIpcResponse,
     GetCurrentViewIpcResponse,
     GetFirstRunIpcResponse,
     GetSatelliteConfigIpcResponse,
@@ -25,9 +27,11 @@ import {
     IpcRequest,
     OPEN_WINDOWS_ICON_SETTINGS,
     QUIT_APPLICATION_CHANNEL,
+    SET_AUTO_UPDATE,
     SET_FIRST_RUN,
     SET_START_ON_LOGIN,
     SET_WALLPAPER_CHANNEL,
+    SetAutoUpdateIpcParams,
     SetFirstRunIpcParams,
     SetStartOnLoginIpcParams,
     SetWallpaperIpcParams,
@@ -38,7 +42,7 @@ import { AppConfigStore } from './app_config_store'
 import { resolveDns } from './dns_handler'
 import { SatelliteConfigStore } from './satellite_config_store'
 import { Initiator } from './update_lock'
-import { startUpdateChecking } from './updater'
+import { setWindowVisibility, startUpdateChecking } from './updater'
 import { formatAxiosError } from './utils'
 import { WallpaperManager } from './wallpaper_manager'
 
@@ -186,10 +190,12 @@ mb.on('after-create-window', () => {
 
     mb.on('hide', () => {
         visibilityChangeAlert(false)
+        setWindowVisibility(false)
     })
 
     mb.on('show', () => {
         visibilityChangeAlert(true)
+        setWindowVisibility(true)
 
         // If on Windows, make sure window position matches toolbar location
         if (process.platform === 'win32') {
@@ -373,6 +379,17 @@ ipcMain.on(GET_FIRST_RUN, async (event, params: IpcRequest<IpcParams>) => {
 
 ipcMain.on(SET_FIRST_RUN, async (_, params: IpcRequest<SetFirstRunIpcParams>) => {
     AppConfigStore.firstRun = params.params.firstRun
+})
+
+ipcMain.on(GET_AUTO_UPDATE, async (event, params: IpcRequest<IpcParams>) => {
+    const response: GetAutoUpdateIpcResponse = {
+        autoUpdate: AppConfigStore.autoUpdate
+    }
+    event.reply(params.responseChannel, response)
+})
+
+ipcMain.on(SET_AUTO_UPDATE, async (_, params: IpcRequest<SetAutoUpdateIpcParams>) => {
+    AppConfigStore.autoUpdate = params.params.autoUpdate
 })
 
 ipcMain.on(OPEN_WINDOWS_ICON_SETTINGS, () => {

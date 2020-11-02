@@ -10,6 +10,7 @@ const log = electronLog.scope('app-config-store')
 const CURRENT_VIEW_ID_KEY = 'CURRENT_VIEW_ID'
 const START_ON_LOGIN_KEY = 'START_ON_LOGIN'
 const FIRST_RUN_KEY = 'FIRST_RUN'
+const AUTO_UPDATE_KEY = 'AUTO_UPDATE'
 
 export class AppConfigStore {
     private static store = new Store()
@@ -45,5 +46,16 @@ export class AppConfigStore {
     public static set firstRun(value: boolean) {
         log.debug('Setting first run to:', value)
         AppConfigStore.store.set(FIRST_RUN_KEY, value)
+    }
+
+    public static get autoUpdate(): boolean {
+        const autoUpdate = AppConfigStore.store.get(AUTO_UPDATE_KEY, true) as boolean
+        log.debug('Auto update retrieved:', autoUpdate)
+        return autoUpdate
+    }
+
+    public static set autoUpdate(value: boolean) {
+        log.debug('Setting auto update to:', value)
+        AppConfigStore.store.set(AUTO_UPDATE_KEY, value)
     }
 }
