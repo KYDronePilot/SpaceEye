@@ -1,13 +1,20 @@
+/* eslint-disable jsx-a11y/anchor-is-valid */
 import {
     Box,
     Button,
+    Dialog,
+    DialogActions,
+    DialogContent,
     Divider,
     FormControl,
     FormControlLabel,
     Grid,
+    Link,
     Switch,
     Typography
 } from '@material-ui/core'
+import { shell } from 'electron'
+import path from 'path'
 import * as React from 'react'
 import { Redirect } from 'react-router-dom'
 import styled from 'styled-components'
@@ -24,6 +31,8 @@ import {
     SetStartOnLoginIpcParams
 } from '../../shared/IpcDefinitions'
 import { ipcRequest } from '../IpcService'
+
+const RESOURCES_DIR = path.dirname(path.dirname(__dirname))
 
 const SectionsContainer = styled.div`
     display: flex;
@@ -149,13 +158,64 @@ const SettingsSwitch: React.FC<SettingsSwitchProps> = props => {
     )
 }
 
+const AppIcon = styled.img`
+    width: 70px;
+    height: 70px;
+    margin-left: auto;
+    margin-right: auto;
+`
+
+interface AboutThisAppProps {
+    onClickDone: () => void
+    visible: boolean
+}
+
+const AboutThisApp: React.FC<AboutThisAppProps> = props => {
+    return (
+        <Dialog open={props.visible} style={{ userSelect: 'none', textAlign: 'center' }}>
+            <DialogContent>
+                <AppIcon
+                    src="https://miro.medium.com/max/1000/1*_bq2g7Lo2RjWi98i5l75Wg.png"
+                    alt="SpaceEye icon"
+                />
+                <Typography variant="h6">SpaceEye</Typography>
+                <Typography variant="body2" style={{ userSelect: 'text' }}>
+                    Version {APP_VERSION}
+                </Typography>
+                <Typography variant="body2">Copyright (c) 2020 Michael Galliers</Typography>
+                <Typography variant="body2">License: {APP_LICENSE}</Typography>
+                <Link
+                    component="button"
+                    variant="body2"
+                    onClick={() => shell.openExternal(APP_BUGS_URL)}
+                >
+                    Report bugs
+                </Link>
+                <DialogActions>
+                    <Button
+                        onClick={() =>
+                            shell.openPath(path.join(RESOURCES_DIR, 'legal_notices.txt'))
+                        }
+                    >
+                        Acknowledgements
+                    </Button>
+                    <Button onClick={props.onClickDone}>Done</Button>
+                </DialogActions>
+            </DialogContent>
+        </Dialog>
+    )
+}
+
 interface SettingsProps {
     onClickBack: () => void
     onClickQuit: () => void
     onClickStartOnLoginSwitch: (shouldStart: boolean) => void
     onClickAutoUpdateSwitch: (autoUpdate: boolean) => void
+    openAboutApp: () => void
+    closeAboutApp: () => void
     shouldStartOnLogin: boolean
     autoUpdate: boolean
+    aboutAppVisible: boolean
 }
 
 const Settings: React.FC<SettingsProps> = props => {
@@ -164,8 +224,11 @@ const Settings: React.FC<SettingsProps> = props => {
         onClickQuit,
         onClickStartOnLoginSwitch,
         onClickAutoUpdateSwitch,
+        openAboutApp,
+        closeAboutApp,
         shouldStartOnLogin,
-        autoUpdate
+        autoUpdate,
+        aboutAppVisible
     } = props
 
     return (
@@ -183,7 +246,16 @@ const Settings: React.FC<SettingsProps> = props => {
                         </Button>
                     </Grid>
                     <Spacer />
-                    <Grid container direction="row" justify="center">
+                    <Grid container direction="column" justify="center" alignItems="center">
+                        <Link
+                            component="button"
+                            variant="body2"
+                            color="textSecondary"
+                            onClick={openAboutApp}
+                        >
+                            About
+                        </Link>
+                        <Box my={0.5} />
                         <Button variant="outlined" color="secondary" onClick={onClickQuit}>
                             Quit
                         </Button>
@@ -215,6 +287,7 @@ const Settings: React.FC<SettingsProps> = props => {
                     )}
                 </Grid>
             </SettingsColumn>
+            <AboutThisApp onClickDone={closeAboutApp} visible={aboutAppVisible} />
         </SettingsContainer>
     )
 }
@@ -224,6 +297,7 @@ interface SettingsManagerState {
     startOnLogin: boolean
     autoUpdate: boolean
     isLoaded: boolean
+    aboutAppVisible: boolean
 }
 
 export default class SettingsManager extends React.Component<{}, SettingsManagerState> {
@@ -238,7 +312,8 @@ export default class SettingsManager extends React.Component<{}, SettingsManager
             backCLicked: false,
             startOnLogin: false,
             autoUpdate: false,
-            isLoaded: false
+            isLoaded: false,
+            aboutAppVisible: false
         }
 
         this.onChangeStartOnLogin = this.onChangeStartOnLogin.bind(this)
@@ -288,9 +363,12 @@ export default class SettingsManager extends React.Component<{}, SettingsManager
                 onClickBack={this.onClickBack}
                 onClickStartOnLoginSwitch={this.onChangeStartOnLogin}
                 onClickAutoUpdateSwitch={this.onChangeAutoUpdate}
+                openAboutApp={() => this.setState({ aboutAppVisible: true })}
+                closeAboutApp={() => this.setState({ aboutAppVisible: false })}
                 shouldStartOnLogin={this.state.startOnLogin}
                 autoUpdate={this.state.autoUpdate}
                 onClickQuit={SettingsManager.onClickQuit}
+                aboutAppVisible={this.state.aboutAppVisible}
             />
         )
     }
