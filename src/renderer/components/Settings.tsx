@@ -32,8 +32,6 @@ import {
 } from '../../shared/IpcDefinitions'
 import { ipcRequest } from '../IpcService'
 
-const RESOURCES_DIR = path.dirname(path.dirname(__dirname))
-
 const SectionsContainer = styled.div`
     display: flex;
     flex-direction: row;
@@ -194,7 +192,7 @@ const AboutThisApp: React.FC<AboutThisAppProps> = props => {
                 <DialogActions>
                     <Button
                         onClick={() =>
-                            shell.openPath(path.join(RESOURCES_DIR, 'legal_notices.txt'))
+                            shell.openPath(path.join(process.resourcesPath, 'legal_notices.txt'))
                         }
                     >
                         Acknowledgements
