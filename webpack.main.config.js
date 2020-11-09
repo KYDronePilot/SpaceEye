@@ -42,6 +42,9 @@ module.exports = merge.smart(baseConfig, {
         }),
         new CopyPlugin({
             patterns: [{ from: 'assets', to: 'assets' }]
+        }),
+        new CopyPlugin({
+            patterns: [{ from: 'node_modules/@kydronepilot/space-eye-icons/dist', to: 'icons' }]
         })
     ]
 })

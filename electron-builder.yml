@@ -18,8 +18,10 @@ mac:
   darkModeSupport: true
   type: distribution
   publish: [github]
+  icon: node_modules/@kydronepilot/space-eye-icons/dist/mac_app.icns
 win:
   target:
     - target: nsis
       arch: x64
   publish: [github]
+  icon: node_modules/@kydronepilot/space-eye-icons/dist/windows_app.ico

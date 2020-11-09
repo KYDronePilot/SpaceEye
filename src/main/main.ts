@@ -94,9 +94,16 @@ const index = url.format({
 // Initial window positioning (subject to change on Windows depending on taskbar location)
 const windowPosition = process.platform === 'darwin' ? 'trayRight' : 'trayBottomRight'
 
+// Use ICO file for Windows
+const toolbarIconPath = path.join(
+    __dirname,
+    'icons',
+    process.platform === 'win32' ? 'windows_toolbar.ico' : 'mac_toolbar.png'
+)
+
 const mb = menubar({
     index,
-    icon: path.join(__dirname, 'assets', 'IconTemplate.png'),
+    icon: toolbarIconPath,
     browserWindow: {
         width: 550,
         height: 640,
