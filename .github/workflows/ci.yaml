@@ -36,6 +36,8 @@ jobs:
 
       - name: Install packages
         run: yarn install --frozen-lockfile --prefer-offline
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       # If macOS, install Mac Node API
       - run: yarn add git+https://github.com/KYDronePilot/space-eye-mac-node-api.git
