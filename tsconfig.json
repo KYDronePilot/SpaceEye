@@ -60,6 +60,6 @@
         // "emitDecoratorMetadata": true,         /* Enables experimental support for emitting type metadata for decorators. */
         "esModuleInterop": true
     },
-    "include": ["./src", "./test", "./mocks"],
+    "include": ["./src", "./test", "./mocks", "./generate_license_report.ts"],
     "exclude": ["node_modules"]
 }
