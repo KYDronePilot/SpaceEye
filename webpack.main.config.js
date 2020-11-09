@@ -41,10 +41,12 @@ module.exports = merge.smart(baseConfig, {
             'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development')
         }),
         new CopyPlugin({
-            patterns: [{ from: 'assets', to: 'assets' }]
-        }),
-        new CopyPlugin({
-            patterns: [{ from: 'node_modules/@kydronepilot/space-eye-icons/dist', to: 'icons' }]
+            patterns: [
+                {
+                    from: 'node_modules/@kydronepilot/space-eye-icons/dist',
+                    to: 'icons'
+                }
+            ]
         })
     ]
 })
