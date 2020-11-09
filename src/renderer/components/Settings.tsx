@@ -1,4 +1,5 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
+import infoIcon from '@kydronepilot/space-eye-icons/dist/info_app.png'
 import {
     Box,
     Button,
@@ -172,15 +173,12 @@ const AboutThisApp: React.FC<AboutThisAppProps> = props => {
     return (
         <Dialog open={props.visible} style={{ userSelect: 'none', textAlign: 'center' }}>
             <DialogContent>
-                <AppIcon
-                    src="https://miro.medium.com/max/1000/1*_bq2g7Lo2RjWi98i5l75Wg.png"
-                    alt="SpaceEye icon"
-                />
+                <AppIcon src={infoIcon} alt="SpaceEye icon" />
                 <Typography variant="h6">SpaceEye</Typography>
                 <Typography variant="body2" style={{ userSelect: 'text' }}>
                     Version {APP_VERSION}
                 </Typography>
-                <Typography variant="body2">Copyright (c) 2020 Michael Galliers</Typography>
+                <Typography variant="body2">Copyright &copy; 2020 Michael Galliers</Typography>
                 <Typography variant="body2">License: {APP_LICENSE}</Typography>
                 <Link
                     component="button"
