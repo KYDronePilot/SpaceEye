@@ -22,6 +22,12 @@ jobs:
         with:
           node-version: 13
 
+      - name: Create .npmrc file for GitHub package
+        run: |
+          echo "//npm.pkg.github.com/kydronepilot/:_authToken=${NODE_AUTH_TOKEN}" > .npmrc
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Get yarn cache directory path
         id: yarn-cache-dir-path
         run: echo "::set-output name=dir::$(yarn cache dir)"
@@ -36,8 +42,6 @@ jobs:
 
       - name: Install packages
         run: yarn install --frozen-lockfile --prefer-offline
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       # If macOS, install Mac Node API
       - run: yarn add git+https://github.com/KYDronePilot/space-eye-mac-node-api.git
