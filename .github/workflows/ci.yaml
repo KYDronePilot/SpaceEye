@@ -34,6 +34,9 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.GP_ACCESS_TOKEN }}
         if: startsWith(matrix.os, 'macos')
 
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+
       - name: Get yarn cache directory path
         id: yarn-cache-dir-path
         run: echo "::set-output name=dir::$(yarn cache dir)"
