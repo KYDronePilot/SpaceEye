@@ -26,7 +26,7 @@ jobs:
         run: |
           echo "//npm.pkg.github.com/kydronepilot/:_authToken=${NODE_AUTH_TOKEN}" > .npmrc
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.GP_ACCESS_TOKEN }}
 
       - name: Get yarn cache directory path
         id: yarn-cache-dir-path
