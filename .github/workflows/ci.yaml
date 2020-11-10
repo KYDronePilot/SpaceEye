@@ -22,17 +22,21 @@ jobs:
         with:
           node-version: 13
 
-      - name: Create .npmrc file for GitHub package
+      - name: Create .npmrc token file for Windows
+        run: echo "//npm.pkg.github.com/:_authToken=%NODE_AUTH_TOKEN%" > .npmrc
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GP_ACCESS_TOKEN }}
+        if: startsWith(matrix.os, 'windows')
+
+      - name: Create .npmrc token file for macOS
         run: echo "//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}" > .npmrc
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GP_ACCESS_TOKEN }}
+        if: startsWith(matrix.os, 'macos')
 
       - name: Get yarn cache directory path
         id: yarn-cache-dir-path
         run: echo "::set-output name=dir::$(yarn cache dir)"
-
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
 
       - uses: actions/cache@v1
         id: yarn-cache
