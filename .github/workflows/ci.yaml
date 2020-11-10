@@ -40,6 +40,9 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-
 
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+
       - name: Install packages
         run: yarn install --frozen-lockfile --prefer-offline
 
