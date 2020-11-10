@@ -31,6 +31,9 @@ jobs:
         id: yarn-cache-dir-path
         run: echo "::set-output name=dir::$(yarn cache dir)"
 
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+
       - uses: actions/cache@v1
         id: yarn-cache
         with:
