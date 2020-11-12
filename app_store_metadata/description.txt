@@ -16,4 +16,5 @@ Special thanks to NOAA and Colorado State University for providing the satellite
 
 ---
 
-Homepage: https://github.com/KYDronePilot/SpaceEye Report a bug or suggest an improvement: https://github.com/KYDronePilot/SpaceEye/issues
+Homepage: https://github.com/KYDronePilot/SpaceEye
+Report a bug or suggest an improvement: https://github.com/KYDronePilot/SpaceEye/issues
