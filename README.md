@@ -26,6 +26,12 @@ things to change frequently until the first official release.
 If you encounter a bug or have a feature request, please post it on the [Issues
 page](https://github.com/KYDronePilot/SpaceEye/issues).
 
+## Privacy
+
+The only data collected are server logs when downloading the [satellite config
+file](https://spaceeye-satellite-configs.s3.us-east-2.amazonaws.com/1.0.1/config.json),
+with links to the live satellite images. Nothing else.
+
 ## License
 
 MIT © [Michael Galliers](https://github.com/KYDronePilot)
