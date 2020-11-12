@@ -1,10 +1,10 @@
 Make live satellite imagery your desktop background with SpaceEye.
 
-SpaceEye gets current images from geostationary weather satellites and sets them as your desktop background, updating (at most) every 20 minutes.
-
 Choose from 10 different live views of the Earth. See real-time weather patterns in high resolution as they occur. Watch shadows move throughout the day as the sun rises and sets.
 
-Includes views from the satellites Himawari-8, GOES-17 (West), and GOES-16 (East).
+SpaceEye gets current images from geostationary weather satellites and sets them as your desktop background, updating (at most) every 20 minutes.
+
+Includes live views from the satellites Himawari-8, GOES-17 (West), and GOES-16 (East).
 
 FREE AND OPEN SOURCE
 
