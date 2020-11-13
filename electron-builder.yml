@@ -32,5 +32,6 @@ mas:
   entitlementsInherit: build/entitlements.mas.inherit.plist
   extendInfo:
     LSMultipleInstancesProhibited: true
+    ITSAppUsesNonExemptEncryption: false
   asarUnpack:
     - "**/*.node"

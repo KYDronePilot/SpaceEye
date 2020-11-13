@@ -1,6 +1,6 @@
 {
     "name": "space-eye",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "description": "Live satellite imagery for your desktop background",
     "main": "./dist/main.js",
     "scripts": {
@@ -84,7 +84,7 @@
         "copy-webpack-plugin": "^6.0.3",
         "cross-env": "^5.1.3",
         "css-loader": "^2.1.1",
-        "electron": "^9.0.0",
+        "electron": "^9.0.5",
         "electron-builder": "^22.8.0",
         "electron-builder-notarize": "^1.2.0",
         "eslint": "^6.5.1",
