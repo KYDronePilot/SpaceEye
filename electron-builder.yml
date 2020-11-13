@@ -15,7 +15,6 @@ afterSign: electron-builder-notarize
 mac:
   category: public.app-category.utilities
   hardenedRuntime: true
-  darkModeSupport: true
   type: distribution
   publish: [github]
   icon: node_modules/@kydronepilot/space-eye-icons/dist/mac_app.icns
