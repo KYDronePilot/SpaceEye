@@ -284,13 +284,13 @@ function configureStartOnLogin(shouldStart: boolean) {
     }
 }
 
-// Default to start on login
+// Default to not start on login
 if (AppConfigStore.startOnLogin === undefined) {
-    AppConfigStore.startOnLogin = true
+    AppConfigStore.startOnLogin = false
 }
 
 // Ensure configured on startup
-configureStartOnLogin(AppConfigStore.startOnLogin ?? true)
+configureStartOnLogin(AppConfigStore.startOnLogin)
 
 app.on('will-quit', () => {
     log.info('Application will quit')
