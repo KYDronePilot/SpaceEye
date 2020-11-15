@@ -149,17 +149,20 @@ function getWindowsTaskbarLocation(trayBounds: Rectangle): WindowsTaskbarPositio
     return WindowsTaskbarPosition.Right
 }
 
-// Only let one instance be opened
-if (!app.requestSingleInstanceLock()) {
-    app.quit()
-} else {
-    // If another instance is opened (and then closed), focus on this one
-    app.on('second-instance', () => {
-        mb.showWindow()
-        if (mb.window) {
-            mb.window.focus()
-        }
-    })
+// No multi-instance checking on MAS builds (causes app to close immediately)
+if (!process.mas) {
+    // Only let one instance be opened
+    if (!app.requestSingleInstanceLock()) {
+        app.quit()
+    } else {
+        // If another instance is opened (and then closed), focus on this one
+        app.on('second-instance', () => {
+            mb.showWindow()
+            if (mb.window) {
+                mb.window.focus()
+            }
+        })
+    }
 }
 
 /**
@@ -281,13 +284,13 @@ function configureStartOnLogin(shouldStart: boolean) {
     }
 }
 
-// Default to start on login
+// Default to not start on login
 if (AppConfigStore.startOnLogin === undefined) {
-    AppConfigStore.startOnLogin = true
+    AppConfigStore.startOnLogin = false
 }
 
 // Ensure configured on startup
-configureStartOnLogin(AppConfigStore.startOnLogin ?? true)
+configureStartOnLogin(AppConfigStore.startOnLogin)
 
 app.on('will-quit', () => {
     log.info('Application will quit')
