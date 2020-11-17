@@ -12,7 +12,6 @@ const updateAlertVersions: Record<string, boolean> = {}
 
 autoUpdater.logger = log
 autoUpdater.autoDownload = true
-autoUpdater.autoInstallOnAppQuit = true
 
 let isUpdateDownloaded = false
 let isWindowVisible = false
