@@ -16,7 +16,7 @@ mac:
   category: public.app-category.utilities
   hardenedRuntime: true
   type: distribution
-  target: [mas]
+  target: [dmg, zip]
   electronLanguages: [en]
   publish: [github]
   icon: node_modules/@kydronepilot/space-eye-icons/dist/mac_app.icns
