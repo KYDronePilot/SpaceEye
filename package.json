@@ -17,7 +17,7 @@
         "pretest:e2e": "npm run build",
         "test:e2e": "jest '(\\/test\\/e2e/).*'",
         "pack": "npm run build && electron-builder --dir",
-        "dist": "npm run build && node generate_license_report.ts && electron-builder",
+        "dist": "npm run build && ts-node generate_license_report.ts && electron-builder",
         "postinstall": "electron-builder install-app-deps"
     },
     "lint-staged": {
