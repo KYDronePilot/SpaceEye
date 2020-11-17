@@ -4,6 +4,7 @@ import * as React from 'react'
 import { ReactNode } from 'react'
 import styled from 'styled-components'
 
+import { RootSatelliteConfig } from '../../shared/config_types'
 import {
     GET_CURRENT_VIEW_CHANNEL,
     GET_SATELLITE_CONFIG_CHANNEL,

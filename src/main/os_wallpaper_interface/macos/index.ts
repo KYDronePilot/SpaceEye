@@ -1,6 +1,7 @@
 import electronLog from 'electron-log'
 
 import { OSWallpaperInterface } from '..'
+import { ScalingOption } from '../../../shared/config_types'
 import * as DesktopWallpaper from './DesktopWallpaperTypes'
 
 const log = electronLog.scope('mac-wallpaper-interface')
@@ -15,9 +16,13 @@ if (process.platform === 'darwin') {
 
 export class MacOSWallpaperInterface implements OSWallpaperInterface {
     // eslint-disable-next-line class-methods-use-this
-    setWallpaper(monitor: Electron.Display, _: number, path: string): void {
+    setWallpaper(monitor: Electron.Display, _: number, path: string, scaling: ScalingOption): void {
         log.debug(`Setting wallpaper. Monitor: ${monitor.id}, Path: "${path}"`)
-        MacDesktopWallpaper.SetWallpaper(monitor.id, path)
+        MacDesktopWallpaper.SetWallpaper(monitor.id, path, {
+            imageScaling: MacDesktopWallpaper.ImageScaling.proportionallyUpOrDown,
+            allowClipping: scaling === ScalingOption.fit,
+            desktopFillColor: { red: 0, green: 0, blue: 0, alpha: 1 }
+        })
     }
 
     // eslint-disable-next-line class-methods-use-this

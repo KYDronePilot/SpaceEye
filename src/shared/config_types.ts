@@ -1,19 +1,28 @@
 /**
+ * Scaling options for images.
+ */
+export enum ScalingOption {
+    fit = 'fit',
+    fill = 'fill'
+}
+
+/**
  * Information about a particular image source.
  */
-interface ImageSource {
+export interface ImageSource {
     id: number
     url: string
     estimatedSize: string
     updateInterval: number
     dimensions: [number, number]
     isThumbnail?: boolean
+    defaultScaling: ScalingOption
 }
 
 /**
  * A view from a satellite.
  */
-interface SatelliteView {
+export interface SatelliteView {
     id: number
     name: string
     imageSources: ImageSource[]
@@ -23,7 +32,7 @@ interface SatelliteView {
 /**
  * A particular satellite.
  */
-interface Satellite {
+export interface Satellite {
     id: number
     name: string
     views: SatelliteView[]
@@ -32,6 +41,6 @@ interface Satellite {
 /**
  * Root satellite config object.
  */
-interface RootSatelliteConfig {
+export interface RootSatelliteConfig {
     satellites: Satellite[]
 }

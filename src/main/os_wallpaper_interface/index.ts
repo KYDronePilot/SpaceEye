@@ -1,5 +1,7 @@
 import { Display } from 'electron'
 
+import { ScalingOption } from '../../shared/config_types'
+
 export interface OSWallpaperInterface {
     /**
      * Set the wallpaper image for a monitor.
@@ -7,7 +9,7 @@ export interface OSWallpaperInterface {
      * @param monitor - Monitor to set on
      * @param path - Path to the image
      */
-    setWallpaper(monitor: Display, monitorIndex: number, path: string): void
+    setWallpaper(monitor: Display, monitorIndex: number, path: string, scaling: ScalingOption): void
 
     /**
      * Get the wallpaper image path for a particular monitor.

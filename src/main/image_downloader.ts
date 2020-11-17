@@ -6,6 +6,7 @@ import moment from 'moment'
 import { Readable } from 'stream'
 import { promisify } from 'util'
 
+import { ImageSource } from '../shared/config_types'
 import { DownloadedImage } from './downloaded_image'
 import { FileDoesNotExistError, RequestCancelledError } from './errors'
 import { UpdateLock } from './update_lock'

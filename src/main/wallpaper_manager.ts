@@ -8,6 +8,7 @@ import electronLog from 'electron-log'
 import { maxBy } from 'lodash'
 import moment from 'moment'
 
+import { ImageSource, SatelliteView } from '../shared/config_types'
 import { AppConfigStore } from './app_config_store'
 import { DownloadedImage } from './downloaded_image'
 import {
@@ -198,7 +199,12 @@ export class WallpaperManager {
         )
         // Set the wallpaper on monitors that don't have it set yet
         monitorsToSet.forEach((monitor, i) =>
-            wallpaperInterface.setWallpaper(monitor, i, imageToSet!.getPath())
+            wallpaperInterface.setWallpaper(
+                monitor,
+                i,
+                imageToSet!.getPath(),
+                imageConfig.defaultScaling
+            )
         )
     }
 

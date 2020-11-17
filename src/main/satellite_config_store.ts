@@ -6,6 +6,7 @@ import Axios from 'axios'
 import electronLog from 'electron-log'
 import moment, { Moment } from 'moment'
 
+import { ImageSource, RootSatelliteConfig, Satellite, SatelliteView } from '../shared/config_types'
 import { RequestError } from './errors'
 
 const log = electronLog.scope('satellite-config-store')
@@ -14,7 +15,7 @@ const log = electronLog.scope('satellite-config-store')
 const INVALIDATION_TIMEOUT = 60
 
 // URL to download the config
-const CONFIG_URL = 'https://spaceeye-satellite-configs.s3.us-east-2.amazonaws.com/1.0.1/config.json'
+const CONFIG_URL = 'https://spaceeye-satellite-configs.s3.us-east-2.amazonaws.com/1.1.0/config.json'
 
 // Async lock
 const lock = new AsyncLock()
