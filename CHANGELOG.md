@@ -11,6 +11,9 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 ### Added
 
 - Option to enabled/disable start on login.
+- Onboarding info for Windows users.
+- Full-auto update option for GitHub Releases builds.
+- App icons.
 
 ### Changed
 
@@ -20,13 +23,19 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 - Don't update image if screen is locked.
 - Update the image on app start.
 - Removed dependencies that were not needed.
-- Switched to using Yarn as the package manager.
+- Added "About" section in settings with open source license info.
+- Increased redundancy when making web requests.
+- Better overall error handling when making web requests.
 
 ### Fixed
 
 - Optimal image size for all monitors will now be downloaded, instead of just
   the largest.
 - Updated packages with security vulnerabilities.
+- Only one instance of app should ever be opened.
+- Window wasn't positioned correctly when Windows Toolbar wasn't at the bottom
+  of the screen.
+- Full disk images are no longer cut off by scaling.
 
 ## [0.1.0]
 
