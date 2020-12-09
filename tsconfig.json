@@ -60,6 +60,11 @@
         // "emitDecoratorMetadata": true,         /* Enables experimental support for emitting type metadata for decorators. */
         "esModuleInterop": true
     },
-    "include": ["./src", "./test", "./mocks", "./generate_license_report.ts"],
-    "exclude": ["node_modules"]
+    "include": ["./src", "./test", "./mocks", "./gulpfile.ts"],
+    "exclude": ["node_modules"],
+    "ts-node": {
+        "compilerOptions": {
+            "module": "commonjs"
+        }
+    }
 }
