@@ -1,7 +1,7 @@
 /* eslint-disable jsdoc/require-returns */
 import { ChildProcess, exec, spawn } from 'child_process'
 import fs from 'fs'
-import { parallel } from 'gulp'
+import { parallel, series } from 'gulp'
 import path from 'path'
 import { promisify } from 'util'
 
@@ -42,13 +42,6 @@ function buildRenderer(): ChildProcess {
 }
 
 /**
- * Build code.
- */
-function build() {
-    return parallel(buildMain, buildRenderer)
-}
-
-/**
  * Generate the application license report from used packages.
  */
 async function generateLicenseReport() {
@@ -59,6 +52,13 @@ async function generateLicenseReport() {
         maxBuffer: 1024 * 50000
     })
     await asyncWriteFile(destPath, res.toString())
+}
+
+/**
+ * Run the electron builder command.
+ */
+function runElectronBuilder() {
+    return spawn('electron-builder', { env: { PATH: EXTENDED_PATH }, stdio: 'inherit' })
 }
 
 /**
@@ -117,5 +117,11 @@ function startDev(done: (error?: any) => void) {
     })
 }
 
-exports['build-ci'] = parallel(build(), generateLicenseReport)
+export const build = parallel(buildMain, buildRenderer)
+
+const buildCi = parallel(build, generateLicenseReport)
+exports['build-ci'] = buildCi
+
 exports['start-dev'] = startDev
+
+exports.dist = series(buildCi, runElectronBuilder)

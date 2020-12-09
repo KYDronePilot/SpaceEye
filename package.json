@@ -4,6 +4,9 @@
     "description": "Live satellite imagery for your desktop background",
     "main": "./dist/main.js",
     "scripts": {
+        "build": "gulp build",
+        "build-ci": "gulp build-ci",
+        "start-dev": "gulp start-dev",
         "prestart": "npm run build",
         "start": "electron .",
         "lint": "eslint --ext=jsx,js,tsx,ts src",
@@ -11,7 +14,7 @@
         "pretest:e2e": "npm run build",
         "test:e2e": "jest '(\\/test\\/e2e/).*'",
         "pack": "npm run build && electron-builder --dir",
-        "dist": "npm run build && ts-node generate_license_report.ts && electron-builder",
+        "dist": "gulp dist",
         "postinstall": "electron-builder install-app-deps"
     },
     "lint-staged": {
