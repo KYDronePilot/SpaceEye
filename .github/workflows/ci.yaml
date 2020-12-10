@@ -65,7 +65,7 @@ jobs:
           echo '${{ secrets.api_key }}' > ~/private_keys/AuthKey_${{ secrets.api_key_id }}.p8
 
       - name: Build
-        run: gulp build-ci
+        run: npx gulp build-ci
 
       - name: Electron Builder
         uses: samuelmeuli/action-electron-builder@v1
