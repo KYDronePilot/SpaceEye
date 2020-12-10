@@ -1,5 +1,6 @@
 /* eslint-disable jsdoc/require-returns */
-import { ChildProcess, exec, spawn } from 'child_process'
+import { ChildProcess, exec, spawn, SpawnOptions } from 'child_process'
+import fkill from 'fkill'
 import fs from 'fs'
 import { parallel, series } from 'gulp'
 import path from 'path'
@@ -10,83 +11,90 @@ const asyncWriteFile = promisify(fs.writeFile)
 
 const NODE_MODULES_BIN = path.join(__dirname, 'node_modules', '.bin')
 const EXTENDED_PATH = NODE_MODULES_BIN + path.delimiter + (process.env.PATH ?? '')
-const MAIN_DIST = path.join(__dirname, 'dist', 'main.js')
+const DIST = path.join(__dirname, 'dist')
+const MAIN_DIST = path.join(DIST, 'main.js')
+const LEGAL_NOTICES = path.join(DIST, 'legal_notices.txt')
+
+const defaultSpawnOptions: SpawnOptions = {
+    env: {
+        PATH: EXTENDED_PATH
+    },
+    stdio: 'inherit',
+    shell: true
+}
+const prodSpawnOptions: SpawnOptions = {
+    ...defaultSpawnOptions,
+    env: {
+        ...defaultSpawnOptions.env,
+        NODE_ENV: 'production'
+    }
+}
 
 /**
  * Run Webpack with a config.
  *
  * @param config - Path to config to use
+ * @param production - Whether the node environment should be production
  */
-function runWebpack(config: string): ChildProcess {
-    return spawn('webpack', ['--config', config], {
-        env: {
-            NODE_ENV: 'production',
-            PATH: EXTENDED_PATH
-        },
-        stdio: 'inherit'
-    })
+function runWebpack(config: string, production = false): ChildProcess {
+    const options = production ? prodSpawnOptions : defaultSpawnOptions
+    return spawn('webpack', ['--config', config], options)
 }
 
 /**
  * Build the main process code.
  */
 function buildMain(): ChildProcess {
-    return runWebpack('webpack.main.prod.config.js')
+    return runWebpack('webpack.main.prod.config.js', true)
 }
 
 /**
  * Build the renderer process code.
  */
 function buildRenderer(): ChildProcess {
-    return runWebpack('webpack.renderer.prod.config.js')
+    return runWebpack('webpack.renderer.prod.config.js', true)
 }
 
 /**
  * Generate the application license report from used packages.
  */
 async function generateLicenseReport() {
-    const destPath = path.join(__dirname, 'dist', 'legal_notices.txt')
-    const yarnCmd = process.platform === 'win32' ? 'yarn.cmd' : 'yarn'
-
-    const res = await asyncExec(`${yarnCmd} --silent licenses generate-disclaimer`, {
+    const res = await asyncExec('yarn --silent licenses generate-disclaimer', {
         maxBuffer: 1024 * 50000
     })
-    await asyncWriteFile(destPath, res.toString())
+    await asyncWriteFile(LEGAL_NOTICES, res.stdout)
 }
 
 /**
  * Run the electron builder command.
  */
 function runElectronBuilder() {
-    return spawn('electron-builder', { env: { PATH: EXTENDED_PATH }, stdio: 'inherit' })
+    return spawn('electron-builder', defaultSpawnOptions)
 }
 
 /**
  * Build main process code in dev mode.
  */
 function buildMainDev(): ChildProcess {
-    return spawn('webpack', ['--config', 'webpack.main.config.js'], {
-        env: {
-            PATH: EXTENDED_PATH
-        },
-        stdio: 'inherit'
-    })
+    return runWebpack('webpack.main.config.js')
 }
 
 /**
  * Start running electron in dev mode.
  */
 function startElectronDev(): ChildProcess {
-    return spawn('electron', [MAIN_DIST], { env: { PATH: EXTENDED_PATH } })
+    return spawn('electron', [`"${MAIN_DIST}"`], defaultSpawnOptions)
 }
 
 /**
  * Start the renderer process webpack dev server.
  */
 function startRendererDevServer(): ChildProcess {
-    return spawn('webpack-dev-server', ['--config', 'webpack.renderer.dev.config.js'], {
-        env: { PATH: EXTENDED_PATH }
-    })
+    return spawn(
+        'webpack-dev-server',
+        ['--config', 'webpack.renderer.dev.config.js'],
+        defaultSpawnOptions
+    )
 }
 
 /**
@@ -103,7 +111,7 @@ function startDev(done: (error?: any) => void) {
     mainBuilder.on('close', code => {
         // Stop the dev server and exit if main build didn't exit cleanly
         if (code !== 0) {
-            rendererDevServer.kill('SIGINT')
+            fkill(rendererDevServer.pid, { force: process.platform === 'win32' })
             done()
             return
         }
@@ -111,7 +119,7 @@ function startDev(done: (error?: any) => void) {
         const electronDev = startElectronDev()
         // When stopped, stop the renderer dev server
         electronDev.on('close', () => {
-            rendererDevServer.kill('SIGINT')
+            fkill(rendererDevServer.pid, { force: process.platform === 'win32' })
             done()
         })
     })
