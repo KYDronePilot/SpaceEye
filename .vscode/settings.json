@@ -17,5 +17,11 @@
     },
     "[markdown]": {
         "editor.formatOnSave": false
+    },
+    "[typescript]": {
+        "editor.rulers": [100]
+    },
+    "[typescriptreact]": {
+        "editor.rulers": [100]
     }
 }
