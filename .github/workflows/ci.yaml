@@ -65,6 +65,9 @@ jobs:
           echo '${{ secrets.api_key }}' > ~/private_keys/AuthKey_${{ secrets.api_key_id }}.p8
 
       - name: Build
+        run: npx gulp build-ci
+
+      - name: Electron Builder
         uses: samuelmeuli/action-electron-builder@v1
         with:
           github_token: ${{ secrets.github_token }}
@@ -72,6 +75,7 @@ jobs:
           mac_certs_password: ${{ secrets.mac_certs_password }}
           # Release on version tag
           release: ${{ startsWith(github.ref, 'refs/tags/v') }}
+          skip_build: true
         env:
           API_KEY_ID: ${{ secrets.api_key_id }}
           API_KEY_ISSUER_ID: ${{ secrets.api_key_issuer_id }}

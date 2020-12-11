@@ -4,7 +4,11 @@
     "editor.codeActionsOnSave": {
         "source.fixAll": true
     },
-    "cSpell.words": ["Scrollable", "simplebar"],
+    "cSpell.words": [
+        "Scrollable",
+        "fkill",
+        "simplebar"
+    ],
     "yaml.schemas": {
         "https://json.schemastore.org/electron-builder": [
             "electron-builder.yaml",
