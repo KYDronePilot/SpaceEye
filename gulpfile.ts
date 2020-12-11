@@ -2,6 +2,7 @@
 import { ChildProcess, exec, spawn, SpawnOptions } from 'child_process'
 import fkill from 'fkill'
 import fs from 'fs'
+import fse from 'fs-extra'
 import { parallel, series } from 'gulp'
 import path from 'path'
 import { promisify } from 'util'
@@ -125,9 +126,16 @@ function startDev(done: (error?: any) => void) {
     })
 }
 
+/**
+ * Create the dist dir if it doesn't exist.
+ */
+async function ensureDist() {
+    await fse.ensureDir(DIST)
+}
+
 export const build = parallel(buildMain, buildRenderer)
 
-const buildCi = parallel(build, generateLicenseReport)
+const buildCi = series(ensureDist, parallel(build, generateLicenseReport))
 exports['build-ci'] = buildCi
 
 exports['start-dev'] = startDev
