@@ -10,6 +10,15 @@ import { promisify } from 'util'
 const asyncExec = promisify(exec)
 const asyncWriteFile = promisify(fs.writeFile)
 
+const BUILD_DIR = path.join(__dirname, 'build')
+const APPX_ASSETS = path.join(BUILD_DIR, 'appx')
+const SPACE_EYE_ICONS = path.join(
+    __dirname,
+    'node_modules',
+    '@kydronepilot',
+    'space-eye-icons',
+    'dist'
+)
 const NODE_MODULES_BIN = path.join(__dirname, 'node_modules', '.bin')
 const EXTENDED_PATH = NODE_MODULES_BIN + path.delimiter + (process.env.PATH ?? '')
 const DIST = path.join(__dirname, 'dist')
@@ -65,6 +74,15 @@ async function generateLicenseReport() {
         maxBuffer: 1024 * 50000
     })
     await asyncWriteFile(LEGAL_NOTICES, res.stdout)
+}
+
+/**
+ * Copy icon asset files to the build dir for electron builder to access.
+ */
+async function copyIconAssets() {
+    // Delete old appx assets if they exist, then copy the new
+    await fse.remove(APPX_ASSETS)
+    await fse.copy(path.join(SPACE_EYE_ICONS, 'appx'), APPX_ASSETS)
 }
 
 /**
@@ -140,7 +158,7 @@ async function ensureDist() {
 
 export const build = parallel(buildMain, buildRenderer)
 
-const buildCi = series(ensureDist, parallel(build, generateLicenseReport))
+const buildCi = series(ensureDist, parallel(build, generateLicenseReport, copyIconAssets))
 exports['build-ci'] = buildCi
 
 exports['start-dev'] = startDev
