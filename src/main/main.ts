@@ -116,7 +116,8 @@ const mb = menubar({
         resizable: false,
         movable: false
     },
-    windowPosition
+    windowPosition,
+    preloadWindow: true
 })
 
 /**
