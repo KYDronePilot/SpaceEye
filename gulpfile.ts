@@ -13,6 +13,7 @@ const asyncWriteFile = promisify(fs.writeFile)
 const NODE_MODULES_BIN = path.join(__dirname, 'node_modules', '.bin')
 const EXTENDED_PATH = NODE_MODULES_BIN + path.delimiter + (process.env.PATH ?? '')
 const DIST = path.join(__dirname, 'dist')
+const RELEASE = path.join(__dirname, 'release')
 const MAIN_DIST = path.join(DIST, 'main.js')
 const LEGAL_NOTICES = path.join(DIST, 'legal_notices.txt')
 
@@ -67,9 +68,13 @@ async function generateLicenseReport() {
 }
 
 /**
- * Run the electron builder command.
+ * Build for distribution with electron-builder.
  */
-function runElectronBuilder() {
+function buildDist() {
+    // If on Windows, clear out the old release dir (causes lock problems otherwise)
+    if (process.platform === 'win32') {
+        fse.emptyDir(RELEASE)
+    }
     return spawn('electron-builder', defaultSpawnOptions)
 }
 
@@ -140,4 +145,4 @@ exports['build-ci'] = buildCi
 
 exports['start-dev'] = startDev
 
-exports.dist = series(buildCi, runElectronBuilder)
+exports.dist = series(buildCi, buildDist)
