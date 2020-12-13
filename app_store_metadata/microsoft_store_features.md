@@ -1,0 +1,3 @@
+- 10 different live views from the Himawari-8, GOES-17 (West), and GOES-16 (East) satellites
+- Backgrounds update at most every 20 minutes
+- Free and open source
