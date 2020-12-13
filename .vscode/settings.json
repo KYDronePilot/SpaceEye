@@ -18,10 +18,23 @@
     "[markdown]": {
         "editor.formatOnSave": false
     },
+    "[json]": {
+        "editor.formatOnSave": false
+    },
+    "[jsonc]": {
+        "editor.formatOnSave": false
+    },
     "[typescript]": {
         "editor.rulers": [100]
     },
     "[typescriptreact]": {
         "editor.rulers": [100]
+    },
+    "files.watcherExclude": {
+        "**/.git/objects/**": true,
+        "**/.git/subtree-cache/**": true,
+        "**/node_modules/*/**": true,
+        "**/.hg/store/**": true,
+        "**/release/win-unpacked/**": true
     }
 }
