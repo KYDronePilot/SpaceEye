@@ -1,6 +1,7 @@
 import Axios from 'axios'
 import { spawn } from 'child_process'
 import { app, ipcMain, powerMonitor, Rectangle, screen, systemPreferences } from 'electron'
+import { ipcMain as ipc } from 'electron-better-ipc'
 import electronLog from 'electron-log'
 import { cloneDeep } from 'lodash'
 import { menubar } from 'menubar'
@@ -9,6 +10,7 @@ import net from 'net'
 import * as path from 'path'
 import * as url from 'url'
 
+import { RootSatelliteConfig } from '../shared/config_types'
 import {
     DOWNLOAD_THUMBNAIL_CHANNEL,
     DownloadThumbnailIpcParams,
@@ -21,7 +23,6 @@ import {
     GetAutoUpdateIpcResponse,
     GetCurrentViewIpcResponse,
     GetFirstRunIpcResponse,
-    GetSatelliteConfigIpcResponse,
     GetStartOnLoginIpcResponse,
     IpcParams,
     IpcRequest,
@@ -310,22 +311,19 @@ ipcMain.on(QUIT_APPLICATION_CHANNEL, () => {
     app.quit()
 })
 
-ipcMain.on(GET_SATELLITE_CONFIG_CHANNEL, async (event, params: IpcRequest<IpcParams>) => {
-    log.info('Get satellite config request received')
-    const configStore = SatelliteConfigStore.Instance
-    try {
-        const response: GetSatelliteConfigIpcResponse = {
-            config: await configStore.getConfig()
+ipc.answerRenderer<void, RootSatelliteConfig | undefined>(
+    GET_SATELLITE_CONFIG_CHANNEL,
+    async () => {
+        log.info('Get satellite config request received')
+        const configStore = SatelliteConfigStore.Instance
+        try {
+            return await configStore.getConfig()
+        } catch (error) {
+            log.error('Failed to get new satellite config:', error)
+            return undefined
         }
-        event.reply(params.responseChannel, response)
-    } catch (error) {
-        log.error('Failed to get new satellite config:', error)
-        const response: GetSatelliteConfigIpcResponse = {
-            config: undefined
-        }
-        event.reply(params.responseChannel, response)
     }
-})
+)
 
 ipcMain.on(SET_WALLPAPER_CHANNEL, async (event, params: IpcRequest<SetWallpaperIpcParams>) => {
     log.info('Wallpaper set request received for view:', params.params.viewId)

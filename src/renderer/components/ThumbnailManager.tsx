@@ -1,5 +1,6 @@
 import { Box, CircularProgress, Grid, Typography } from '@material-ui/core'
 import { ipcRenderer } from 'electron'
+import { ipcRenderer as ipc } from 'electron-better-ipc'
 import * as React from 'react'
 import { ReactNode } from 'react'
 import styled from 'styled-components'
@@ -9,7 +10,6 @@ import {
     GET_CURRENT_VIEW_CHANNEL,
     GET_SATELLITE_CONFIG_CHANNEL,
     GetCurrentViewIpcResponse,
-    GetSatelliteConfigIpcResponse,
     IpcParams,
     IpcResponse,
     SET_WALLPAPER_CHANNEL,
@@ -123,11 +123,11 @@ export default class ThumbnailManager extends React.Component<
      */
     async update(): Promise<void> {
         const [configResponse, currentViewResponse] = await Promise.all([
-            ipcRequest<IpcParams, GetSatelliteConfigIpcResponse>(GET_SATELLITE_CONFIG_CHANNEL, {}),
+            ipc.callMain<void, RootSatelliteConfig>(GET_SATELLITE_CONFIG_CHANNEL),
             ipcRequest<IpcParams, GetCurrentViewIpcResponse>(GET_CURRENT_VIEW_CHANNEL, {})
         ])
         this.setState({
-            satelliteConfig: configResponse.config,
+            satelliteConfig: configResponse,
             selectedId: currentViewResponse.viewId
         })
     }
