@@ -25,8 +25,7 @@ import {
     SET_FIRST_RUN,
     SET_START_ON_LOGIN,
     SET_WALLPAPER_CHANNEL,
-    VISIBILITY_CHANGE_ALERT_CHANNEL,
-    VisibilityChangeAlertIpcParams
+    VISIBILITY_CHANGE_ALERT_CHANNEL
 } from '../shared/IpcDefinitions'
 import { AppConfigStore } from './app_config_store'
 import { resolveDns } from './dns_handler'
@@ -162,11 +161,7 @@ if (!process.mas) {
  * @param visible Whether the window became visible or not visible
  */
 function visibilityChangeAlert(visible: boolean) {
-    const params: VisibilityChangeAlertIpcParams = {
-        visible
-    }
-
-    mb.window!.webContents.send(VISIBILITY_CHANGE_ALERT_CHANNEL, params)
+    ipc.callRenderer<boolean>(mb.window!, VISIBILITY_CHANGE_ALERT_CHANNEL, visible)
 }
 
 mb.on('after-create-window', () => {

@@ -1,5 +1,4 @@
 import { Box, CircularProgress, Grid, Typography } from '@material-ui/core'
-import { ipcRenderer } from 'electron'
 import { ipcRenderer as ipc } from 'electron-better-ipc'
 import * as React from 'react'
 import { ReactNode } from 'react'
@@ -10,8 +9,7 @@ import {
     GET_CURRENT_VIEW_CHANNEL,
     GET_SATELLITE_CONFIG_CHANNEL,
     SET_WALLPAPER_CHANNEL,
-    VISIBILITY_CHANGE_ALERT_CHANNEL,
-    VisibilityChangeAlertIpcParams
+    VISIBILITY_CHANGE_ALERT_CHANNEL
 } from '../../shared/IpcDefinitions'
 import Thumbnail from './Thumbnail'
 import { ThumbnailsContainer } from './ThumbnailsContainer'
@@ -31,6 +29,7 @@ interface ThumbnailInformation {
 export interface ThumbnailManagerState {
     satelliteConfig?: RootSatelliteConfig
     selectedId?: number
+    cancelVisibilityChangeSub?: () => void
 }
 
 const ContentContainer = styled.div`
@@ -60,15 +59,19 @@ export default class ThumbnailManager extends React.Component<
     }
 
     async componentDidMount(): Promise<void> {
-        ipcRenderer.on(
-            VISIBILITY_CHANGE_ALERT_CHANNEL,
-            (_, params: VisibilityChangeAlertIpcParams) => {
-                if (params.visible) {
-                    this.update()
-                }
+        const cancel = ipc.answerMain<boolean>(VISIBILITY_CHANGE_ALERT_CHANNEL, visible => {
+            if (visible) {
+                this.update()
             }
-        )
+        })
+        this.setState({ cancelVisibilityChangeSub: cancel })
         await this.update()
+    }
+
+    async componentWillUnmount(): Promise<void> {
+        if (this.state.cancelVisibilityChangeSub !== undefined) {
+            this.state.cancelVisibilityChangeSub()
+        }
     }
 
     /**

@@ -11,8 +11,7 @@ import styled from 'styled-components'
 import {
     DOWNLOAD_THUMBNAIL_CHANNEL,
     DownloadThumbnailIpcResponse,
-    VISIBILITY_CHANGE_ALERT_CHANNEL,
-    VisibilityChangeAlertIpcParams
+    VISIBILITY_CHANGE_ALERT_CHANNEL
 } from '../../shared/IpcDefinitions'
 
 ipcRenderer.setMaxListeners(30)
@@ -147,6 +146,7 @@ interface ThumbnailProps {
 interface ThumbnailState {
     b64Image?: string
     loadingState: ThumbnailLoadingState
+    cancelVisibilityChangeSub?: () => void
 }
 
 const thumbnailCache: { [key: number]: CachedImage } = {}
@@ -164,15 +164,19 @@ export default class Thumbnail extends React.Component<ThumbnailProps, Thumbnail
     }
 
     async componentDidMount(): Promise<void> {
-        ipcRenderer.on(
-            VISIBILITY_CHANGE_ALERT_CHANNEL,
-            (_, params: VisibilityChangeAlertIpcParams) => {
-                if (params.visible) {
-                    this.update()
-                }
+        const cancel = ipc.answerMain<boolean>(VISIBILITY_CHANGE_ALERT_CHANNEL, visible => {
+            if (visible) {
+                this.update()
             }
-        )
+        })
+        this.setState({ cancelVisibilityChangeSub: cancel })
         await this.update()
+    }
+
+    async componentWillUnmount(): Promise<void> {
+        if (this.state.cancelVisibilityChangeSub !== undefined) {
+            this.state.cancelVisibilityChangeSub()
+        }
     }
 
     /**
