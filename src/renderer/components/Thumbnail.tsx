@@ -2,6 +2,7 @@ import { Grid, LinearProgress, Typography } from '@material-ui/core'
 import ErrorIcon from '@material-ui/icons/Error'
 import AsyncLock from 'async-lock'
 import { ipcRenderer } from 'electron'
+import { ipcRenderer as ipc } from 'electron-better-ipc'
 import electronLog from 'electron-log'
 import moment, { Moment } from 'moment'
 import * as React from 'react'
@@ -9,12 +10,9 @@ import styled from 'styled-components'
 
 import {
     DOWNLOAD_THUMBNAIL_CHANNEL,
-    DownloadThumbnailIpcParams,
     DownloadThumbnailIpcResponse,
-    VISIBILITY_CHANGE_ALERT_CHANNEL,
-    VisibilityChangeAlertIpcParams
+    VISIBILITY_CHANGE_ALERT_CHANNEL
 } from '../../shared/IpcDefinitions'
-import { ipcRequest } from '../IpcService'
 
 ipcRenderer.setMaxListeners(30)
 const log = electronLog.scope('thumbnail-component')
@@ -148,6 +146,7 @@ interface ThumbnailProps {
 interface ThumbnailState {
     b64Image?: string
     loadingState: ThumbnailLoadingState
+    cancelVisibilityChangeSub?: () => void
 }
 
 const thumbnailCache: { [key: number]: CachedImage } = {}
@@ -165,15 +164,19 @@ export default class Thumbnail extends React.Component<ThumbnailProps, Thumbnail
     }
 
     async componentDidMount(): Promise<void> {
-        ipcRenderer.on(
-            VISIBILITY_CHANGE_ALERT_CHANNEL,
-            (_, params: VisibilityChangeAlertIpcParams) => {
-                if (params.visible) {
-                    this.update()
-                }
+        const cancel = ipc.answerMain<boolean>(VISIBILITY_CHANGE_ALERT_CHANNEL, visible => {
+            if (visible) {
+                this.update()
             }
-        )
+        })
+        this.setState({ cancelVisibilityChangeSub: cancel })
         await this.update()
+    }
+
+    async componentWillUnmount(): Promise<void> {
+        if (this.state.cancelVisibilityChangeSub !== undefined) {
+            this.state.cancelVisibilityChangeSub()
+        }
     }
 
     /**
@@ -196,9 +199,9 @@ export default class Thumbnail extends React.Component<ThumbnailProps, Thumbnail
             this.setState({ loadingState: ThumbnailLoadingState.loading })
         }
         // Fetch a new image and cache it
-        const response = await ipcRequest<DownloadThumbnailIpcParams, DownloadThumbnailIpcResponse>(
+        const response = await ipc.callMain<string, DownloadThumbnailIpcResponse>(
             DOWNLOAD_THUMBNAIL_CHANNEL,
-            { url: this.props.src }
+            this.props.src
         )
         // If it failed, report and exit
         if (response.dataUrl === undefined) {

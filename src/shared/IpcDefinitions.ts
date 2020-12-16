@@ -1,73 +1,8 @@
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface IpcParams {}
-
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface IpcResponse {}
-
-export interface IpcRequest<P extends IpcParams> {
-    params: P
-    responseChannel: string
-}
-
-export type QuitApplicationIpcParams = IpcParams
-export type QuitApplicationIpcResponse = IpcResponse
 export const QUIT_APPLICATION_CHANNEL = 'QUIT_APPLICATION_CHANNEL'
-
-export interface ExampleIpcParams {
-    testP: string
-}
-
-export interface ExampleIpcResponse {
-    testR: string
-}
-
-export interface GetSatelliteConfigIpcResponse {
-    config?: RootSatelliteConfig
-}
-
-export interface SetWallpaperIpcParams {
-    viewId: number
-}
-
-export interface VisibilityChangeAlertIpcParams {
-    visible: boolean
-}
-
-export interface GetCurrentViewIpcResponse {
-    viewId?: number
-}
 
 export interface DownloadThumbnailIpcResponse {
     dataUrl?: string
     expiration?: number
-}
-
-export interface DownloadThumbnailIpcParams {
-    url: string
-}
-
-export interface GetStartOnLoginIpcResponse {
-    startOnLogin?: boolean
-}
-
-export interface SetStartOnLoginIpcParams {
-    startOnLogin: boolean
-}
-
-export interface GetFirstRunIpcResponse {
-    firstRun: boolean
-}
-
-export interface SetFirstRunIpcParams {
-    firstRun: boolean
-}
-
-export interface GetAutoUpdateIpcResponse {
-    autoUpdate: boolean
-}
-
-export interface SetAutoUpdateIpcParams {
-    autoUpdate: boolean
 }
 
 export const EXAMPLE_CHANNEL = 'EXAMPLE_CHANNEL'

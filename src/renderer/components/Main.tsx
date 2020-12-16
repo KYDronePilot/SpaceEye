@@ -9,20 +9,16 @@ import {
     DialogTitle
 } from '@material-ui/core'
 import { createMuiTheme, ThemeProvider as MuiThemeProvider } from '@material-ui/core/styles'
+import { ipcRenderer as ipc } from 'electron-better-ipc'
 import * as React from 'react'
 import { HashRouter, Route } from 'react-router-dom'
 import styled, { ThemeProvider } from 'styled-components'
 
 import {
     GET_FIRST_RUN,
-    GetFirstRunIpcResponse,
-    IpcParams,
-    IpcResponse,
     OPEN_WINDOWS_ICON_SETTINGS,
-    SET_FIRST_RUN,
-    SetFirstRunIpcParams
+    SET_FIRST_RUN
 } from '../../shared/IpcDefinitions'
-import { ipcRequest } from '../IpcService'
 import { DarkTheme } from '../themes'
 import HeaderBar from './HeaderBar'
 import Settings from './Settings'
@@ -103,14 +99,14 @@ class ImagePickerPage extends React.Component<{}, ImagePickerPageState> {
 
     async componentDidMount() {
         // Check if we need to onboard the user
-        const res = await ipcRequest<IpcParams, GetFirstRunIpcResponse>(GET_FIRST_RUN, {})
-        this.setState({ isOnboarding: res.firstRun })
+        const firstRun = await ipc.callMain<void, boolean>(GET_FIRST_RUN)
+        this.setState({ isOnboarding: firstRun })
     }
 
     finishOnboarding() {
         this.setState({ isOnboarding: false })
         // No longer a first run after the user dismisses the message
-        ipcRequest<SetFirstRunIpcParams, IpcResponse>(SET_FIRST_RUN, { firstRun: false }, false)
+        ipc.callMain<boolean>(SET_FIRST_RUN, false)
     }
 
     public render() {
@@ -122,7 +118,7 @@ class ImagePickerPage extends React.Component<{}, ImagePickerPageState> {
                 <WindowsOnboardingDialog
                     show={this.state.isOnboarding && process.platform === 'win32'}
                     onDone={this.finishOnboarding}
-                    onOpenSettings={() => ipcRequest(OPEN_WINDOWS_ICON_SETTINGS, {}, false)}
+                    onOpenSettings={() => ipc.callMain(OPEN_WINDOWS_ICON_SETTINGS)}
                 />
             </Container>
         )

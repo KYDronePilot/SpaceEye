@@ -127,6 +127,7 @@
         "@material-ui/icons": "^4.9.1",
         "async-lock": "^1.2.4",
         "axios": "^0.19.2",
+        "electron-better-ipc": "^1.1.1",
         "electron-log": "^4.2.4",
         "electron-store": "^6.0.0",
         "electron-updater": "^4.3.4",
