@@ -15,6 +15,7 @@ import {
     Typography
 } from '@material-ui/core'
 import { shell } from 'electron'
+import { ipcRenderer as ipc } from 'electron-better-ipc'
 import path from 'path'
 import * as React from 'react'
 import { Redirect } from 'react-router-dom'
@@ -23,15 +24,10 @@ import styled from 'styled-components'
 import {
     GET_AUTO_UPDATE,
     GET_START_ON_LOGIN,
-    GetAutoUpdateIpcResponse,
-    GetStartOnLoginIpcResponse,
     QUIT_APPLICATION_CHANNEL,
     SET_AUTO_UPDATE,
-    SET_START_ON_LOGIN,
-    SetAutoUpdateIpcParams,
-    SetStartOnLoginIpcParams
+    SET_START_ON_LOGIN
 } from '../../shared/IpcDefinitions'
-import { ipcRequest } from '../IpcService'
 
 const SectionsContainer = styled.div`
     display: flex;
@@ -297,8 +293,8 @@ interface SettingsManagerState {
 }
 
 export default class SettingsManager extends React.Component<{}, SettingsManagerState> {
-    private static async onClickQuit() {
-        await ipcRequest(QUIT_APPLICATION_CHANNEL, {}, false)
+    private static onClickQuit() {
+        ipc.callMain(QUIT_APPLICATION_CHANNEL)
     }
 
     constructor(props: {}) {
@@ -319,28 +315,24 @@ export default class SettingsManager extends React.Component<{}, SettingsManager
 
     async componentDidMount(): Promise<void> {
         const [startOnLogin, autoUpdate] = await Promise.all([
-            ipcRequest<{}, GetStartOnLoginIpcResponse>(GET_START_ON_LOGIN, {}),
-            ipcRequest<{}, GetAutoUpdateIpcResponse>(GET_AUTO_UPDATE, {})
+            ipc.callMain<void, boolean | undefined>(GET_START_ON_LOGIN),
+            ipc.callMain<void, boolean>(GET_AUTO_UPDATE)
         ])
         this.setState({
-            startOnLogin: startOnLogin.startOnLogin ?? false,
-            autoUpdate: autoUpdate.autoUpdate,
+            startOnLogin: startOnLogin ?? false,
+            autoUpdate,
             isLoaded: true
         })
     }
 
     private async onChangeStartOnLogin(shouldStart: boolean) {
         this.setState({ startOnLogin: shouldStart })
-        await ipcRequest<SetStartOnLoginIpcParams, {}>(
-            SET_START_ON_LOGIN,
-            { startOnLogin: shouldStart },
-            false
-        )
+        await ipc.callMain<boolean>(SET_START_ON_LOGIN, shouldStart)
     }
 
     private async onChangeAutoUpdate(autoUpdate: boolean) {
         this.setState({ autoUpdate })
-        await ipcRequest<SetAutoUpdateIpcParams, {}>(SET_AUTO_UPDATE, { autoUpdate }, false)
+        await ipc.callMain<boolean>(SET_AUTO_UPDATE, autoUpdate)
     }
 
     private onClickBack() {

@@ -1,6 +1,6 @@
 import Axios from 'axios'
 import { spawn } from 'child_process'
-import { app, ipcMain, powerMonitor, Rectangle, screen, systemPreferences } from 'electron'
+import { app, powerMonitor, Rectangle, screen, systemPreferences } from 'electron'
 import { ipcMain as ipc } from 'electron-better-ipc'
 import electronLog from 'electron-log'
 import { cloneDeep } from 'lodash'
@@ -13,29 +13,18 @@ import * as url from 'url'
 import { RootSatelliteConfig } from '../shared/config_types'
 import {
     DOWNLOAD_THUMBNAIL_CHANNEL,
-    DownloadThumbnailIpcParams,
     DownloadThumbnailIpcResponse,
     GET_AUTO_UPDATE,
     GET_CURRENT_VIEW_CHANNEL,
     GET_FIRST_RUN,
     GET_SATELLITE_CONFIG_CHANNEL,
     GET_START_ON_LOGIN,
-    GetAutoUpdateIpcResponse,
-    GetCurrentViewIpcResponse,
-    GetFirstRunIpcResponse,
-    GetStartOnLoginIpcResponse,
-    IpcParams,
-    IpcRequest,
     OPEN_WINDOWS_ICON_SETTINGS,
     QUIT_APPLICATION_CHANNEL,
     SET_AUTO_UPDATE,
     SET_FIRST_RUN,
     SET_START_ON_LOGIN,
     SET_WALLPAPER_CHANNEL,
-    SetAutoUpdateIpcParams,
-    SetFirstRunIpcParams,
-    SetStartOnLoginIpcParams,
-    SetWallpaperIpcParams,
     VISIBILITY_CHANGE_ALERT_CHANNEL,
     VisibilityChangeAlertIpcParams
 } from '../shared/IpcDefinitions'
@@ -306,7 +295,7 @@ app.on('window-all-closed', () => {
     }
 })
 
-ipcMain.on(QUIT_APPLICATION_CHANNEL, () => {
+ipc.answerRenderer(QUIT_APPLICATION_CHANNEL, () => {
     log.info('Quit request received')
     app.quit()
 })
@@ -325,83 +314,67 @@ ipc.answerRenderer<void, RootSatelliteConfig | undefined>(
     }
 )
 
-ipcMain.on(SET_WALLPAPER_CHANNEL, async (event, params: IpcRequest<SetWallpaperIpcParams>) => {
-    log.info('Wallpaper set request received for view:', params.params.viewId)
-    AppConfigStore.currentViewId = params.params.viewId
+ipc.answerRenderer<number, void>(SET_WALLPAPER_CHANNEL, async viewId => {
+    log.info('Wallpaper set request received for view:', viewId)
+    AppConfigStore.currentViewId = viewId
     await WallpaperManager.update(Initiator.user)
-    event.reply(params.responseChannel, {})
 })
 
-ipcMain.on(GET_CURRENT_VIEW_CHANNEL, async (event, params: IpcRequest<IpcParams>) => {
+ipc.answerRenderer<void, number | undefined>(GET_CURRENT_VIEW_CHANNEL, () => {
     log.info('Current view request received')
-    const response: GetCurrentViewIpcResponse = {
-        viewId: AppConfigStore.currentViewId
-    }
-    event.reply(params.responseChannel, response)
+    return AppConfigStore.currentViewId
 })
 
-ipcMain.on(
+ipc.answerRenderer<string, DownloadThumbnailIpcResponse>(
     DOWNLOAD_THUMBNAIL_CHANNEL,
-    async (event, params: IpcRequest<DownloadThumbnailIpcParams>) => {
+    async thumbnailUrl => {
         log.info('Download thumbnail request received')
         let webResponse
         try {
-            webResponse = await Axios.get(params.params.url, { responseType: 'arraybuffer' })
+            webResponse = await Axios.get(thumbnailUrl, { responseType: 'arraybuffer' })
         } catch (error) {
             log.error('Error while downloading thumbnail:', formatAxiosError(error))
-            const response: DownloadThumbnailIpcResponse = {
+            return {
                 dataUrl: undefined
             }
-            event.reply(params.responseChannel, response)
-            return
         }
         const b64Image = Buffer.from(webResponse.data, 'binary').toString('base64')
         const contentType = webResponse.headers['content-type'] ?? 'image/jpeg'
-        const response: DownloadThumbnailIpcResponse = {
+        return {
             dataUrl: `data:${contentType};base64,${b64Image}`,
             expiration: moment(
                 webResponse.headers.expires ?? moment.utc().add(10, 'minutes')
             ).valueOf()
         }
-        event.reply(params.responseChannel, response)
     }
 )
 
-ipcMain.on(GET_START_ON_LOGIN, async (event, params: IpcRequest<IpcParams>) => {
-    const response: GetStartOnLoginIpcResponse = {
-        startOnLogin: AppConfigStore.startOnLogin
-    }
-    event.reply(params.responseChannel, response)
+ipc.answerRenderer<void, boolean | undefined>(GET_START_ON_LOGIN, () => {
+    return AppConfigStore.startOnLogin
 })
 
-ipcMain.on(SET_START_ON_LOGIN, async (_, params: IpcRequest<SetStartOnLoginIpcParams>) => {
-    AppConfigStore.startOnLogin = params.params.startOnLogin
-    configureStartOnLogin(params.params.startOnLogin)
+ipc.answerRenderer<boolean>(SET_START_ON_LOGIN, startOnLogin => {
+    AppConfigStore.startOnLogin = startOnLogin
+    configureStartOnLogin(startOnLogin)
 })
 
-ipcMain.on(GET_FIRST_RUN, async (event, params: IpcRequest<IpcParams>) => {
-    const response: GetFirstRunIpcResponse = {
-        firstRun: AppConfigStore.firstRun
-    }
-    event.reply(params.responseChannel, response)
+ipc.answerRenderer<void, boolean>(GET_FIRST_RUN, () => {
+    return AppConfigStore.firstRun
 })
 
-ipcMain.on(SET_FIRST_RUN, async (_, params: IpcRequest<SetFirstRunIpcParams>) => {
-    AppConfigStore.firstRun = params.params.firstRun
+ipc.answerRenderer<boolean>(SET_FIRST_RUN, firstRun => {
+    AppConfigStore.firstRun = firstRun
 })
 
-ipcMain.on(GET_AUTO_UPDATE, async (event, params: IpcRequest<IpcParams>) => {
-    const response: GetAutoUpdateIpcResponse = {
-        autoUpdate: AppConfigStore.autoUpdate
-    }
-    event.reply(params.responseChannel, response)
+ipc.answerRenderer<void, boolean>(GET_AUTO_UPDATE, () => {
+    return AppConfigStore.autoUpdate
 })
 
-ipcMain.on(SET_AUTO_UPDATE, async (_, params: IpcRequest<SetAutoUpdateIpcParams>) => {
-    AppConfigStore.autoUpdate = params.params.autoUpdate
+ipc.answerRenderer<boolean>(SET_AUTO_UPDATE, autoUpdate => {
+    AppConfigStore.autoUpdate = autoUpdate
 })
 
-ipcMain.on(OPEN_WINDOWS_ICON_SETTINGS, () => {
+ipc.answerRenderer(OPEN_WINDOWS_ICON_SETTINGS, () => {
     log.info('Opening Windows icon settings')
     // Special command that opens Windows notification area icon settings
     const command = spawn('cmd.exe', [

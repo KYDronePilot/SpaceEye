@@ -2,6 +2,7 @@ import { Grid, LinearProgress, Typography } from '@material-ui/core'
 import ErrorIcon from '@material-ui/icons/Error'
 import AsyncLock from 'async-lock'
 import { ipcRenderer } from 'electron'
+import { ipcRenderer as ipc } from 'electron-better-ipc'
 import electronLog from 'electron-log'
 import moment, { Moment } from 'moment'
 import * as React from 'react'
@@ -9,12 +10,10 @@ import styled from 'styled-components'
 
 import {
     DOWNLOAD_THUMBNAIL_CHANNEL,
-    DownloadThumbnailIpcParams,
     DownloadThumbnailIpcResponse,
     VISIBILITY_CHANGE_ALERT_CHANNEL,
     VisibilityChangeAlertIpcParams
 } from '../../shared/IpcDefinitions'
-import { ipcRequest } from '../IpcService'
 
 ipcRenderer.setMaxListeners(30)
 const log = electronLog.scope('thumbnail-component')
@@ -196,9 +195,9 @@ export default class Thumbnail extends React.Component<ThumbnailProps, Thumbnail
             this.setState({ loadingState: ThumbnailLoadingState.loading })
         }
         // Fetch a new image and cache it
-        const response = await ipcRequest<DownloadThumbnailIpcParams, DownloadThumbnailIpcResponse>(
+        const response = await ipc.callMain<string, DownloadThumbnailIpcResponse>(
             DOWNLOAD_THUMBNAIL_CHANNEL,
-            { url: this.props.src }
+            this.props.src
         )
         // If it failed, report and exit
         if (response.dataUrl === undefined) {

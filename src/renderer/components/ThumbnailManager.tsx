@@ -9,15 +9,10 @@ import { RootSatelliteConfig } from '../../shared/config_types'
 import {
     GET_CURRENT_VIEW_CHANNEL,
     GET_SATELLITE_CONFIG_CHANNEL,
-    GetCurrentViewIpcResponse,
-    IpcParams,
-    IpcResponse,
     SET_WALLPAPER_CHANNEL,
-    SetWallpaperIpcParams,
     VISIBILITY_CHANGE_ALERT_CHANNEL,
     VisibilityChangeAlertIpcParams
 } from '../../shared/IpcDefinitions'
-import { ipcRequest } from '../IpcService'
 import Thumbnail from './Thumbnail'
 import { ThumbnailsContainer } from './ThumbnailsContainer'
 
@@ -86,7 +81,7 @@ export default class ThumbnailManager extends React.Component<
             return
         }
         this.setState({ selectedId: viewId })
-        await ipcRequest<SetWallpaperIpcParams, IpcResponse>(SET_WALLPAPER_CHANNEL, { viewId })
+        await ipc.callMain<number, void>(SET_WALLPAPER_CHANNEL, viewId)
     }
 
     /**
@@ -124,11 +119,11 @@ export default class ThumbnailManager extends React.Component<
     async update(): Promise<void> {
         const [configResponse, currentViewResponse] = await Promise.all([
             ipc.callMain<void, RootSatelliteConfig>(GET_SATELLITE_CONFIG_CHANNEL),
-            ipcRequest<IpcParams, GetCurrentViewIpcResponse>(GET_CURRENT_VIEW_CHANNEL, {})
+            ipc.callMain<void, number>(GET_CURRENT_VIEW_CHANNEL)
         ])
         this.setState({
             satelliteConfig: configResponse,
-            selectedId: currentViewResponse.viewId
+            selectedId: currentViewResponse
         })
     }
 
