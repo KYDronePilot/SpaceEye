@@ -2,6 +2,7 @@
 import Axios, { CancelTokenSource } from 'axios'
 import electronLog from 'electron-log'
 import Fs from 'fs'
+import fse from 'fs-extra'
 import moment from 'moment'
 import { Readable } from 'stream'
 import { promisify } from 'util'
@@ -111,10 +112,10 @@ export async function downloadImage(
 ): Promise<DownloadedImage> {
     // FIXME: Don't leave as hardcoded jpg
     const downloadedImage = new DownloadedImage(image.id, moment.utc(), 'jpg')
-    log.debug('Downloading image to:', downloadedImage.getPath())
+    log.debug('Downloading image to:', downloadedImage.getDownloadPath())
 
     try {
-        await downloadStream(image.url, downloadedImage.getPath(), cancelToken, onProgress)
+        await downloadStream(image.url, downloadedImage.getDownloadPath(), cancelToken, onProgress)
         lock.destroyCancelToken(cancelToken)
     } catch (error) {
         lock.destroyCancelToken(cancelToken)
@@ -128,8 +129,9 @@ export async function downloadImage(
         throw error
     }
     // Sanity check to make sure the image actually exists
-    if (await existsAsync(downloadedImage.getPath())) {
+    if (await existsAsync(downloadedImage.getDownloadPath())) {
         log.debug('Successfully downloaded image:', image.id)
+        await fse.rename(downloadedImage.getDownloadPath(), downloadedImage.getPath())
         return downloadedImage
     }
     // Else, throw an error

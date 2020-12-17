@@ -75,6 +75,20 @@ export class DownloadedImage {
     }
 
     /**
+     * Clean up partially downloaded images.
+     */
+    static async cleanUpPartiallyDownloadedImages(): Promise<void> {
+        const files = await asyncReadDir(IMAGES_DIR)
+        log.debug('All files in images dir:', files)
+        // Filter so we only have the partially downloaded image files
+        // TODO: Handle other extensions
+        const imageRegex = new RegExp(`^\\d+-\\d+\\.(jpg)\\.download$`)
+        const imageFiles = files.filter(file => Path.basename(file).match(imageRegex))
+        log.debug('All partially downloaded image files to delete:', imageFiles)
+        await Promise.all(imageFiles.map(file => asyncUnlink(Path.join(IMAGES_DIR, file))))
+    }
+
+    /**
      * Delete old images.
      */
     public static async cleanupOldImages(): Promise<void> {
@@ -88,6 +102,7 @@ export class DownloadedImage {
             oldImages.map(image => image.getPath())
         )
         await Promise.all(oldImages.map(image => asyncUnlink(image.getPath())))
+        await DownloadedImage.cleanUpPartiallyDownloadedImages()
     }
 
     /**
@@ -100,5 +115,16 @@ export class DownloadedImage {
             IMAGES_DIR,
             `${this.imageId}-${formatTimestamp(this.timestamp)}.${this.extension}`
         )
+    }
+
+    /**
+     * Get the path to download the file to.
+     *
+     * Has the extension `.download` so the system won't use the file till it's fully downloaded.
+     *
+     * @returns Path to download file to
+     */
+    public getDownloadPath(): string {
+        return `${this.getPath()}.download`
     }
 }
