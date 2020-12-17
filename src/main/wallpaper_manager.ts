@@ -4,11 +4,13 @@
 
 // eslint-disable-next-line max-classes-per-file
 import { Display, screen } from 'electron'
+import { ipcMain as ipc } from 'electron-better-ipc'
 import electronLog from 'electron-log'
 import { maxBy } from 'lodash'
 import moment from 'moment'
 
 import { ImageSource, SatelliteView } from '../shared/config_types'
+import { VIEW_DOWNLOAD_PROGRESS } from '../shared/IpcDefinitions'
 import { AppConfigStore } from './app_config_store'
 import { DownloadedImage } from './downloaded_image'
 import {
@@ -180,7 +182,25 @@ export class WallpaperManager {
             moment.utc().diff(imageToSet.timestamp, 'seconds') > imageConfig.updateInterval
         ) {
             log.info('New image must be downloaded')
-            imageToSet = await downloadImage(imageConfig, lock.generateCancelToken(), lock)
+            imageToSet = await downloadImage(
+                imageConfig,
+                lock.generateCancelToken(),
+                lock,
+                percentage => {
+                    if (mb.window !== undefined) {
+                        // Skip if percentage is a number not divisible by 5
+                        // This prevents IPC from being overwhelmed
+                        if (percentage !== undefined && percentage !== -1 && percentage % 5 !== 0) {
+                            return
+                        }
+                        ipc.callRenderer<number | undefined>(
+                            mb.window,
+                            `${VIEW_DOWNLOAD_PROGRESS}_${viewConfig!.id}`,
+                            percentage
+                        )
+                    }
+                }
+            )
             // Make sure we still have the lock
             if (!lock.isStillHeld()) {
                 log.debug('Lost update lock while downloading image')

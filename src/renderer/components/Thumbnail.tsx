@@ -1,4 +1,4 @@
-import { Grid, LinearProgress, Typography } from '@material-ui/core'
+import { Grid, LinearProgress, Typography, withStyles } from '@material-ui/core'
 import ErrorIcon from '@material-ui/icons/Error'
 import AsyncLock from 'async-lock'
 import { ipcRenderer } from 'electron'
@@ -11,6 +11,7 @@ import styled from 'styled-components'
 import {
     DOWNLOAD_THUMBNAIL_CHANNEL,
     DownloadThumbnailIpcResponse,
+    VIEW_DOWNLOAD_PROGRESS,
     VISIBILITY_CHANGE_ALERT_CHANNEL
 } from '../../shared/IpcDefinitions'
 
@@ -28,6 +29,11 @@ const Image = styled.img`
     max-width: 100%;
     max-height: 100%;
     pointer-events: none;
+    position: absolute;
+    left: 0;
+    right: 0;
+    margin-left: auto;
+    margin-right: auto;
 `
 
 /**
@@ -89,9 +95,18 @@ enum ThumbnailLoadingState {
     failed
 }
 
-const BottomProgress = styled(LinearProgress)`
-    margin-top: calc(var(--height) - 4.12px);
-`
+const BottomProgress = withStyles({
+    root: {
+        marginTop: 'calc(var(--height) - 6.62px)',
+        height: '6.5px'
+    },
+    colorPrimary: {
+        backgroundColor: '#567d2e'
+    },
+    barColorPrimary: {
+        backgroundColor: '#96c267'
+    }
+})(LinearProgress)
 
 const VerticalCenterContainer = styled.div`
     display: flex;
@@ -103,17 +118,28 @@ const VerticalCenterContainer = styled.div`
 interface ImageSwitcherProps {
     src: string
     loadingState: ThumbnailLoadingState
+    downloadingPercentage?: number
 }
 
 // eslint-disable-next-line consistent-return
 const ImageSwitcher: React.FC<ImageSwitcherProps> = props => {
-    const { src, loadingState } = props
+    const { src, loadingState, downloadingPercentage } = props
     // eslint-disable-next-line default-case
     switch (loadingState) {
         case ThumbnailLoadingState.loading:
             return <BottomProgress />
         case ThumbnailLoadingState.loaded:
-            return <Image src={src} />
+            return (
+                <>
+                    <Image src={src} />
+                    {downloadingPercentage !== undefined && (
+                        <BottomProgress
+                            variant={downloadingPercentage === -1 ? 'indeterminate' : 'determinate'}
+                            value={downloadingPercentage}
+                        />
+                    )}
+                </>
+            )
         case ThumbnailLoadingState.failed:
             return (
                 <VerticalCenterContainer>
@@ -147,6 +173,8 @@ interface ThumbnailState {
     b64Image?: string
     loadingState: ThumbnailLoadingState
     cancelVisibilityChangeSub?: () => void
+    cancelProgressChangeSub?: () => void
+    downloadPercentage?: number
 }
 
 const thumbnailCache: { [key: number]: CachedImage } = {}
@@ -164,18 +192,40 @@ export default class Thumbnail extends React.Component<ThumbnailProps, Thumbnail
     }
 
     async componentDidMount(): Promise<void> {
-        const cancel = ipc.answerMain<boolean>(VISIBILITY_CHANGE_ALERT_CHANNEL, visible => {
-            if (visible) {
-                this.update()
+        const cancelVisChange = ipc.answerMain<boolean>(
+            VISIBILITY_CHANGE_ALERT_CHANNEL,
+            visible => {
+                if (visible) {
+                    this.update()
+                }
             }
+        )
+        const cancelProgressChange = ipc.answerMain<number | undefined>(
+            `${VIEW_DOWNLOAD_PROGRESS}_${this.props.id}`,
+            percentage => {
+                // Delay before resetting to give time for background to change
+                if (percentage === undefined) {
+                    setTimeout(() => {
+                        this.setState({ downloadPercentage: percentage })
+                    }, 400)
+                } else {
+                    this.setState({ downloadPercentage: percentage })
+                }
+            }
+        )
+        this.setState({
+            cancelVisibilityChangeSub: cancelVisChange,
+            cancelProgressChangeSub: cancelProgressChange
         })
-        this.setState({ cancelVisibilityChangeSub: cancel })
         await this.update()
     }
 
     async componentWillUnmount(): Promise<void> {
         if (this.state.cancelVisibilityChangeSub !== undefined) {
             this.state.cancelVisibilityChangeSub()
+        }
+        if (this.state.cancelProgressChangeSub !== undefined) {
+            this.state.cancelProgressChangeSub()
         }
     }
 
@@ -236,6 +286,9 @@ export default class Thumbnail extends React.Component<ThumbnailProps, Thumbnail
                         <ImageSwitcher
                             src={this.state.b64Image ?? ''}
                             loadingState={this.state.loadingState}
+                            downloadingPercentage={
+                                isSelectedValue ? this.state.downloadPercentage : undefined
+                            }
                         />
                     </ImageContainer>
                 </ImageContainerBackground>
