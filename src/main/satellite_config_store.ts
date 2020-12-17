@@ -12,7 +12,7 @@ import { RequestError } from './errors'
 const log = electronLog.scope('satellite-config-store')
 
 // Time in seconds before invalidating the cached config.
-const INVALIDATION_TIMEOUT = 60
+const INVALIDATION_TIMEOUT = 900
 
 // URL to download the config
 const CONFIG_URL = 'https://spaceeye-satellite-configs.s3.us-east-2.amazonaws.com/1.1.0/config.json'

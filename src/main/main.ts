@@ -35,7 +35,7 @@ import { setWindowVisibility, startUpdateChecking } from './updater'
 import { formatAxiosError } from './utils'
 import { WallpaperManager } from './wallpaper_manager'
 
-const HEARTBEAT_INTERVAL = 600000
+const HEARTBEAT_INTERVAL = 60000
 let heartbeatHandle: number
 
 // let win: BrowserWindow | null
