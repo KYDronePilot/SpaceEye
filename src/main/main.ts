@@ -90,7 +90,7 @@ const toolbarIconPath = path.join(
     process.platform === 'win32' ? 'windows_toolbar.ico' : 'mac_toolbar.png'
 )
 
-const mb = menubar({
+global.mb = menubar({
     index,
     icon: toolbarIconPath,
     browserWindow: {
