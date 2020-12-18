@@ -42,6 +42,10 @@ function tryUpdating() {
  * @param visible - Whether the window is visible or not
  */
 export function setWindowVisibility(visible: boolean): void {
+    // No auto-updating when running in MAS or Windows Store builds
+    if (process.mas === true || process.windowsStore === true) {
+        return
+    }
     isWindowVisible = visible
     if (!visible) {
         tryUpdating()
@@ -90,6 +94,10 @@ autoUpdater.on('update-downloaded', (info: UpdateInfo) => {
 export function startUpdateChecking(): void {
     // No auto-updating when running in dev mode
     if (process.env.NODE_ENV !== 'production') {
+        return
+    }
+    // No auto-updating when running in MAS or Windows Store builds
+    if (process.mas === true || process.windowsStore === true) {
         return
     }
     autoUpdater.checkForUpdates()
