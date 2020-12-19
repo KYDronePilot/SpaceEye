@@ -4,8 +4,12 @@ Live satellite imagery for your **macOS** or **Windows** desktop background.
 
 ![Build](https://github.com/KYDronePilot/SpaceEye/workflows/Build/badge.svg)
 ![Latest release](https://img.shields.io/github/v/release/KYDronePilot/SpaceEye?label=latest%20release)
-![Downloads](https://img.shields.io/github/downloads/KYDronePilot/SpaceEye/latest/total)
+![Supported platforms](https://img.shields.io/badge/platforms-macOS%20%7C%20Windows-lightgrey)
 ![License](https://img.shields.io/github/license/KYDronePilot/SpaceEye)
+
+![Latest Mac ZIP downloads](https://img.shields.io/github/downloads/KYDronePilot/SpaceEye/latest/SpaceEye-1.0.4-mac.zip)
+![Latest Mac DMG downloads](https://img.shields.io/github/downloads/KYDronePilot/SpaceEye/latest/SpaceEye-1.0.4.dmg)
+![Latest Windows downloads](https://img.shields.io/github/downloads/KYDronePilot/SpaceEye/latest/SpaceEye-Setup-1.0.4.exe)
 
 ![App running on macOS](docs/img/macos_menubar.jpg)
 
