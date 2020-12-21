@@ -7,6 +7,7 @@ import { cloneDeep } from 'lodash'
 import { menubar } from 'menubar'
 import moment from 'moment'
 import net from 'net'
+import os from 'os'
 import * as path from 'path'
 import * as url from 'url'
 
@@ -43,6 +44,10 @@ let heartbeatHandle: number
 const log = electronLog.scope('main')
 
 Axios.defaults.adapter = require('axios/lib/adapters/http')
+
+Axios.defaults.headers[
+    'User-Agent'
+] = `SpaceEye/${APP_VERSION} (${os.type()}; ${os.arch()}; ${os.release()})`
 
 // Send HEAD requests to each DNS IP, using the IP first to respond
 Axios.interceptors.request.use(async config => {
