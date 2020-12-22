@@ -21,6 +21,7 @@ import {
 } from '../../shared/IpcDefinitions'
 import { DarkTheme } from '../themes'
 import HeaderBar from './HeaderBar'
+import OnboardingHOC from './onboarding'
 import Settings from './Settings'
 import ThumbnailManager from './ThumbnailManager'
 
@@ -120,6 +121,7 @@ class ImagePickerPage extends React.Component<{}, ImagePickerPageState> {
                     onDone={this.finishOnboarding}
                     onOpenSettings={() => ipc.callMain(OPEN_WINDOWS_ICON_SETTINGS)}
                 />
+                <OnboardingHOC />
             </Container>
         )
     }

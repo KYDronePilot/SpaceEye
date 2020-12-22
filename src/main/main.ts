@@ -375,10 +375,7 @@ ipc.answerRenderer<boolean>(SET_AUTO_UPDATE, autoUpdate => {
 ipc.answerRenderer(OPEN_WINDOWS_ICON_SETTINGS, () => {
     log.info('Opening Windows icon settings')
     // Special command that opens Windows notification area icon settings
-    const command = spawn('cmd.exe', [
-        '/c',
-        'explorer shell:::{05d7b0f4-2121-4eff-bf6b-ed3f69b894d9}'
-    ])
+    const command = spawn('cmd.exe', ['/c', 'start ms-settings:taskbar'])
 
     command.stdout.on('data', data => {
         log.debug('Windows icon settings stdout:', data)
