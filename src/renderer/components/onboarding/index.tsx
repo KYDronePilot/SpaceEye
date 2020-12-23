@@ -279,7 +279,10 @@ const WINDOWS_BASE_PAGES: OnboardingPage[] = [
     GetStartedPage
 ]
 
-export interface OnboardingHOCProps {}
+export interface OnboardingHOCProps {
+    show: boolean
+    onComplete: () => void
+}
 
 export interface OnboardingHOCState {
     currentIndex: number
@@ -316,8 +319,13 @@ export default class OnboardingHOC extends React.Component<OnboardingHOCProps, O
     }
 
     private increment() {
+        // Complete if on last page
+        if (this.state.currentIndex === this.count() - 1) {
+            this.props.onComplete()
+            return
+        }
         this.setState(state => ({
-            currentIndex: Math.min(this.count() - 1, state.currentIndex + 1)
+            currentIndex: state.currentIndex + 1
         }))
     }
 
@@ -347,7 +355,7 @@ export default class OnboardingHOC extends React.Component<OnboardingHOCProps, O
 
     public render() {
         return (
-            <Dialog open={true} style={{ userSelect: 'none' }}>
+            <Dialog open={this.props.show} style={{ userSelect: 'none' }}>
                 {this.state.pages
                     .filter((_, index) => this.state.currentIndex === index)
                     .map(Page => (

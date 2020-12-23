@@ -14,11 +14,7 @@ import * as React from 'react'
 import { HashRouter, Route } from 'react-router-dom'
 import styled, { ThemeProvider } from 'styled-components'
 
-import {
-    GET_FIRST_RUN,
-    OPEN_WINDOWS_ICON_SETTINGS,
-    SET_FIRST_RUN
-} from '../../shared/IpcDefinitions'
+import { GET_FIRST_RUN, SET_FIRST_RUN } from '../../shared/IpcDefinitions'
 import { DarkTheme } from '../themes'
 import HeaderBar from './HeaderBar'
 import OnboardingHOC from './onboarding'
@@ -116,12 +112,7 @@ class ImagePickerPage extends React.Component<{}, ImagePickerPageState> {
                 <HeaderBar />
                 <ThumbnailManager />
                 {/* <Toolbar /> */}
-                <WindowsOnboardingDialog
-                    show={this.state.isOnboarding && process.platform === 'win32'}
-                    onDone={this.finishOnboarding}
-                    onOpenSettings={() => ipc.callMain(OPEN_WINDOWS_ICON_SETTINGS)}
-                />
-                <OnboardingHOC />
+                <OnboardingHOC show={this.state.isOnboarding} onComplete={this.finishOnboarding} />
             </Container>
         )
     }
