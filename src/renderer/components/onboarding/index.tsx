@@ -10,6 +10,7 @@ import {
     MobileStepper
 } from '@material-ui/core'
 import { KeyboardArrowLeft } from '@material-ui/icons'
+import { ipcRenderer as ipc } from 'electron-better-ipc'
 import * as React from 'react'
 import { FC } from 'react'
 import styled from 'styled-components'
@@ -19,6 +20,11 @@ import windowsAlwaysShowIcon from '../../../img/windows_always_show_icon.png'
 import windowsIconAppearance from '../../../img/windows_icon_appearance.png'
 import windowsMenubar from '../../../img/windows_menubar_icon.png'
 import windowsOverflow from '../../../img/windows_overflow_icon.png'
+import {
+    OPEN_WINDOWS_ICON_SETTINGS,
+    SET_AUTO_UPDATE,
+    SET_START_ON_LOGIN
+} from '../../../shared/IpcDefinitions'
 
 const MenubarImg = styled.img`
     width: 400px;
@@ -94,7 +100,11 @@ const WindowsAlwaysShowIconTutorial: OnboardingPage = props => {
                     Click below to open the Windows Taskbar settings:
                 </DialogContentText>
                 <div style={{ textAlign: 'center' }}>
-                    <Button variant="contained" color="primary">
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={() => ipc.callMain(OPEN_WINDOWS_ICON_SETTINGS)}
+                    >
                         Open taskbar settings
                     </Button>
                 </div>
@@ -177,11 +187,25 @@ const AllowStartOnLoginPage: OnboardingPage = props => {
                 </DialogContentText>
                 <Grid container direction="column" justify="center" alignItems="center">
                     <Box my={0.5} />
-                    <Button variant="contained" color="primary" onClick={props.next}>
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={() => {
+                            ipc.callMain<boolean>(SET_START_ON_LOGIN, true)
+                            props.next()
+                        }}
+                    >
                         Yes
                     </Button>
                     <Box my={0.5} />
-                    <Button variant="text" color="default" onClick={props.next}>
+                    <Button
+                        variant="text"
+                        color="default"
+                        onClick={() => {
+                            ipc.callMain<boolean>(SET_START_ON_LOGIN, false)
+                            props.next()
+                        }}
+                    >
                         No, thanks
                     </Button>
                 </Grid>
@@ -205,11 +229,25 @@ const AllowAutoUpdatePage: OnboardingPage = props => {
                 </DialogContentText>
                 <Grid container direction="column" justify="center" alignItems="center">
                     <Box my={0.5} />
-                    <Button variant="contained" color="primary" onClick={props.next}>
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={() => {
+                            ipc.callMain<boolean>(SET_AUTO_UPDATE, true)
+                            props.next()
+                        }}
+                    >
                         Allow automatic updates
                     </Button>
                     <Box my={0.5} />
-                    <Button variant="text" color="default" onClick={props.next}>
+                    <Button
+                        variant="text"
+                        color="default"
+                        onClick={() => {
+                            ipc.callMain<boolean>(SET_AUTO_UPDATE, false)
+                            props.next()
+                        }}
+                    >
                         Notify me of updates
                     </Button>
                 </Grid>
