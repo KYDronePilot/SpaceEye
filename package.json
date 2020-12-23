@@ -132,6 +132,7 @@
         "electron-store": "^6.0.0",
         "electron-updater": "^4.3.4",
         "fontsource-roboto": "^3.0.3",
+        "glob": "^7.1.6",
         "lodash": "^4.17.19",
         "menubar": "^9.0.1",
         "moment": "^2.26.0",
