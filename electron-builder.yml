@@ -38,6 +38,8 @@ win:
     - "!**/dist/legal_notices.txt"
     - "!node_modules/space-eye-mac-node-api/**/*"
   # certificateSubjectName: CN=SpaceEye Self Code Signing Certificate
+  asarUnpack:
+    - "**/*.node"
 mas:
   type: distribution
   entitlements: build/entitlements.mas.plist
