@@ -293,7 +293,8 @@ export default class OnboardingHOC extends React.Component<OnboardingHOCProps, O
     constructor(props: OnboardingHOCProps) {
         super(props)
 
-        const pages = process.platform !== 'darwin' ? MAC_BASE_PAGES : WINDOWS_BASE_PAGES
+        let pages = process.platform !== 'win32' ? MAC_BASE_PAGES : WINDOWS_BASE_PAGES
+        pages = [...pages]
         // Add auto update page if GitHub download
         if (process.mas !== true && process.windowsStore !== true) {
             pages.splice(pages.length - 1, 0, AllowAutoUpdatePage)
@@ -353,7 +354,7 @@ export default class OnboardingHOC extends React.Component<OnboardingHOCProps, O
         })
     }
 
-    public render() {
+    public render(): React.ReactNode {
         return (
             <Dialog open={this.props.show} style={{ userSelect: 'none' }}>
                 {this.state.pages
