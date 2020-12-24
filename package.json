@@ -139,6 +139,8 @@
         "react-dom": "^16.8.6",
         "react-router-dom": "^5.2.0",
         "simplebar-react": "^2.2.0",
+        "space-eye-mac-node-api": "^1.0.0-beta2",
+        "space-eye-windows-node-api": "^1.0.0-beta1",
         "styled-components": "^5.1.0"
     }
 }

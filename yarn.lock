@@ -9587,6 +9587,11 @@ no-case@^2.2.0:
   dependencies:
     lower-case "^1.1.1"
 
+node-addon-api@^3.0.0:
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/node-addon-api/-/node-addon-api-3.1.0.tgz#98b21931557466c6729e51cb77cd39c965f42239"
+  integrity sha512-flmrDNB06LIl5lywUz7YlNGZH/5p0M7W28k8hzd9Lshtdh1wshD2Y+U4h9LD6KObOy1f+fEVdgprPrEymjM5uw==
+
 node-forge@^0.10.0:
   version "0.10.0"
   resolved "https://registry.yarnpkg.com/node-forge/-/node-forge-0.10.0.tgz#32dea2afb3e9926f02ee5ce8794902691a676bf3"
@@ -12187,6 +12192,20 @@ source-map@^0.7.3:
   version "0.7.3"
   resolved "https://registry.yarnpkg.com/source-map/-/source-map-0.7.3.tgz#5302f8169031735226544092e64981f751750383"
   integrity sha512-CkCj6giN3S+n9qrYiBTX5gystlENnRW5jZeNLHpe6aue+SrHcG5VYwujhW9s4dY31mEGsxBDrHR6oI69fTXsaQ==
+
+space-eye-mac-node-api@^1.0.0-beta2:
+  version "1.0.0-beta2"
+  resolved "https://registry.yarnpkg.com/space-eye-mac-node-api/-/space-eye-mac-node-api-1.0.0-beta2.tgz#b9a5e9f758bb0ea5a12bdf42b176d23adbff0d38"
+  integrity sha512-9HTx6z+9d/wCHKIxfudoDCE6TbqBVywWUpzbFUfUp6civ5qgwdOl46hPHP/YXb3IV9mCU2bsL3bx+MZGJDRrvQ==
+  dependencies:
+    node-addon-api "^3.0.0"
+
+space-eye-windows-node-api@^1.0.0-beta1:
+  version "1.0.0-beta1"
+  resolved "https://registry.yarnpkg.com/space-eye-windows-node-api/-/space-eye-windows-node-api-1.0.0-beta1.tgz#9de82b472c74aeff53b9400af7aa33ae8106aeef"
+  integrity sha512-nUTHzWbLvK9DhR42PgAmicEwgUMUt22K/GnozSMglDpy2Qvc4KH8+jzbjFEEwYVHZsxYnsrzBSAeUtZQ17TvbQ==
+  dependencies:
+    node-addon-api "^3.0.0"
 
 sparkles@^1.0.0:
   version "1.0.1"
