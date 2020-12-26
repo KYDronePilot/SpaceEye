@@ -12193,17 +12193,17 @@ source-map@^0.7.3:
   resolved "https://registry.yarnpkg.com/source-map/-/source-map-0.7.3.tgz#5302f8169031735226544092e64981f751750383"
   integrity sha512-CkCj6giN3S+n9qrYiBTX5gystlENnRW5jZeNLHpe6aue+SrHcG5VYwujhW9s4dY31mEGsxBDrHR6oI69fTXsaQ==
 
-space-eye-mac-node-api@^1.0.0-beta2:
-  version "1.0.0-beta2"
-  resolved "https://registry.yarnpkg.com/space-eye-mac-node-api/-/space-eye-mac-node-api-1.0.0-beta2.tgz#b9a5e9f758bb0ea5a12bdf42b176d23adbff0d38"
-  integrity sha512-9HTx6z+9d/wCHKIxfudoDCE6TbqBVywWUpzbFUfUp6civ5qgwdOl46hPHP/YXb3IV9mCU2bsL3bx+MZGJDRrvQ==
+space-eye-mac-node-api@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/space-eye-mac-node-api/-/space-eye-mac-node-api-1.0.2.tgz#4ea7dc0d02cb3788c1bcf604c70c5f912e5fff59"
+  integrity sha512-xgUTvgI+UVRxKnBMbZzoqeYlI/hNjiN34f2QSO1gslvqMdVpVxNJd0NL85gutKDNwXOSY9FjRNOba0uERjlXRw==
   dependencies:
     node-addon-api "^3.0.0"
 
-space-eye-windows-node-api@^1.0.0-beta1:
-  version "1.0.0-beta1"
-  resolved "https://registry.yarnpkg.com/space-eye-windows-node-api/-/space-eye-windows-node-api-1.0.0-beta1.tgz#9de82b472c74aeff53b9400af7aa33ae8106aeef"
-  integrity sha512-nUTHzWbLvK9DhR42PgAmicEwgUMUt22K/GnozSMglDpy2Qvc4KH8+jzbjFEEwYVHZsxYnsrzBSAeUtZQ17TvbQ==
+space-eye-windows-node-api@^1.0.3:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/space-eye-windows-node-api/-/space-eye-windows-node-api-1.0.3.tgz#bb8c64a46d411273a72c81f2499f120129fb4eee"
+  integrity sha512-0zyEK7TrLx9yFFRMgLijlxTejyLYW1hiIKiRXrDYurlbhgL9yevutw2rWuhbk1h6n01uCO1giDbHuNvbuEa/yQ==
   dependencies:
     node-addon-api "^3.0.0"
 
