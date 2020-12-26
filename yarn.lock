@@ -1293,11 +1293,6 @@
     "@types/yargs" "^15.0.0"
     chalk "^4.0.0"
 
-"@kydronepilot/space-eye-icons@^0.2.3":
-  version "0.2.3"
-  resolved "https://npm.pkg.github.com/download/@kydronepilot/space-eye-icons/0.2.3/f45742b1ea1a97c3fa7036303f50433a39f2a329e88b8de1cc1e25c5bf8e50d9#f7453856be1abfc2d815afb8fe292e52f6d44f2c"
-  integrity sha512-/T+dV5zcPm0bjy0xtvO0oxu24B9fFXhfa/2TlrYlk/Cg/TOyybvvtnnqRIxpiRAQOB+VWH/cH8xb5GBYV4/R9w==
-
 "@material-ui/core@^4.11.0":
   version "4.11.0"
   resolved "https://registry.yarnpkg.com/@material-ui/core/-/core-4.11.0.tgz#b69b26e4553c9e53f2bfaf1053e216a0af9be15a"
@@ -12192,6 +12187,11 @@ source-map@^0.7.3:
   version "0.7.3"
   resolved "https://registry.yarnpkg.com/source-map/-/source-map-0.7.3.tgz#5302f8169031735226544092e64981f751750383"
   integrity sha512-CkCj6giN3S+n9qrYiBTX5gystlENnRW5jZeNLHpe6aue+SrHcG5VYwujhW9s4dY31mEGsxBDrHR6oI69fTXsaQ==
+
+space-eye-icons@^0.3.0:
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/space-eye-icons/-/space-eye-icons-0.3.0.tgz#6006a45aac5856d1d65c9a5397c9056e6ba07db6"
+  integrity sha512-ahcPfukQpFVnghgmD65rCRx8CVTmOaWAxlaG6QofFb7fRDlVxYaJW4VwyHS4v4uKFaUbaqgxgzCeUrP9Z1WH9A==
 
 space-eye-mac-node-api@^1.0.2:
   version "1.0.2"
