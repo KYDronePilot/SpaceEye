@@ -1293,11 +1293,6 @@
     "@types/yargs" "^15.0.0"
     chalk "^4.0.0"
 
-"@kydronepilot/space-eye-icons@^0.2.3":
-  version "0.2.3"
-  resolved "https://npm.pkg.github.com/download/@kydronepilot/space-eye-icons/0.2.3/f45742b1ea1a97c3fa7036303f50433a39f2a329e88b8de1cc1e25c5bf8e50d9#f7453856be1abfc2d815afb8fe292e52f6d44f2c"
-  integrity sha512-/T+dV5zcPm0bjy0xtvO0oxu24B9fFXhfa/2TlrYlk/Cg/TOyybvvtnnqRIxpiRAQOB+VWH/cH8xb5GBYV4/R9w==
-
 "@material-ui/core@^4.11.0":
   version "4.11.0"
   resolved "https://registry.yarnpkg.com/@material-ui/core/-/core-4.11.0.tgz#b69b26e4553c9e53f2bfaf1053e216a0af9be15a"
@@ -9587,6 +9582,11 @@ no-case@^2.2.0:
   dependencies:
     lower-case "^1.1.1"
 
+node-addon-api@^3.0.0:
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/node-addon-api/-/node-addon-api-3.1.0.tgz#98b21931557466c6729e51cb77cd39c965f42239"
+  integrity sha512-flmrDNB06LIl5lywUz7YlNGZH/5p0M7W28k8hzd9Lshtdh1wshD2Y+U4h9LD6KObOy1f+fEVdgprPrEymjM5uw==
+
 node-forge@^0.10.0:
   version "0.10.0"
   resolved "https://registry.yarnpkg.com/node-forge/-/node-forge-0.10.0.tgz#32dea2afb3e9926f02ee5ce8794902691a676bf3"
@@ -12187,6 +12187,25 @@ source-map@^0.7.3:
   version "0.7.3"
   resolved "https://registry.yarnpkg.com/source-map/-/source-map-0.7.3.tgz#5302f8169031735226544092e64981f751750383"
   integrity sha512-CkCj6giN3S+n9qrYiBTX5gystlENnRW5jZeNLHpe6aue+SrHcG5VYwujhW9s4dY31mEGsxBDrHR6oI69fTXsaQ==
+
+space-eye-icons@^0.3.0:
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/space-eye-icons/-/space-eye-icons-0.3.0.tgz#6006a45aac5856d1d65c9a5397c9056e6ba07db6"
+  integrity sha512-ahcPfukQpFVnghgmD65rCRx8CVTmOaWAxlaG6QofFb7fRDlVxYaJW4VwyHS4v4uKFaUbaqgxgzCeUrP9Z1WH9A==
+
+space-eye-mac-node-api@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/space-eye-mac-node-api/-/space-eye-mac-node-api-1.0.2.tgz#4ea7dc0d02cb3788c1bcf604c70c5f912e5fff59"
+  integrity sha512-xgUTvgI+UVRxKnBMbZzoqeYlI/hNjiN34f2QSO1gslvqMdVpVxNJd0NL85gutKDNwXOSY9FjRNOba0uERjlXRw==
+  dependencies:
+    node-addon-api "^3.0.0"
+
+space-eye-windows-node-api@^1.0.3:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/space-eye-windows-node-api/-/space-eye-windows-node-api-1.0.3.tgz#bb8c64a46d411273a72c81f2499f120129fb4eee"
+  integrity sha512-0zyEK7TrLx9yFFRMgLijlxTejyLYW1hiIKiRXrDYurlbhgL9yevutw2rWuhbk1h6n01uCO1giDbHuNvbuEa/yQ==
+  dependencies:
+    node-addon-api "^3.0.0"
 
 sparkles@^1.0.0:
   version "1.0.1"

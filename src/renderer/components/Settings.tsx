@@ -1,5 +1,4 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import infoIcon from '@kydronepilot/space-eye-icons/dist/info_app.png'
 import {
     Box,
     Button,
@@ -19,6 +18,7 @@ import { ipcRenderer as ipc } from 'electron-better-ipc'
 import path from 'path'
 import * as React from 'react'
 import { Redirect } from 'react-router-dom'
+import infoIcon from 'space-eye-icons/dist/info_app.png'
 import styled from 'styled-components'
 
 import {

@@ -21,13 +21,13 @@ mac:
   extendInfo:
     LSUIElement: true
   publish: [github]
-  icon: node_modules/@kydronepilot/space-eye-icons/dist/mac_app.icns
+  icon: node_modules/space-eye-icons/dist/mac_app.icns
 win:
   target:
     - target: nsis
       arch: x64
   publish: [github]
-  icon: node_modules/@kydronepilot/space-eye-icons/dist/windows_app.ico
+  icon: node_modules/space-eye-icons/dist/windows_app.ico
 mas:
   type: distribution
   entitlements: build/entitlements.mas.plist
