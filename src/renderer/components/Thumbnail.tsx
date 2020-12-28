@@ -1,4 +1,10 @@
-import { Grid, LinearProgress, Typography, withStyles } from '@material-ui/core'
+import {
+    Grid,
+    LinearProgress,
+    Tooltip,
+    Typography,
+    withStyles
+} from '@material-ui/core'
 import ErrorIcon from '@material-ui/icons/Error'
 import AsyncLock from 'async-lock'
 import { ipcRenderer } from 'electron'
@@ -88,6 +94,65 @@ const ThumbnailContainer = styled.div<IsSelectedStyleProps>`
     transition: transform var(--transition-time);
     user-select: none;
 `
+
+enum ImageUpdateStatus {
+    upToDate,
+    expired,
+    failed
+}
+
+interface StatusProps {
+    readonly status: ImageUpdateStatus
+}
+
+const StatusIconDot = styled.div<StatusProps>`
+    height: 10px;
+    width: 10px;
+    background-color: ${props => {
+        switch (props.status) {
+            case ImageUpdateStatus.upToDate:
+                return '#35c522'
+            case ImageUpdateStatus.expired:
+                return '#dfb727'
+            default:
+                return '#ec473b'
+        }
+    }};
+    border-radius: 50%;
+    /* border: 1px solid black; */
+    position: absolute;
+    top: 7px;
+    left: 7px;
+    z-index: 1;
+    box-shadow: 0 3px 10px 3px rgba(0, 0, 0, 0.9);
+    &:before {
+        content: '';
+        position: absolute;
+        border-radius: 50%;
+        width: 200%;
+        height: 200%;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        z-index: -1;
+    }
+`
+
+const StatusTooltip = withStyles({
+    tooltipPlacementBottom: {
+        margin: '12px 0'
+    }
+})(Tooltip)
+
+const StatusIcon: React.FC<StatusProps> = props => (
+    <StatusTooltip
+        title={<Typography variant="caption">Last updated: 10 minutes ago</Typography>}
+        placement="bottom"
+        arrow
+    >
+        <StatusIconDot {...props} />
+    </StatusTooltip>
+)
 
 enum ThumbnailLoadingState {
     loading,
@@ -283,6 +348,7 @@ export default class Thumbnail extends React.Component<ThumbnailProps, Thumbnail
             <ThumbnailContainer isSelected={isSelectedValue}>
                 <ImageContainerBackground isSelected={isSelectedValue}>
                     <ImageContainer isSelected={isSelectedValue} onClick={() => onClick(id)}>
+                        <StatusIcon status={ImageUpdateStatus.expired} />
                         <ImageSwitcher
                             src={this.state.b64Image ?? ''}
                             loadingState={this.state.loadingState}
