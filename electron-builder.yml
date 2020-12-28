@@ -3,13 +3,10 @@ appId: com.kydronepilot.spaceeye
 directories:
   output: release
 npmRebuild: true
-files:
-  - dist/
-  - node_modules/
-  - package.json
-  - "!**/dist/legal_notices.txt"
 extraResources:
   - from: dist/legal_notices.txt
+    to: ./
+  - from: LICENSE
     to: ./
 afterSign: electron-builder-notarize
 mac:
@@ -22,12 +19,26 @@ mac:
     LSUIElement: true
   publish: [github]
   icon: node_modules/space-eye-icons/dist/mac_app.icns
+  asarUnpack:
+    - "**/*.node"
+  files:
+    - dist/
+    - node_modules/
+    - package.json
+    - "!**/dist/legal_notices.txt"
+    - "!node_modules/space-eye-windows-node-api/**/*"
 win:
   target:
     - target: nsis
       arch: x64
   publish: [github]
   icon: node_modules/space-eye-icons/dist/windows_app.ico
+  files:
+    - dist/
+    - node_modules/
+    - package.json
+    - "!**/dist/legal_notices.txt"
+    - "!node_modules/space-eye-mac-node-api/**/*"
 mas:
   type: distribution
   entitlements: build/entitlements.mas.plist
@@ -35,5 +46,3 @@ mas:
   extendInfo:
     LSMultipleInstancesProhibited: true
     ITSAppUsesNonExemptEncryption: false
-  asarUnpack:
-    - "**/*.node"
