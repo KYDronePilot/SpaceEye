@@ -6,6 +6,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic
 Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0]
+
+### Added
+
+- Onboarding steps for new users, to explain how the app works and to prompt for
+  basic settings options.
+
+### Fixed
+
+- Periodic background updates were taking longer than they should have.
+- Bug that would have allowed MAS and Windows Store builds to try auto updating.
+
 ## [1.0.0]
 
 ### Added
