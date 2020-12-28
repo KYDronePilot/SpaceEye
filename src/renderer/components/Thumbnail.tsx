@@ -1,11 +1,13 @@
 import {
     Grid,
+    IconButton,
     LinearProgress,
     Tooltip,
     Typography,
     withStyles
 } from '@material-ui/core'
 import ErrorIcon from '@material-ui/icons/Error'
+import RefreshIcon from '@material-ui/icons/Refresh'
 import AsyncLock from 'async-lock'
 import { ipcRenderer } from 'electron'
 import { ipcRenderer as ipc } from 'electron-better-ipc'
@@ -17,9 +19,11 @@ import styled from 'styled-components'
 import {
     DOWNLOAD_THUMBNAIL_CHANNEL,
     DownloadThumbnailIpcResponse,
+    PUSH_VIEW_STATUS_CHANGE,
     VIEW_DOWNLOAD_PROGRESS,
     VISIBILITY_CHANGE_ALERT_CHANNEL
 } from '../../shared/IpcDefinitions'
+import { ImageStatus, ImageStatusState, ImageStatusUpdate } from '../../shared/types'
 
 ipcRenderer.setMaxListeners(30)
 const log = electronLog.scope('thumbnail-component')
@@ -44,6 +48,8 @@ const Image = styled.img`
 
 /**
  * Clickable container which the image is in.
+ *
+ * @param props
  */
 const ImageContainer = styled.div<IsSelectedStyleProps>`
     --width: 200px;
@@ -60,6 +66,8 @@ const ImageContainer = styled.div<IsSelectedStyleProps>`
 
 /**
  * Background of the image container which acts as a border.
+ *
+ * @param props
  */
 const ImageContainerBackground = styled.div<IsSelectedStyleProps>`
     background: ${props => (props.isSelected ? props.theme.colors.borderHighlight : 'transparent')};
@@ -72,6 +80,8 @@ const ImageContainerBackground = styled.div<IsSelectedStyleProps>`
 
 /**
  * Name describing the thumbnail.
+ *
+ * @param props
  */
 const ThumbnailName = styled.p<IsSelectedStyleProps>`
     font-family: Roboto, sans-serif;
@@ -85,6 +95,8 @@ const ThumbnailName = styled.p<IsSelectedStyleProps>`
 
 /**
  * Container for the image and name.
+ *
+ * @param props
  */
 const ThumbnailContainer = styled.div<IsSelectedStyleProps>`
     --transition-time: 200ms;
@@ -95,14 +107,8 @@ const ThumbnailContainer = styled.div<IsSelectedStyleProps>`
     user-select: none;
 `
 
-enum ImageUpdateStatus {
-    upToDate,
-    expired,
-    failed
-}
-
 interface StatusProps {
-    readonly status: ImageUpdateStatus
+    readonly status: ImageStatusState
 }
 
 const StatusIconDot = styled.div<StatusProps>`
@@ -110,9 +116,9 @@ const StatusIconDot = styled.div<StatusProps>`
     width: 10px;
     background-color: ${props => {
         switch (props.status) {
-            case ImageUpdateStatus.upToDate:
+            case ImageStatusState.updated:
                 return '#35c522'
-            case ImageUpdateStatus.expired:
+            case ImageStatusState.error:
                 return '#dfb727'
             default:
                 return '#ec473b'
@@ -144,13 +150,37 @@ const StatusTooltip = withStyles({
     }
 })(Tooltip)
 
-const StatusIcon: React.FC<StatusProps> = props => (
+const ReloadButton = withStyles({
+    root: {
+        position: 'absolute',
+        top: '4px',
+        right: '4px',
+        'z-index': '1',
+        transform: 'scale(0.80)',
+        padding: '0'
+    }
+})(IconButton)
+
+const ImageReloadIcon = withStyles({
+    root: {
+        filter: Array.from({ length: 3 })
+            .map(() => 'drop-shadow(0 2px 6px rgba(0, 0, 0, 0.8))')
+            .join(' ')
+    }
+})(RefreshIcon)
+
+interface StatusIconProps {
+    state: ImageStatusState
+    message: string
+}
+
+const StatusIcon: React.FC<StatusIconProps> = props => (
     <StatusTooltip
-        title={<Typography variant="caption">Last updated: 10 minutes ago</Typography>}
+        title={<Typography variant="caption">{props.message}</Typography>}
         placement="bottom"
         arrow
     >
-        <StatusIconDot {...props} />
+        <StatusIconDot status={props.state} />
     </StatusTooltip>
 )
 
@@ -237,8 +267,11 @@ interface ThumbnailProps {
 interface ThumbnailState {
     b64Image?: string
     loadingState: ThumbnailLoadingState
+    viewStatus: ImageStatus
+    viewStatusMessage: string
     cancelVisibilityChangeSub?: () => void
     cancelProgressChangeSub?: () => void
+    cancelStatusUpdateSub?: () => void
     downloadPercentage?: number
 }
 
@@ -249,11 +282,14 @@ export default class Thumbnail extends React.Component<ThumbnailProps, Thumbnail
         super(props)
 
         this.state = {
-            loadingState: ThumbnailLoadingState.loading
+            loadingState: ThumbnailLoadingState.loading,
+            viewStatus: { state: ImageStatusState.loading, message: 'Loading...' },
+            viewStatusMessage: 'Loading...'
         }
 
         this.updateUnsafe = this.updateUnsafe.bind(this)
         this.update = this.update.bind(this)
+        this.updateViewStatusMessage = this.updateViewStatusMessage.bind(this)
     }
 
     async componentDidMount(): Promise<void> {
@@ -278,9 +314,20 @@ export default class Thumbnail extends React.Component<ThumbnailProps, Thumbnail
                 }
             }
         )
+        const cancelStatusUpdateSub = ipc.answerMain<ImageStatusUpdate>(
+            PUSH_VIEW_STATUS_CHANGE,
+            newStatus => {
+                // Only handle updates for this view
+                if (newStatus.viewId !== this.props.id) {
+                    return
+                }
+                this.setState({ viewStatus: newStatus.status })
+            }
+        )
         this.setState({
             cancelVisibilityChangeSub: cancelVisChange,
-            cancelProgressChangeSub: cancelProgressChange
+            cancelProgressChangeSub: cancelProgressChange,
+            cancelStatusUpdateSub
         })
         await this.update()
     }
@@ -292,6 +339,21 @@ export default class Thumbnail extends React.Component<ThumbnailProps, Thumbnail
         if (this.state.cancelProgressChangeSub !== undefined) {
             this.state.cancelProgressChangeSub()
         }
+        if (this.state.cancelStatusUpdateSub !== undefined) {
+            this.state.cancelStatusUpdateSub()
+        }
+    }
+
+    /**
+     * Update the view status message for the status tooltip.
+     */
+    private updateViewStatusMessage() {
+        if (this.state.viewStatus.state === ImageStatusState.updated) {
+            const timeAgo = moment(this.state.viewStatus.lastUpdated!).fromNow()
+            this.setState({ viewStatusMessage: `Updated ${timeAgo}` })
+            return
+        }
+        this.setState({ viewStatusMessage: this.state.viewStatus.message! })
     }
 
     /**
@@ -348,7 +410,13 @@ export default class Thumbnail extends React.Component<ThumbnailProps, Thumbnail
             <ThumbnailContainer isSelected={isSelectedValue}>
                 <ImageContainerBackground isSelected={isSelectedValue}>
                     <ImageContainer isSelected={isSelectedValue} onClick={() => onClick(id)}>
-                        <StatusIcon status={ImageUpdateStatus.expired} />
+                        <StatusIcon
+                            state={this.state.viewStatus.state}
+                            message={this.updateViewStatusMessage()}
+                        />
+                        <ReloadButton size="small">
+                            <ImageReloadIcon />
+                        </ReloadButton>
                         <ImageSwitcher
                             src={this.state.b64Image ?? ''}
                             loadingState={this.state.loadingState}

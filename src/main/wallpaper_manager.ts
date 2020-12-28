@@ -11,6 +11,7 @@ import moment from 'moment'
 
 import { ImageSource, SatelliteView } from '../shared/config_types'
 import { VIEW_DOWNLOAD_PROGRESS } from '../shared/IpcDefinitions'
+import { ImageStatusState } from '../shared/types'
 import { AppConfigStore } from './app_config_store'
 import { DownloadedImage } from './downloaded_image'
 import {
@@ -22,6 +23,7 @@ import {
     ViewNotSetError
 } from './errors'
 import { downloadImage } from './image_downloader'
+import { ImageStatusManager } from './image_status'
 import { OSWallpaperInterface } from './os_wallpaper_interface'
 import { MacOSWallpaperInterface } from './os_wallpaper_interface/macos'
 import { WindowsWallpaperInterface } from './os_wallpaper_interface/windows'
@@ -124,6 +126,7 @@ export class WallpaperManager {
      * Non-error catching pipeline to update the wallpaper.
      *
      * @param lock - Acquired update pipeline lock
+     * @param viewId - ID of the view to update
      * @throws {ViewNotSetError} if view not set in config when running
      * @throws {ViewConfigAccessError} if there's an issue while obtaining the
      * current view config
@@ -133,10 +136,13 @@ export class WallpaperManager {
      * @throws {MonitorConfigChangedError} if the monitor config changed while
      * running update tasks
      * @throws {Error} Unknown errors
+     * @returns Downloaded image
      */
-    public static async updatePipeline(lock: UpdateLock): Promise<void> {
+    public static async updatePipeline(
+        lock: UpdateLock,
+        viewId?: number
+    ): Promise<DownloadedImage> {
         log.debug('Entering update pipeline')
-        const viewId = AppConfigStore.currentViewId
         // If no view ID set, nothing to update
         if (viewId === undefined) {
             log.debug('No view set to update')
@@ -226,6 +232,7 @@ export class WallpaperManager {
                 imageConfig.defaultScaling
             )
         )
+        return imageToSet
     }
 
     /**
@@ -242,10 +249,19 @@ export class WallpaperManager {
             return false
         }
         log.info(`Update triggered by ${initiator}, lock acquisition succeeded`)
+        const viewId = AppConfigStore.currentViewId
+        // Update the status to loading if there is a view ID
+        if (viewId !== undefined) {
+            ImageStatusManager.updateViewLoading(viewId)
+        }
         try {
             // Try to run the pipeline and release the lock when done
-            await WallpaperManager.updatePipeline(lock)
+            const image = await WallpaperManager.updatePipeline(lock, viewId)
             lock.release()
+            ImageStatusManager.updateViewStatus(viewId!, {
+                state: ImageStatusState.updated,
+                lastUpdated: image.timestamp.valueOf()
+            })
             // Delete old images
             await DownloadedImage.cleanupOldImages()
             return true
@@ -253,6 +269,12 @@ export class WallpaperManager {
             if (error instanceof RequestCancelledError) {
                 log.info('Image download request cancelled')
                 return false
+            }
+            if (viewId !== undefined) {
+                ImageStatusManager.updateViewStatus(viewId, {
+                    state: ImageStatusState.error,
+                    message: 'Error while updating'
+                })
             }
             log.error('Error while updating. Invalidating lock.', error)
             lock.invalidate()
