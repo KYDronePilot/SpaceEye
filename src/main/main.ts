@@ -90,7 +90,7 @@ const windowPosition = process.platform === 'darwin' ? 'trayRight' : 'trayBottom
 const toolbarIconPath = path.join(
     __dirname,
     'icons',
-    process.platform === 'win32' ? 'windows_toolbar.ico' : 'mac_toolbar.png'
+    process.platform === 'win32' ? 'windows_toolbar.ico' : 'MacToolbarTemplate.png'
 )
 
 global.mb = menubar({
