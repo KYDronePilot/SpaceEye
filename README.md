@@ -66,6 +66,46 @@ State University) for hosting the satellite imagery.
 If you encounter a bug or have a feature request, please create an issue on the
 [Issues page](https://github.com/KYDronePilot/SpaceEye/issues).
 
+## Development
+
+### Requirements
+
+- NodeJS
+- Yarn
+- [`windows-build-tools`](https://www.npmjs.com/package/windows-build-tools) (if
+  on Windows)
+
+[VS Code](https://code.visualstudio.com) is recommended for development, but not
+required. The repo includes configs and recommended extensions.
+
+### Setup
+
+```bash
+git clone https://github.com/KYDronePilot/SpaceEye.git
+cd SpaceEye
+yarn
+yarn run build
+```
+
+### Start in dev mode
+
+Opens Chromium dev tools and watches renderer files.
+
+```bash
+yarn run start-dev
+```
+
+### Package the app
+
+Builds and packages app for distribution.
+
+If on macOS, creates DMG and ZIP files, or if on Windows, creates NSIS
+executable installer.
+
+```bash
+yarn run dist
+```
+
 ## Privacy
 
 The only data collected are server logs when downloading the [satellite config
