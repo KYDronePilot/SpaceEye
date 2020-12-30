@@ -7,9 +7,9 @@ Live satellite imagery for your **Mac** or **Windows** desktop background.
 ![Supported platforms](https://img.shields.io/badge/platforms-macOS%20%7C%20Windows-lightgrey)
 ![License](https://img.shields.io/github/license/KYDronePilot/SpaceEye)
 
-![Latest Mac ZIP downloads](https://img.shields.io/github/downloads/KYDronePilot/SpaceEye/latest/SpaceEye-1.0.4-mac.zip)
-![Latest Mac DMG downloads](https://img.shields.io/github/downloads/KYDronePilot/SpaceEye/latest/SpaceEye-1.0.4.dmg)
-![Latest Windows downloads](https://img.shields.io/github/downloads/KYDronePilot/SpaceEye/latest/SpaceEye-Setup-1.0.4.exe)
+![Latest Mac ZIP downloads](https://img.shields.io/github/downloads/KYDronePilot/SpaceEye/latest/SpaceEye-1.1.1-mac.zip)
+![Latest Mac DMG downloads](https://img.shields.io/github/downloads/KYDronePilot/SpaceEye/latest/SpaceEye-1.1.1.dmg)
+![Latest Windows downloads](https://img.shields.io/github/downloads/KYDronePilot/SpaceEye/latest/SpaceEye-Setup-1.1.1.exe)
 
 ![App running on macOS](docs/img/macos_menubar.jpg)
 
@@ -25,9 +25,9 @@ Live satellite imagery for your **Mac** or **Windows** desktop background.
 - Download from the [latest GitHub
   release](https://github.com/KYDronePilot/SpaceEye/releases/latest)
   (available everywhere):
-  - [SpaceEye-1.0.4.dmg](https://github.com/KYDronePilot/SpaceEye/releases/download/v1.0.4/SpaceEye-1.0.4.dmg)
+  - [SpaceEye-1.1.1.dmg](https://github.com/KYDronePilot/SpaceEye/releases/download/v1.1.1/SpaceEye-1.1.1.dmg)
     or
-  - [SpaceEye-1.0.4-mac.zip](https://github.com/KYDronePilot/SpaceEye/releases/download/v1.0.4/SpaceEye-1.0.4-mac.zip)
+  - [SpaceEye-1.1.1-mac.zip](https://github.com/KYDronePilot/SpaceEye/releases/download/v1.1.1/SpaceEye-1.1.1-mac.zip)
 
 ### Windows
 
