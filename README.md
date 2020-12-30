@@ -13,15 +13,14 @@ Live satellite imagery for your **Mac** or **Windows** desktop background.
 
 ![App running on macOS](docs/img/macos_menubar.jpg)
 
-<a href="https://apps.apple.com/us/app/spaceeye-satellite-wallpaper/id1539851747?mt=12&amp;itsct=apps_box&amp;itscg=30200" style="display: inline-block; overflow: hidden; border-top-left-radius: 13px; border-top-right-radius: 13px; border-bottom-right-radius: 13px; border-bottom-left-radius: 13px; width: 250px; height: 83px;"><img src="https://tools.applemediaservices.com/api/badges/download-on-the-mac-app-store/black/en-US?size=250x83&amp;releaseDate=1608163200&h=b44730f456f465fe5777eff552560a5c" alt="Download on the Mac App Store" style="border-top-left-radius: 13px; border-top-right-radius: 13px; border-bottom-right-radius: 13px; border-bottom-left-radius: 13px; width: 250px; height: 83px;"></a>
-
 ## Install
 
 ### Mac
 
-- Download from the [Mac App
-  Store](https://apps.apple.com/us/app/spaceeye-satellite-wallpaper/id1539851747)
-  (US and Canada only).
+<a href="https://apps.apple.com/us/app/spaceeye-satellite-wallpaper/id1539851747?mt=12&amp;itsct=apps_box&amp;itscg=30200" style="display: inline-block; overflow: hidden; border-top-left-radius: 13px; border-top-right-radius: 13px; border-bottom-right-radius: 13px; border-bottom-left-radius: 13px; width: 250px; height: 83px;"><img src="docs/img/mas_badge_black.svg" alt="Download on the Mac App Store" style="border-top-left-radius: 13px; border-top-right-radius: 13px; border-bottom-right-radius: 13px; border-bottom-left-radius: 13px; width: 250px; height: 83px;" width="250px" height="83px"></a>
+
+- Download from the **Mac App Store** by clicking the link above (US and Canada
+  only).
 - Download from the [latest GitHub
   release](https://github.com/KYDronePilot/SpaceEye/releases/latest)
   (available everywhere):
@@ -31,9 +30,16 @@ Live satellite imagery for your **Mac** or **Windows** desktop background.
 
 ### Windows
 
-- Follow the [installation
+<a href="//www.microsoft.com/store/apps/9NF3WZ8TT6MN?cid=storebadge&ocid=badge"><img src="docs/img/ms_badge_large.png" alt="Download from the Microsoft Store" width="250px" height="92px"/></a>
+
+- **Recommended**: Download from the **Microsoft Store** by clicking the link
+  above (US and Canada only).
+- Alternative: Follow the [installation
   instructions](https://github.com/KYDronePilot/SpaceEye/wiki/Installing-on-Windows)
-  to download and run the installer from the latest GitHub release.
+  to download and run the installer from the latest GitHub release (available
+  everywhere).
+  - **Note**: You will have to dismiss warnings about the download being
+    potentially dangerous with this method.
 
 ## About
 
