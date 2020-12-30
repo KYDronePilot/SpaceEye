@@ -1,6 +1,6 @@
 # SpaceEye
 
-Live satellite imagery for your **macOS** or **Windows** desktop background.
+Live satellite imagery for your **Mac** or **Windows** desktop background.
 
 ![Build](https://github.com/KYDronePilot/SpaceEye/workflows/Build/badge.svg)
 ![Latest release](https://img.shields.io/github/v/release/KYDronePilot/SpaceEye?label=latest%20release)
@@ -19,13 +19,21 @@ Live satellite imagery for your **macOS** or **Windows** desktop background.
 
 ### Mac
 
-#### Download from the [Mac App Store](https://apps.apple.com/us/app/spaceeye-satellite-wallpaper/id1539851747) (US and Canada only)
-
-#### Download the latest DMG from GitHub: [SpaceEye-1.0.4.dmg](https://github.com/KYDronePilot/SpaceEye/releases/download/v1.0.4/SpaceEye-1.0.4.dmg) (anywhere)
+- Download from the [Mac App
+  Store](https://apps.apple.com/us/app/spaceeye-satellite-wallpaper/id1539851747)
+  (US and Canada only).
+- Download from the [latest GitHub
+  release](https://github.com/KYDronePilot/SpaceEye/releases/latest)
+  (available everywhere):
+  - [SpaceEye-1.0.4.dmg](https://github.com/KYDronePilot/SpaceEye/releases/download/v1.0.4/SpaceEye-1.0.4.dmg)
+    or
+  - [SpaceEye-1.0.4-mac.zip](https://github.com/KYDronePilot/SpaceEye/releases/download/v1.0.4/SpaceEye-1.0.4-mac.zip)
 
 ### Windows
 
-#### Follow the [installation instructions](https://github.com/KYDronePilot/SpaceEye/wiki/Installing-on-Windows) to download and run the installer from GitHub
+- Follow the [installation
+  instructions](https://github.com/KYDronePilot/SpaceEye/wiki/Installing-on-Windows)
+  to download and run the installer from the latest GitHub release.
 
 ## About
 
