@@ -24,18 +24,6 @@ jobs:
         with:
           node-version: 13
 
-      - name: Create .npmrc token file for Windows
-        run: echo "//npm.pkg.github.com/:_authToken=$env:NODE_AUTH_TOKEN" > .npmrc
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GP_ACCESS_TOKEN }}
-        if: startsWith(matrix.os, 'windows')
-
-      - name: Create .npmrc token file for macOS
-        run: echo "//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}" > .npmrc
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GP_ACCESS_TOKEN }}
-        if: startsWith(matrix.os, 'macos')
-
       - name: Get yarn cache directory path
         id: yarn-cache-dir-path
         run: echo "::set-output name=dir::$(yarn cache dir)"
@@ -50,14 +38,6 @@ jobs:
 
       - name: Install packages
         run: yarn install --frozen-lockfile --prefer-offline
-
-      # If macOS, install Mac Node API
-      - run: yarn add git+https://github.com/KYDronePilot/space-eye-mac-node-api.git
-        if: startsWith(matrix.os, 'macos')
-
-      # If Windows, install Windows Node API
-      - run: yarn add git+https://github.com/KYDronePilot/space-eye-windows-node-api.git
-        if: startsWith(matrix.os, 'windows')
 
       - name: Prepare for app notarization
         if: startsWith(matrix.os, 'macos')
