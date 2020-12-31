@@ -33,7 +33,7 @@ Live satellite imagery for your **Mac** or **Windows** desktop background.
 <a href="//www.microsoft.com/store/apps/9NF3WZ8TT6MN?cid=storebadge&ocid=badge"><img src="docs/img/ms_badge_large.png" alt="Download from the Microsoft Store" width="250px" height="92px"/></a>
 
 - **Recommended**: Download from the **Microsoft Store** by clicking the link
-  above (US and Canada only).
+  above (Microsoft account not needed; US and Canada only).
 - Alternative: Follow the [installation
   instructions](https://github.com/KYDronePilot/SpaceEye/wiki/Installing-on-Windows)
   to download and run the installer from the latest GitHub release (available
