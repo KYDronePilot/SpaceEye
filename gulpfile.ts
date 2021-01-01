@@ -15,7 +15,6 @@ const APPX_ASSETS = path.join(BUILD_DIR, 'appx')
 const SPACE_EYE_ICONS = path.join(
     __dirname,
     'node_modules',
-    '@kydronepilot',
     'space-eye-icons',
     'dist'
 )
