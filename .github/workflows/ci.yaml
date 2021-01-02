@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      - windows-store-distribution
   create:
     tags: [v*]
 

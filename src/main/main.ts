@@ -1,3 +1,4 @@
+import { StartupTaskState, WindowsStoreAutoLaunch } from '@kydronepilot/electron-winstore-auto-launch'
 import Axios from 'axios'
 import { spawn } from 'child_process'
 import { app, powerMonitor, Rectangle, screen, systemPreferences } from 'electron'
@@ -327,7 +328,31 @@ mb.on('ready', () => {
  *
  * @param shouldStart - Whether the app should start on login
  */
-function configureStartOnLogin(shouldStart: boolean) {
+async function configureStartOnLogin(shouldStart: boolean) {
+    // Handle differently if windows store build
+    if (process.windowsStore === true) {
+        let task
+        try {
+            task = await WindowsStoreAutoLaunch.getStartupTask('SpaceEyeStartup')
+        } catch (error) {
+            log.error('Failed to get start on login MS task:', error)
+            return
+        }
+        if (task !== undefined && task.state !== StartupTaskState.disabledByUser) {
+            if (task.state === StartupTaskState.disabled && shouldStart) {
+                task.requestEnableAsync((error, _) => {
+                    if (error) {
+                        log.error('Failed to enable start on login for MS build')
+                    }
+                })
+            } else if (task.state === StartupTaskState.enabled && !shouldStart) {
+                task.disable()
+            }
+        } else {
+            log.warn('User has disabled start on login from task manager; unable to change')
+        }
+        return
+    }
     const loginItemSettings = app.getLoginItemSettings()
 
     // If not set to what it should be, update it
