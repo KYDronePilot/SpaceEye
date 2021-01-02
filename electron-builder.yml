@@ -9,6 +9,7 @@ extraResources:
   - from: LICENSE
     to: ./
 afterSign: electron-builder-notarize
+appxManifestCreated: ./scripts/appxManifestCreated.js
 mac:
   category: public.app-category.utilities
   hardenedRuntime: true

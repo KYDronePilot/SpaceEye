@@ -6,6 +6,7 @@ import fse from 'fs-extra'
 import { parallel, series } from 'gulp'
 import path from 'path'
 import { promisify } from 'util'
+import xml2js from 'xml2js'
 
 const asyncExec = promisify(exec)
 const asyncWriteFile = promisify(fs.writeFile)
@@ -153,6 +154,54 @@ function startDev(done: (error?: any) => void) {
  */
 async function ensureDist() {
     await fse.ensureDir(DIST)
+}
+
+/**
+ * Add the start-on-login extension to the APPX manifest after it is created.
+ *
+ * @param manifest - The parsed manifest
+ */
+function addAppxStartupExtension(manifest: any) {
+    // If an "Extensions" key doesn't exist, create it
+    const application = manifest.Package.Applications[0].Application[0]
+    if (!('Extensions' in application)) {
+        application.Extensions = [{}]
+    }
+    const extensions = application.Extensions[0]
+    // Add the startup task extension
+    extensions['desktop:Extension'] = [
+        {
+            $: {
+                Category: 'windows.startupTask',
+                Executable: application.$.Executable,
+                EntryPoint: 'Windows.FullTrustApplication'
+            },
+            'desktop:StartupTask': [
+                {
+                    $: {
+                        TaskId: 'SpaceEyeStartup',
+                        Enabled: 'false',
+                        DisplayName: 'SpaceEye'
+                    }
+                }
+            ]
+        }
+    ]
+}
+
+export const appxManifestCreated = async function(): Promise<void> {
+    const manifest = process.argv[4]
+    // Read and parse the manifest
+    const content = await fse.readFile(manifest)
+    const xml = await xml2js.parseStringPromise(content.toString())
+    // Call modification functions
+    addAppxStartupExtension(xml)
+    // Build back to XML
+    const builder = new xml2js.Builder({ headless: true })
+    let rebuilt = builder.buildObject(xml)
+    // Add a custom header (need for suppression comment)
+    rebuilt = `<?xml version="1.0" encoding="utf-8"?>\n<!--suppress XmlUnusedNamespaceDeclaration -->\n${rebuilt}`
+    await fse.writeFile(manifest, rebuilt)
 }
 
 export const build = parallel(buildMain, buildRenderer)

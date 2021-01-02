@@ -76,6 +76,7 @@
         "@types/styled-components": "^5.1.0",
         "@types/webdriverio": "^4.8.7",
         "@types/webpack-env": "^1.13.3",
+        "@types/xml2js": "^0.4.7",
         "@typescript-eslint/eslint-plugin": "^3.5.0",
         "@typescript-eslint/parser": "^3.5.0",
         "babel-loader": "^8.0.6",
@@ -120,7 +121,8 @@
         "webpack": "^4.32.2",
         "webpack-cli": "^3.3.2",
         "webpack-dev-server": "^3.11.0",
-        "webpack-merge": "^4.2.1"
+        "webpack-merge": "^4.2.1",
+        "xml2js": "^0.4.23"
     },
     "dependencies": {
         "@material-ui/core": "^4.11.0",
