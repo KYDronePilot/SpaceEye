@@ -1293,10 +1293,10 @@
     "@types/yargs" "^15.0.0"
     chalk "^4.0.0"
 
-"@kydronepilot/electron-winstore-auto-launch@^3.0.0-beta5":
-  version "3.0.0-beta5"
-  resolved "https://registry.npmjs.org/@kydronepilot/electron-winstore-auto-launch/-/electron-winstore-auto-launch-3.0.0-beta5.tgz#cb9a62bff506fb66cb8fbbb517ffcdc5b133dd6f"
-  integrity sha512-atVEAOBr+wr7UiYiGvZdrQBLURcIrKsW33aDStnmmDjg6fL87K6x/7+0Y4coZAcd6DJj8yRuNuxKHz8GQUlr7w==
+"@kydronepilot/electron-winstore-auto-launch@^3.0.0":
+  version "3.0.0"
+  resolved "https://registry.npmjs.org/@kydronepilot/electron-winstore-auto-launch/-/electron-winstore-auto-launch-3.0.0.tgz#8953a563ddfd7157bce3301c779d7bdf3af161da"
+  integrity sha512-4hFvWRqqf22miWffz/QFbgnMC9RKRzHSONca5T8mXQnZOWQaG7+bHMduME83LZK/xFMY0dO7Mw5+hqdJ7D0FqA==
   dependencies:
     "@nodert-win10-rs3/windows.applicationmodel" "^0.4.4"
 

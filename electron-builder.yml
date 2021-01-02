@@ -38,6 +38,9 @@ win:
     - package.json
     - "!**/dist/legal_notices.txt"
     - "!node_modules/space-eye-mac-node-api/**/*"
+    - "!node_modules/@nodert-win10-*/**/*.h"
+    - "!node_modules/@nodert-win10-*/**/*.cpp"
+    - "!node_modules/@nodert-win10-*/windows.applicationmodel/build"
   # certificateSubjectName: CN=SpaceEye Self Code Signing Certificate
   asarUnpack:
     - "**/*.node"
