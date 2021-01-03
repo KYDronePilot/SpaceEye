@@ -106,7 +106,7 @@
         "image-webpack-loader": "^4.6.0",
         "jest": "^26.4.2",
         "lint-staged": "^10.0.7",
-        "node-loader": "^0.6.0",
+        "node-loader": "^1.0.2",
         "node-sass": "^4.14.1",
         "prettier": "^1.18.2",
         "react-hot-loader": "^4.8.8",
