@@ -40,7 +40,8 @@ win:
     - "!node_modules/space-eye-mac-node-api/**/*"
     - "!node_modules/@nodert-win10-*/**/*.h"
     - "!node_modules/@nodert-win10-*/**/*.cpp"
-    - "!node_modules/@nodert-win10-*/windows.applicationmodel/build"
+    - "!node_modules/@nodert-win10-*/windows.applicationmodel/build/binding*"
+    - "!node_modules/@nodert-win10-*/windows.applicationmodel/build/Release/obj"
   # certificateSubjectName: CN=SpaceEye Self Code Signing Certificate
   asarUnpack:
     - "**/*.node"
