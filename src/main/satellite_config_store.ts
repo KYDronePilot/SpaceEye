@@ -33,6 +33,11 @@ export class SatelliteConfigStore {
      */
     config?: RootSatelliteConfig
 
+    /**
+     * ETag for currently downloaded config
+     */
+    etag?: string
+
     public static get Instance(): SatelliteConfigStore {
         if (this.instance === undefined) {
             this.instance = new this()
@@ -48,7 +53,18 @@ export class SatelliteConfigStore {
     private async updateConfig() {
         log.debug('Updating satellite config')
         try {
-            this.config = (await Axios.get<RootSatelliteConfig>(CONFIG_URL)).data
+            const response = await Axios.get<RootSatelliteConfig>(CONFIG_URL, {
+                headers: { 'If-None-Match': this.etag ?? '' },
+                validateStatus: status => (status >= 200 && status < 300) || status === 304
+            })
+            // ETags don't match
+            if (response.status !== 304) {
+                log.debug('Setting new config; ETag has changed')
+                this.config = response.data
+                this.etag = response.headers.etag ?? undefined
+            } else {
+                log.debug('ETag is the same; keeping old config')
+            }
         } catch (error) {
             log.info('Satellite config update failed')
             throw new RequestError('Error while fetching the satellite config')
