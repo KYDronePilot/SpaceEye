@@ -6,7 +6,13 @@ import Axios from 'axios'
 import electronLog from 'electron-log'
 import moment, { Moment } from 'moment'
 
-import { ImageSource, RootSatelliteConfig, Satellite, SatelliteView } from '../shared/config_types'
+import {
+    ImageSource,
+    RootSatelliteConfig,
+    Satellite,
+    SatelliteView,
+    version as configVersion
+} from '../shared/config_types'
 import { RequestError } from './errors'
 
 const log = electronLog.scope('satellite-config-store')
@@ -15,7 +21,7 @@ const log = electronLog.scope('satellite-config-store')
 const INVALIDATION_TIMEOUT = 900
 
 // URL to download the config
-const CONFIG_URL = 'https://spaceeye-satellite-configs.s3.us-east-2.amazonaws.com/1.1.0/config.json'
+const CONFIG_URL = `https://spaceeye-satellite-configs.s3.us-east-2.amazonaws.com/${configVersion}/config.json`
 
 // Async lock
 const lock = new AsyncLock()
@@ -37,6 +43,11 @@ export class SatelliteConfigStore {
      * ETag for currently downloaded config
      */
     etag?: string
+
+    /**
+     * Domains that should not be probed via HTTP HEAD requests before requesting.
+     */
+    dnsProbeOverrideDomains?: string[]
 
     public static get Instance(): SatelliteConfigStore {
         if (this.instance === undefined) {
@@ -62,6 +73,7 @@ export class SatelliteConfigStore {
                 log.debug('Setting new config; ETag has changed')
                 this.config = response.data
                 this.etag = response.headers.etag ?? undefined
+                this.dnsProbeOverrideDomains = this.config.dnsHttpProbeOverride
             } else {
                 log.debug('ETag is the same; keeping old config')
             }

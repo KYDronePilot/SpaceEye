@@ -5,6 +5,7 @@ import Url from 'url'
 import { promisify } from 'util'
 
 import { RequestError } from './errors'
+import { SatelliteConfigStore } from './satellite_config_store'
 import { formatAxiosError } from './utils'
 
 const asyncLookup = promisify(Dns.lookup)
@@ -20,6 +21,22 @@ const log = electronLog.scope('dns-handler')
  */
 export async function resolveDns(requestUrl: Url.URL, cancelToken?: CancelToken): Promise<string> {
     const addressInfo = await asyncLookup(requestUrl.hostname, { all: true })
+    // Probably won't ever happen, but just in case
+    if (addressInfo.length === 0) {
+        log.error(
+            'Unable to resolve',
+            requestUrl.hostname,
+            'to an address. Unexpected behavior may ensue.'
+        )
+    }
+    const configStore = SatelliteConfigStore.Instance
+    if (
+        configStore.dnsProbeOverrideDomains !== undefined &&
+        configStore.dnsProbeOverrideDomains.includes(requestUrl.hostname)
+    ) {
+        log.debug('Skipping DNS probing on', requestUrl.hostname)
+        return addressInfo[0].address
+    }
     return new Promise((resolve, reject) => {
         const probeCancelToken = Axios.CancelToken.source()
         let complete = false

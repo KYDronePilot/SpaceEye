@@ -12200,6 +12200,11 @@ space-eye-mac-node-api@^1.0.2:
   dependencies:
     node-addon-api "^3.0.0"
 
+space-eye-satellite-config@^1.1.2:
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/space-eye-satellite-config/-/space-eye-satellite-config-1.1.2.tgz#43302c4059a433c873c38a1c1731be155f27ffe9"
+  integrity sha512-46gCIJyeKBwdYloa6FP4Ze/GmFRWUZ8gpC5VwICriKW9YXQj2d2SJ4B8pgaENpTHUCkGWxdyhJOcikf7/Xewyg==
+
 space-eye-windows-node-api@^1.0.3:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/space-eye-windows-node-api/-/space-eye-windows-node-api-1.0.3.tgz#bb8c64a46d411273a72c81f2499f120129fb4eee"

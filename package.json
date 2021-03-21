@@ -140,6 +140,7 @@
         "simplebar-react": "^2.2.0",
         "space-eye-icons": "^0.3.0",
         "space-eye-mac-node-api": "^1.0.2",
+        "space-eye-satellite-config": "^1.1.2",
         "space-eye-windows-node-api": "^1.0.3",
         "styled-components": "^5.1.0"
     }
