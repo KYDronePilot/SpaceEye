@@ -43,11 +43,6 @@ const theme = createMuiTheme({
         primary: {
             main: '#5297ff'
         }
-    },
-    typography: {
-        allVariants: {
-            color: 'white'
-        }
     }
 })
 

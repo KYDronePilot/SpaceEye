@@ -8,8 +8,12 @@ import {
     Divider,
     FormControl,
     FormControlLabel,
+    FormHelperText,
+    FormLabel,
     Grid,
     Link,
+    Radio,
+    RadioGroup,
     Switch,
     Typography
 } from '@material-ui/core'
@@ -146,8 +150,8 @@ const SettingsSwitch: React.FC<SettingsSwitchProps> = props => {
                         color="primary"
                     />
                 }
-                label={label}
-                labelPlacement="top"
+                label={<Typography color="textPrimary">{label}</Typography>}
+                labelPlacement="end"
             />
         </FormControl>
     )
@@ -198,6 +202,32 @@ const AboutThisApp: React.FC<AboutThisAppProps> = props => {
     )
 }
 
+const MultiMonitorSetting: React.FC = () => {
+    return (
+        <FormControl component="fieldset">
+            <FormLabel component="legend" focused={false}>
+                Multi-Monitor Support
+            </FormLabel>
+            <RadioGroup row aria-label="position" name="position" defaultValue="unified">
+                <FormControlLabel
+                    value="unified"
+                    control={<Radio color="primary" />}
+                    label={<Typography color="textPrimary">Unified</Typography>}
+                />
+                <FormControlLabel
+                    value="independent"
+                    control={<Radio color="primary" />}
+                    label={<Typography color="textPrimary">Independent</Typography>}
+                />
+            </RadioGroup>
+            <FormHelperText>
+                Views are set on each monitor independently (open the SpaceEye app window on the
+                monitor you want to change)
+            </FormHelperText>
+        </FormControl>
+    )
+}
+
 interface SettingsProps {
     onClickBack: () => void
     onClickQuit: () => void
@@ -229,7 +259,9 @@ const Settings: React.FC<SettingsProps> = props => {
                 <SectionsColumn>
                     <Box my={1} />
                     <Grid container direction="row" justify="center">
-                        <Typography variant="h5">SpaceEye</Typography>
+                        <Typography variant="h5" color="textPrimary">
+                            SpaceEye
+                        </Typography>
                     </Grid>
                     <Box my={1} />
                     <Grid container direction="row" justify="center">
@@ -258,26 +290,38 @@ const Settings: React.FC<SettingsProps> = props => {
             <SettingsColumn>
                 <Box my={2} />
                 <Grid container direction="row" justify="center">
-                    <Typography variant="h6">Settings</Typography>
+                    <Typography variant="h6" color="textPrimary">
+                        Settings
+                    </Typography>
                 </Grid>
                 <Box my={2} mx={1}>
                     <Divider variant="fullWidth" />
                 </Box>
-                <Grid container direction="column" justify="flex-start" alignContent="flex-start">
-                    <SettingsSwitch
-                        isChecked={shouldStartOnLogin}
-                        onChange={onClickStartOnLoginSwitch}
-                        label="Start on Login"
-                    />
-                    {/* Don't show auto-update option if downloaded from an app store */}
-                    {!process.mas && !process.windowsStore && (
+                <Box mx={2}>
+                    <Grid
+                        container
+                        direction="column"
+                        justify="flex-start"
+                        alignContent="flex-start"
+                    >
                         <SettingsSwitch
-                            isChecked={autoUpdate}
-                            onChange={onClickAutoUpdateSwitch}
-                            label="Auto update"
+                            isChecked={shouldStartOnLogin}
+                            onChange={onClickStartOnLoginSwitch}
+                            label="Start on Login"
                         />
-                    )}
-                </Grid>
+                        {/* Don't show auto-update option if downloaded from an app store */}
+                        {!process.mas && !process.windowsStore && (
+                            <SettingsSwitch
+                                isChecked={autoUpdate}
+                                onChange={onClickAutoUpdateSwitch}
+                                label="Auto update"
+                            />
+                        )}
+                        <Box my={2}>
+                            <MultiMonitorSetting />
+                        </Box>
+                    </Grid>
+                </Box>
             </SettingsColumn>
             <AboutThisApp onClickDone={closeAboutApp} visible={aboutAppVisible} />
         </SettingsContainer>
