@@ -31,7 +31,7 @@ import {
     QUIT_APPLICATION_CHANNEL,
     SET_AUTO_UPDATE,
     SET_START_ON_LOGIN
-} from '../../shared/IpcDefinitions'
+} from '../../../shared/IpcDefinitions'
 
 const SectionsContainer = styled.div`
     display: flex;

@@ -18,7 +18,7 @@ import { GET_FIRST_RUN, SET_FIRST_RUN } from '../../shared/IpcDefinitions'
 import { DarkTheme } from '../themes'
 import HeaderBar from './HeaderBar'
 import OnboardingHOC from './onboarding'
-import Settings from './Settings'
+import Settings from './settings'
 import ThumbnailManager from './ThumbnailManager'
 
 const Container = styled.div`
