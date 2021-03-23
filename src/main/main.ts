@@ -10,6 +10,7 @@ import net from 'net'
 import * as path from 'path'
 import * as url from 'url'
 
+import { MultiMonitorMode } from '../shared'
 import { RootSatelliteConfig } from '../shared/config_types'
 import {
     DOWNLOAD_THUMBNAIL_CHANNEL,
@@ -17,12 +18,14 @@ import {
     GET_AUTO_UPDATE,
     GET_CURRENT_VIEW_CHANNEL,
     GET_FIRST_RUN,
+    GET_MULTI_MONITOR_MODE,
     GET_SATELLITE_CONFIG_CHANNEL,
     GET_START_ON_LOGIN,
     OPEN_WINDOWS_ICON_SETTINGS,
     QUIT_APPLICATION_CHANNEL,
     SET_AUTO_UPDATE,
     SET_FIRST_RUN,
+    SET_MULTI_MONITOR_MODE,
     SET_START_ON_LOGIN,
     SET_WALLPAPER_CHANNEL,
     VISIBILITY_CHANGE_ALERT_CHANNEL
@@ -370,6 +373,14 @@ ipc.answerRenderer<void, boolean>(GET_AUTO_UPDATE, () => {
 
 ipc.answerRenderer<boolean>(SET_AUTO_UPDATE, autoUpdate => {
     AppConfigStore.autoUpdate = autoUpdate
+})
+
+ipc.answerRenderer<void, MultiMonitorMode>(GET_MULTI_MONITOR_MODE, () => {
+    return AppConfigStore.multiMonitorMode
+})
+
+ipc.answerRenderer<MultiMonitorMode>(SET_MULTI_MONITOR_MODE, multiMonitorMode => {
+    AppConfigStore.multiMonitorMode = multiMonitorMode
 })
 
 ipc.answerRenderer(OPEN_WINDOWS_ICON_SETTINGS, () => {

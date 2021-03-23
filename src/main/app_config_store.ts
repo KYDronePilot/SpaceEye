@@ -5,12 +5,15 @@
 import electronLog from 'electron-log'
 import Store from 'electron-store'
 
+import { MultiMonitorMode } from '../shared'
+
 const log = electronLog.scope('app-config-store')
 
 const CURRENT_VIEW_ID_KEY = 'CURRENT_VIEW_ID'
 const START_ON_LOGIN_KEY = 'START_ON_LOGIN'
 const FIRST_RUN_KEY = 'FIRST_RUN'
 const AUTO_UPDATE_KEY = 'AUTO_UPDATE'
+const MULTI_MONITOR_MODE_KEY = 'MULTI_MONITOR_MODE'
 
 export class AppConfigStore {
     private static store = new Store()
@@ -57,5 +60,19 @@ export class AppConfigStore {
     public static set autoUpdate(value: boolean) {
         log.debug('Setting auto update to:', value)
         AppConfigStore.store.set(AUTO_UPDATE_KEY, value)
+    }
+
+    public static get multiMonitorMode(): MultiMonitorMode {
+        const multiMonitorMode = AppConfigStore.store.get(
+            MULTI_MONITOR_MODE_KEY,
+            MultiMonitorMode.unified
+        ) as MultiMonitorMode
+        log.debug('Multi-monitor mode retrieved:', multiMonitorMode)
+        return multiMonitorMode
+    }
+
+    public static set multiMonitorMode(value: MultiMonitorMode) {
+        log.debug('Setting multi-monitor mode to:', value)
+        AppConfigStore.store.set(MULTI_MONITOR_MODE_KEY, value)
     }
 }

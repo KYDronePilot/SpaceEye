@@ -8,12 +8,8 @@ import {
     Divider,
     FormControl,
     FormControlLabel,
-    FormHelperText,
-    FormLabel,
     Grid,
     Link,
-    Radio,
-    RadioGroup,
     Switch,
     Typography
 } from '@material-ui/core'
@@ -25,13 +21,17 @@ import { Redirect } from 'react-router-dom'
 import infoIcon from 'space-eye-icons/dist/info_app.png'
 import styled from 'styled-components'
 
+import { MultiMonitorMode } from '../../../shared'
 import {
     GET_AUTO_UPDATE,
+    GET_MULTI_MONITOR_MODE,
     GET_START_ON_LOGIN,
     QUIT_APPLICATION_CHANNEL,
     SET_AUTO_UPDATE,
+    SET_MULTI_MONITOR_MODE,
     SET_START_ON_LOGIN
 } from '../../../shared/IpcDefinitions'
+import { MultiMonitorSetting } from './MultiMonitor'
 
 const SectionsContainer = styled.div`
     display: flex;
@@ -202,41 +202,17 @@ const AboutThisApp: React.FC<AboutThisAppProps> = props => {
     )
 }
 
-const MultiMonitorSetting: React.FC = () => {
-    return (
-        <FormControl component="fieldset">
-            <FormLabel component="legend" focused={false}>
-                Multi-Monitor Support
-            </FormLabel>
-            <RadioGroup row aria-label="position" name="position" defaultValue="unified">
-                <FormControlLabel
-                    value="unified"
-                    control={<Radio color="primary" />}
-                    label={<Typography color="textPrimary">Unified</Typography>}
-                />
-                <FormControlLabel
-                    value="independent"
-                    control={<Radio color="primary" />}
-                    label={<Typography color="textPrimary">Independent</Typography>}
-                />
-            </RadioGroup>
-            <FormHelperText>
-                Views are set on each monitor independently (open the SpaceEye app window on the
-                monitor you want to change)
-            </FormHelperText>
-        </FormControl>
-    )
-}
-
 interface SettingsProps {
     onClickBack: () => void
     onClickQuit: () => void
     onClickStartOnLoginSwitch: (shouldStart: boolean) => void
     onClickAutoUpdateSwitch: (autoUpdate: boolean) => void
+    onClickMultiMonitorMode: (multiMonitorMode: MultiMonitorMode) => void
     openAboutApp: () => void
     closeAboutApp: () => void
     shouldStartOnLogin: boolean
     autoUpdate: boolean
+    multiMonitorMode: MultiMonitorMode
     aboutAppVisible: boolean
 }
 
@@ -246,10 +222,12 @@ const Settings: React.FC<SettingsProps> = props => {
         onClickQuit,
         onClickStartOnLoginSwitch,
         onClickAutoUpdateSwitch,
+        onClickMultiMonitorMode,
         openAboutApp,
         closeAboutApp,
         shouldStartOnLogin,
         autoUpdate,
+        multiMonitorMode,
         aboutAppVisible
     } = props
 
@@ -318,7 +296,10 @@ const Settings: React.FC<SettingsProps> = props => {
                             />
                         )}
                         <Box my={2}>
-                            <MultiMonitorSetting />
+                            <MultiMonitorSetting
+                                mode={multiMonitorMode}
+                                onChange={onClickMultiMonitorMode}
+                            />
                         </Box>
                     </Grid>
                 </Box>
@@ -334,6 +315,7 @@ interface SettingsManagerState {
     autoUpdate: boolean
     isLoaded: boolean
     aboutAppVisible: boolean
+    multiMonitorMode?: MultiMonitorMode
 }
 
 export default class SettingsManager extends React.Component<{}, SettingsManagerState> {
@@ -349,22 +331,26 @@ export default class SettingsManager extends React.Component<{}, SettingsManager
             startOnLogin: false,
             autoUpdate: false,
             isLoaded: false,
-            aboutAppVisible: false
+            aboutAppVisible: false,
+            multiMonitorMode: undefined
         }
 
         this.onChangeStartOnLogin = this.onChangeStartOnLogin.bind(this)
         this.onChangeAutoUpdate = this.onChangeAutoUpdate.bind(this)
         this.onClickBack = this.onClickBack.bind(this)
+        this.onChangeMultiMonitorMode = this.onChangeMultiMonitorMode.bind(this)
     }
 
     async componentDidMount(): Promise<void> {
-        const [startOnLogin, autoUpdate] = await Promise.all([
+        const [startOnLogin, autoUpdate, multiMonitorMode] = await Promise.all([
             ipc.callMain<void, boolean | undefined>(GET_START_ON_LOGIN),
-            ipc.callMain<void, boolean>(GET_AUTO_UPDATE)
+            ipc.callMain<void, boolean>(GET_AUTO_UPDATE),
+            ipc.callMain<void, MultiMonitorMode>(GET_MULTI_MONITOR_MODE)
         ])
         this.setState({
             startOnLogin: startOnLogin ?? false,
             autoUpdate,
+            multiMonitorMode,
             isLoaded: true
         })
     }
@@ -377,6 +363,11 @@ export default class SettingsManager extends React.Component<{}, SettingsManager
     private async onChangeAutoUpdate(autoUpdate: boolean) {
         this.setState({ autoUpdate })
         await ipc.callMain<boolean>(SET_AUTO_UPDATE, autoUpdate)
+    }
+
+    private async onChangeMultiMonitorMode(multiMonitorMode: MultiMonitorMode) {
+        this.setState({ multiMonitorMode })
+        await ipc.callMain<MultiMonitorMode>(SET_MULTI_MONITOR_MODE, multiMonitorMode)
     }
 
     private onClickBack() {
@@ -395,10 +386,12 @@ export default class SettingsManager extends React.Component<{}, SettingsManager
                 onClickBack={this.onClickBack}
                 onClickStartOnLoginSwitch={this.onChangeStartOnLogin}
                 onClickAutoUpdateSwitch={this.onChangeAutoUpdate}
+                onClickMultiMonitorMode={this.onChangeMultiMonitorMode}
                 openAboutApp={() => this.setState({ aboutAppVisible: true })}
                 closeAboutApp={() => this.setState({ aboutAppVisible: false })}
                 shouldStartOnLogin={this.state.startOnLogin}
                 autoUpdate={this.state.autoUpdate}
+                multiMonitorMode={this.state.multiMonitorMode ?? MultiMonitorMode.unified}
                 onClickQuit={SettingsManager.onClickQuit}
                 aboutAppVisible={this.state.aboutAppVisible}
             />
