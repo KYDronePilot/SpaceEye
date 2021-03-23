@@ -13,7 +13,7 @@ import {
     DownloadThumbnailIpcResponse,
     VIEW_DOWNLOAD_PROGRESS,
     VISIBILITY_CHANGE_ALERT_CHANNEL
-} from '../../shared/IpcDefinitions'
+} from '../../../shared/IpcDefinitions'
 
 ipcRenderer.setMaxListeners(30)
 const log = electronLog.scope('thumbnail-component')

@@ -4,15 +4,15 @@ import * as React from 'react'
 import { ReactNode } from 'react'
 import styled from 'styled-components'
 
-import { RootSatelliteConfig } from '../../shared/config_types'
+import { RootSatelliteConfig } from '../../../shared/config_types'
 import {
     GET_CURRENT_VIEW_CHANNEL,
     GET_SATELLITE_CONFIG_CHANNEL,
     SET_WALLPAPER_CHANNEL,
     VISIBILITY_CHANGE_ALERT_CHANNEL
-} from '../../shared/IpcDefinitions'
+} from '../../../shared/IpcDefinitions'
+import { ThumbnailsContainer } from '../ThumbnailsContainer'
 import Thumbnail from './Thumbnail'
-import { ThumbnailsContainer } from './ThumbnailsContainer'
 
 /**
  * Information about a thumbnail to display.

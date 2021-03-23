@@ -19,7 +19,7 @@ import { DarkTheme } from '../themes'
 import HeaderBar from './HeaderBar'
 import OnboardingHOC from './onboarding'
 import Settings from './Settings'
-import ThumbnailManager from './ThumbnailManager'
+import ThumbnailManager from './thumbnail/ThumbnailManager'
 
 const Container = styled.div`
     --header-height: 50px;
