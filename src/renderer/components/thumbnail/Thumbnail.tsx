@@ -14,6 +14,7 @@ import {
     VIEW_DOWNLOAD_PROGRESS,
     VISIBILITY_CHANGE_ALERT_CHANNEL
 } from '../../../shared/IpcDefinitions'
+import StatusIconAndDialog from './StatusIcon'
 
 ipcRenderer.setMaxListeners(30)
 const log = electronLog.scope('thumbnail-component')
@@ -165,6 +166,7 @@ interface ThumbnailProps {
     id: number
     src: string
     name: string
+    description?: string
     isSelected: (id: number) => boolean
     onClick: (id: number) => void
 }
@@ -276,13 +278,21 @@ export default class Thumbnail extends React.Component<ThumbnailProps, Thumbnail
     }
 
     public render(): React.ReactNode {
-        const { id, name, isSelected, onClick } = this.props
+        const { id, name, description, isSelected, onClick } = this.props
         const isSelectedValue = isSelected(id)
 
         return (
             <ThumbnailContainer isSelected={isSelectedValue}>
                 <ImageContainerBackground isSelected={isSelectedValue}>
                     <ImageContainer isSelected={isSelectedValue} onClick={() => onClick(id)}>
+                        <StatusIconAndDialog
+                            viewTitle={name}
+                            viewDescription={description}
+                            updateInterval={900}
+                            downloaded={moment.utc().subtract(12, 'm')}
+                            imageTaken={moment.utc().subtract(27, 'm')}
+                            isBackup={false}
+                        />
                         <ImageSwitcher
                             src={this.state.b64Image ?? ''}
                             loadingState={this.state.loadingState}

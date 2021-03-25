@@ -22,6 +22,7 @@ interface ThumbnailInformation {
     viewId: number
     imageId: number
     name: string
+    description?: string
     url: string
     dimensions: [number, number]
 }
@@ -106,6 +107,7 @@ export default class ThumbnailManager extends React.Component<
                             viewId: view.id,
                             imageId: imageSource.id,
                             name: `${satellite.name} - ${view.name}`,
+                            description: view.description,
                             url: imageSource.url,
                             dimensions: imageSource.dimensions
                         })
@@ -161,6 +163,7 @@ export default class ThumbnailManager extends React.Component<
                         id={image.viewId}
                         src={image.url}
                         name={image.name}
+                        description={image.description}
                         isSelected={(id: number) => id === this.state.selectedId}
                         onClick={(id: number) => this.onSelectImage(id)}
                         key={image.viewId}
