@@ -12201,9 +12201,9 @@ space-eye-mac-node-api@^1.0.2:
     node-addon-api "^3.0.0"
 
 space-eye-satellite-config@^1.1.2:
-  version "1.1.2"
-  resolved "https://registry.yarnpkg.com/space-eye-satellite-config/-/space-eye-satellite-config-1.1.2.tgz#43302c4059a433c873c38a1c1731be155f27ffe9"
-  integrity sha512-46gCIJyeKBwdYloa6FP4Ze/GmFRWUZ8gpC5VwICriKW9YXQj2d2SJ4B8pgaENpTHUCkGWxdyhJOcikf7/Xewyg==
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/space-eye-satellite-config/-/space-eye-satellite-config-1.2.0.tgz#9c14babd4093df8ebb8a6913a3d0f260f340c954"
+  integrity sha512-TnrusyhFRDIkLGxgeYC8/svGdBsW2Fj6f17NrcbGZ8CtAwICLJRhy8YC1eJWzuzT87dAG4LrAyxHK3zDlvtt9w==
 
 space-eye-windows-node-api@^1.0.3:
   version "1.0.3"
