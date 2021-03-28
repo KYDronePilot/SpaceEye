@@ -19,6 +19,7 @@ import {
     GET_FIRST_RUN,
     GET_SATELLITE_CONFIG_CHANNEL,
     GET_START_ON_LOGIN,
+    GET_VIEW_DOWNLOAD_TIME,
     OPEN_WINDOWS_ICON_SETTINGS,
     QUIT_APPLICATION_CHANNEL,
     SET_AUTO_UPDATE,
@@ -34,7 +35,7 @@ import { SatelliteConfigStore } from './satellite_config_store'
 import { Initiator } from './update_lock'
 import { setWindowVisibility, startUpdateChecking } from './updater'
 import { formatAxiosError } from './utils'
-import { WallpaperManager } from './wallpaper_manager'
+import { latestViewDownloadTimes, WallpaperManager } from './wallpaper_manager'
 
 const HEARTBEAT_INTERVAL = 60000
 let heartbeatHandle: number
@@ -460,6 +461,11 @@ ipc.answerRenderer(OPEN_WINDOWS_ICON_SETTINGS, () => {
     command.on('exit', code => {
         log.info('Windows icon settings cmd exited with:', code)
     })
+})
+
+ipc.answerRenderer<number, number | undefined>(GET_VIEW_DOWNLOAD_TIME, viewId => {
+    log.info('Getting latest download time for view', viewId)
+    return latestViewDownloadTimes[viewId]
 })
 
 if (process.platform === 'darwin') {

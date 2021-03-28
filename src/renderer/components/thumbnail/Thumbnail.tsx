@@ -11,6 +11,7 @@ import styled from 'styled-components'
 import { DownloadedThumbnailIpc, DownloadThumbnailIpcRequest } from '../../../shared'
 import {
     DOWNLOAD_THUMBNAIL_CHANNEL,
+    GET_VIEW_DOWNLOAD_TIME,
     VIEW_DOWNLOAD_PROGRESS,
     VISIBILITY_CHANGE_ALERT_CHANNEL
 } from '../../../shared/IpcDefinitions'
@@ -179,6 +180,7 @@ interface ThumbnailState {
     b64Image?: string
     isBackup?: boolean
     timeTaken?: Moment
+    timeDownloaded?: Moment
     loadingState: ThumbnailLoadingState
     cancelVisibilityChangeSub?: () => void
     cancelProgressChangeSub?: () => void
@@ -197,6 +199,7 @@ export default class Thumbnail extends React.Component<ThumbnailProps, Thumbnail
 
         this.updateUnsafe = this.updateUnsafe.bind(this)
         this.update = this.update.bind(this)
+        this.updateTimeDownloaded = this.updateTimeDownloaded.bind(this)
     }
 
     async componentDidMount(): Promise<void> {
@@ -234,6 +237,19 @@ export default class Thumbnail extends React.Component<ThumbnailProps, Thumbnail
         }
         if (this.state.cancelProgressChangeSub !== undefined) {
             this.state.cancelProgressChangeSub()
+        }
+    }
+
+    /**
+     * Update the time the image was last downloaded from main.
+     */
+    private async updateTimeDownloaded(): Promise<void> {
+        const timeDownloaded = await ipc.callMain<number, number | undefined>(
+            GET_VIEW_DOWNLOAD_TIME,
+            this.props.id
+        )
+        if (timeDownloaded !== undefined) {
+            this.setState({ timeDownloaded: moment(timeDownloaded) })
         }
     }
 
@@ -316,10 +332,11 @@ export default class Thumbnail extends React.Component<ThumbnailProps, Thumbnail
                             viewTitle={name}
                             viewDescription={description}
                             updateInterval={this.props.updateInterval}
-                            // downloaded={moment.utc().subtract(12, 'm')}
+                            downloaded={this.state.timeDownloaded}
                             imageTaken={this.state.timeTaken}
                             isBackup={this.state.isBackup}
                             failed={this.state.loadingState === ThumbnailLoadingState.failed}
+                            onHover={this.updateTimeDownloaded}
                         />
                         <ImageSwitcher
                             src={this.state.b64Image ?? ''}

@@ -37,6 +37,8 @@ if (process.platform === 'darwin') {
     wallpaperInterface = new WindowsWallpaperInterface()
 }
 
+export const latestViewDownloadTimes: { [key: number]: number | undefined } = {}
+
 export class WallpaperManager {
     private static instance?: WallpaperManager
 
@@ -207,6 +209,7 @@ export class WallpaperManager {
                 throw new LockInvalidatedError()
             }
         }
+        latestViewDownloadTimes[viewId] = imageToSet.timestamp.valueOf()
         // Make sure the monitor config hasn't changed
         const newMonitors = WallpaperManager.getMonitors()
         if (WallpaperManager.haveMonitorsChanged(monitors, newMonitors)) {

@@ -158,6 +158,7 @@ interface StatusProps {
     imageTaken?: Moment
     updateInterval: number
     failed?: boolean
+    onHover: () => void
 }
 
 /**
@@ -216,7 +217,8 @@ export default class StatusIconAndDialog extends React.Component<StatusProps, St
             downloaded,
             imageTaken,
             updateInterval,
-            failed
+            failed,
+            onHover
         } = this.props
         let status: StatusType
         if (failed === true) {
@@ -249,7 +251,10 @@ export default class StatusIconAndDialog extends React.Component<StatusProps, St
                         onClick={event => {
                             event.stopPropagation()
                             this.setState(state => ({ visible: !state.visible }))
+                            onHover()
                         }}
+                        onMouseOver={() => onHover()}
+                        onFocus={() => undefined}
                         color={StatusToColor[status]}
                     />
                 </StatusTooltip>
