@@ -133,13 +133,21 @@ const StatusDialog: React.FC<StatusDialogProps> = props => {
 
 enum StatusType {
     upToDate = 'Up to date',
-    backup = 'Backup mode'
+    backup = 'Backup mode',
+    failed = 'Failed'
+}
+
+const StatusToColor = {
+    [StatusType.upToDate]: Color.green,
+    [StatusType.backup]: Color.yellow,
+    [StatusType.failed]: Color.red
 }
 
 const statusExplanations = {
     [StatusType.upToDate]: undefined,
     [StatusType.backup]:
-        'A live image is not available right now, so one from a previous day is being shown instead.'
+        'A live image is not available right now, so one from a previous day is being shown instead.',
+    [StatusType.failed]: 'Failed to download the thumbnail for this view.'
 }
 
 interface StatusProps {
@@ -149,6 +157,7 @@ interface StatusProps {
     downloaded?: Moment
     imageTaken?: Moment
     updateInterval: number
+    failed?: boolean
 }
 
 /**
@@ -156,13 +165,18 @@ interface StatusProps {
  * @param downloaded
  * @param imageTaken
  * @param updateInterval
+ * @param failed
  */
 function statusSummary(
     updateInterval: number,
     isBackup?: boolean,
     downloaded?: Moment,
-    imageTaken?: Moment
+    imageTaken?: Moment,
+    failed?: boolean
 ): string {
+    if (failed === true) {
+        return 'Failed to update view'
+    }
     if (isBackup === undefined) {
         if (downloaded !== undefined) {
             return `Downloaded ${downloaded.fromNow()}`
@@ -201,16 +215,28 @@ export default class StatusIconAndDialog extends React.Component<StatusProps, St
             isBackup,
             downloaded,
             imageTaken,
-            updateInterval
+            updateInterval,
+            failed
         } = this.props
-        const status = isBackup === true ? StatusType.backup : StatusType.upToDate
+        let status: StatusType
+        if (failed === true) {
+            status = StatusType.failed
+        } else {
+            status = isBackup === true ? StatusType.backup : StatusType.upToDate
+        }
         return (
             <>
                 <StatusTooltip
                     title={
                         <div>
                             <Typography variant="caption">
-                                {statusSummary(updateInterval, isBackup, downloaded, imageTaken)}
+                                {statusSummary(
+                                    updateInterval,
+                                    isBackup,
+                                    downloaded,
+                                    imageTaken,
+                                    failed
+                                )}
                             </Typography>
                             <br />
                             <Typography variant="caption">Click for more info</Typography>
@@ -224,7 +250,7 @@ export default class StatusIconAndDialog extends React.Component<StatusProps, St
                             event.stopPropagation()
                             this.setState(state => ({ visible: !state.visible }))
                         }}
-                        color={status === StatusType.upToDate ? Color.green : Color.yellow}
+                        color={StatusToColor[status]}
                     />
                 </StatusTooltip>
                 <StatusDialog

@@ -10,10 +10,10 @@ import net from 'net'
 import * as path from 'path'
 import * as url from 'url'
 
+import { DownloadedThumbnailIpc, DownloadThumbnailIpcRequest } from '../shared'
 import { RootSatelliteConfig } from '../shared/config_types'
 import {
     DOWNLOAD_THUMBNAIL_CHANNEL,
-    DownloadThumbnailIpcResponse,
     GET_AUTO_UPDATE,
     GET_CURRENT_VIEW_CHANNEL,
     GET_FIRST_RUN,
@@ -384,26 +384,36 @@ ipc.answerRenderer<void, number | undefined>(GET_CURRENT_VIEW_CHANNEL, () => {
     return AppConfigStore.currentViewId
 })
 
-ipc.answerRenderer<string, DownloadThumbnailIpcResponse>(
+ipc.answerRenderer<DownloadThumbnailIpcRequest, DownloadedThumbnailIpc>(
     DOWNLOAD_THUMBNAIL_CHANNEL,
-    async thumbnailUrl => {
+    async request => {
         log.info('Download thumbnail request received')
         let webResponse
         try {
-            webResponse = await Axios.get(thumbnailUrl, { responseType: 'arraybuffer' })
+            webResponse = await Axios.get(request.url, {
+                responseType: 'arraybuffer',
+                headers: { 'If-None-Match': request.etag ?? '' },
+                validateStatus: status => (status >= 200 && status < 300) || status === 304
+            })
         } catch (error) {
             log.error('Error while downloading thumbnail:', formatAxiosError(error))
-            return {
-                dataUrl: undefined
-            }
+            return {}
+        }
+        if (webResponse.status === 304) {
+            return { isModified: false }
         }
         const b64Image = Buffer.from(webResponse.data, 'binary').toString('base64')
         const contentType = webResponse.headers['content-type'] ?? 'image/jpeg'
+        let timeTaken: number | undefined
+        if (webResponse.headers['x-amz-meta-time-image-taken'] !== undefined) {
+            timeTaken = moment.utc(webResponse.headers['x-amz-meta-time-image-taken']).valueOf()
+        }
         return {
+            isModified: true,
             dataUrl: `data:${contentType};base64,${b64Image}`,
-            expiration: moment(
-                webResponse.headers.expires ?? moment.utc().add(10, 'minutes')
-            ).valueOf()
+            isBackup: webResponse.headers['x-amz-meta-is-backup'] ?? undefined,
+            timeTaken,
+            etag: webResponse.headers.etag ?? undefined
         }
     }
 )
