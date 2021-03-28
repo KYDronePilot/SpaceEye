@@ -59,6 +59,7 @@ const PropertyTable = styled.table`
 `
 
 const KeyTd = styled.td`
+    white-space: nowrap;
     text-align: right;
     padding-right: 3px;
     vertical-align: top;

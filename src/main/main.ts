@@ -10,7 +10,7 @@ import net from 'net'
 import * as path from 'path'
 import * as url from 'url'
 
-import { DownloadedThumbnailIpc, DownloadThumbnailIpcRequest } from '../shared'
+import { DownloadedThumbnailIpc, DownloadThumbnailIpcRequest, toBoolean } from '../shared'
 import { RootSatelliteConfig } from '../shared/config_types'
 import {
     DOWNLOAD_THUMBNAIL_CHANNEL,
@@ -412,7 +412,7 @@ ipc.answerRenderer<DownloadThumbnailIpcRequest, DownloadedThumbnailIpc>(
         return {
             isModified: true,
             dataUrl: `data:${contentType};base64,${b64Image}`,
-            isBackup: webResponse.headers['x-amz-meta-is-backup'] ?? undefined,
+            isBackup: toBoolean(webResponse.headers['x-amz-meta-is-backup'] ?? ''),
             timeTaken,
             etag: webResponse.headers.etag ?? undefined
         }
