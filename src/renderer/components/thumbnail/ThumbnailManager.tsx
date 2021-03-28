@@ -23,6 +23,7 @@ interface ThumbnailInformation {
     imageId: number
     name: string
     description?: string
+    updateInterval: number
     url: string
     dimensions: [number, number]
 }
@@ -108,6 +109,7 @@ export default class ThumbnailManager extends React.Component<
                             imageId: imageSource.id,
                             name: `${satellite.name} - ${view.name}`,
                             description: view.description,
+                            updateInterval: imageSource.updateInterval,
                             url: imageSource.url,
                             dimensions: imageSource.dimensions
                         })
@@ -164,6 +166,7 @@ export default class ThumbnailManager extends React.Component<
                         src={image.url}
                         name={image.name}
                         description={image.description}
+                        updateInterval={image.updateInterval}
                         isSelected={(id: number) => id === this.state.selectedId}
                         onClick={(id: number) => this.onSelectImage(id)}
                         key={image.viewId}

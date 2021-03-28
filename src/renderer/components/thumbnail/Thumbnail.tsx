@@ -170,6 +170,7 @@ interface ThumbnailProps {
     src: string
     name: string
     description?: string
+    updateInterval: number
     isSelected: (id: number) => boolean
     onClick: (id: number) => void
 }
@@ -314,7 +315,7 @@ export default class Thumbnail extends React.Component<ThumbnailProps, Thumbnail
                         <StatusIconAndDialog
                             viewTitle={name}
                             viewDescription={description}
-                            updateInterval={900}
+                            updateInterval={this.props.updateInterval}
                             // downloaded={moment.utc().subtract(12, 'm')}
                             imageTaken={this.state.timeTaken}
                             isBackup={this.state.isBackup}
