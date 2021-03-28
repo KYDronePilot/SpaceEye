@@ -160,7 +160,7 @@ interface CachedImage {
     dataUrl: string
     expiration: Moment
     isBackup?: boolean
-    timeTaken?: number
+    timeTaken?: Moment
     etag?: string
 }
 
@@ -266,7 +266,7 @@ export default class Thumbnail extends React.Component<ThumbnailProps, Thumbnail
                     loadingState: ThumbnailLoadingState.loaded,
                     b64Image: cachedImage.dataUrl,
                     isBackup: cachedImage.isBackup,
-                    timeTaken: moment(cachedImage.timeTaken)
+                    timeTaken: cachedImage.timeTaken
                 })
             } else {
                 // Set the loading animation
@@ -296,18 +296,20 @@ export default class Thumbnail extends React.Component<ThumbnailProps, Thumbnail
             return
         }
         // Update cache and state
+        const momentTaken =
+            response.timeTaken !== undefined ? moment(response.timeTaken) : undefined
         thumbnailCache[this.props.id] = {
             dataUrl: response.dataUrl,
             expiration: newExpiration,
             etag: response.etag,
             isBackup: response.isBackup,
-            timeTaken: response.timeTaken
+            timeTaken: momentTaken
         }
         this.setState({
             loadingState: ThumbnailLoadingState.loaded,
             b64Image: response.dataUrl,
             isBackup: response.isBackup,
-            timeTaken: moment(response.timeTaken)
+            timeTaken: momentTaken
         })
     }
 
