@@ -8,8 +8,9 @@ import {
     Typography,
     withStyles
 } from '@material-ui/core'
-import { Moment } from 'moment'
+import { Moment as MomentType } from 'moment'
 import * as React from 'react'
+import Moment from 'react-moment'
 import styled from 'styled-components'
 
 enum Color {
@@ -71,7 +72,7 @@ const ValueTd = styled.td`
 
 interface TableEntryProps {
     name: string
-    value: string
+    value: string | React.ReactNode
     explanation?: string
 }
 
@@ -154,8 +155,8 @@ interface StatusProps {
     viewTitle: string
     viewDescription?: string
     isBackup?: boolean
-    downloaded?: Moment
-    imageTaken?: Moment
+    downloaded?: MomentType
+    imageTaken?: MomentType
     updateInterval: number
     failed?: boolean
     onHover: () => void
@@ -171,8 +172,8 @@ interface StatusProps {
 function statusSummary(
     updateInterval: number,
     isBackup?: boolean,
-    downloaded?: Moment,
-    imageTaken?: Moment,
+    downloaded?: MomentType,
+    imageTaken?: MomentType,
     failed?: boolean
 ): string {
     if (failed === true) {
@@ -273,10 +274,16 @@ export default class StatusIconAndDialog extends React.Component<StatusProps, St
                         explanation={statusExplanations[status]}
                     />
                     {downloaded !== undefined && (
-                        <TableEntry name="Image downloaded" value={downloaded.fromNow()} />
+                        <TableEntry
+                            name="Image downloaded"
+                            value={<Moment date={downloaded} fromNow />}
+                        />
                     )}
                     {imageTaken !== undefined && (
-                        <TableEntry name="Image taken" value={imageTaken.fromNow()} />
+                        <TableEntry
+                            name="Image taken"
+                            value={<Moment date={imageTaken} fromNow />}
+                        />
                     )}
                     <TableEntry
                         name="Updates every"
