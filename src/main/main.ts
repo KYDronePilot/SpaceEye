@@ -86,12 +86,68 @@ const index = url.format({
 // Initial window positioning (subject to change on Windows depending on taskbar location)
 const windowPosition = process.platform === 'darwin' ? 'trayRight' : 'trayBottomRight'
 
+const ICONS_DIR = path.join(__dirname, 'icons')
+const MAC_TOOLBAR_ICON_PATH = path.join(ICONS_DIR, 'MacToolbarTemplate.png')
+const WINDOWS_TOOLBAR_ICON_PATH = path.join(ICONS_DIR, 'windows_toolbar.ico')
+const WINDOWS_TOOLBAR_LIGHT_ICON_PATH = path.join(ICONS_DIR, 'windows_toolbar_light.ico')
+
 // Use ICO file for Windows
-const toolbarIconPath = path.join(
-    __dirname,
-    'icons',
-    process.platform === 'win32' ? 'windows_toolbar.ico' : 'MacToolbarTemplate.png'
-)
+let toolbarIconPath =
+    process.platform === 'win32' ? WINDOWS_TOOLBAR_ICON_PATH : MAC_TOOLBAR_ICON_PATH
+
+/**
+ * Set the toolbar icon to the path if not already set.
+ *
+ * @param newIconPath - Path to the new icon
+ */
+function setToolbarIcon(newIconPath: string) {
+    if (toolbarIconPath !== newIconPath) {
+        log.info('Updating toolbar icon path to:', newIconPath)
+        toolbarIconPath = newIconPath
+        mb.tray.setImage(toolbarIconPath)
+    }
+}
+
+/**
+ * If on Window, check the taskbar theme and update the taskbar icon accordingly.
+ */
+function updateToolbarIcon() {
+    if (process.platform !== 'win32') {
+        return
+    }
+    // Get the registry value for whether the taskbar is set to light theme
+    const command = spawn('reg.exe', [
+        'query',
+        'HKCU\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize',
+        '/v',
+        'SystemUsesLightTheme'
+    ])
+    let stdout = ''
+    command.stdout.setEncoding('utf8')
+    command.stderr.setEncoding('utf8')
+
+    // Some debugging
+    command.stderr.on('data', data => {
+        log.warn('Windows taskbar update stderr:', data)
+    })
+    command.on('exit', code => {
+        log.debug('Windows taskbar update cmd exited with:', code)
+    })
+    // Accumulate stdout text
+    command.stdout.on('data', data => {
+        stdout += data
+    })
+    command.stdout.on('close', () => {
+        // Regex the key's value
+        const res = stdout.match(new RegExp('SystemUsesLightTheme\\s+REG_DWORD\\s+([^\\s]+)'))
+        // Determine the icon path that should be used
+        let newPath = WINDOWS_TOOLBAR_ICON_PATH
+        if (res && res.length >= 2 && res[1] === '0x1') {
+            newPath = WINDOWS_TOOLBAR_LIGHT_ICON_PATH
+        }
+        setToolbarIcon(newPath)
+    })
+}
 
 global.mb = menubar({
     index,
@@ -190,11 +246,13 @@ mb.on('after-create-window', () => {
     mb.on('hide', () => {
         visibilityChangeAlert(false)
         setWindowVisibility(false)
+        updateToolbarIcon()
     })
 
     mb.on('show', () => {
         visibilityChangeAlert(true)
         setWindowVisibility(true)
+        updateToolbarIcon()
 
         // If on Windows, make sure window position matches toolbar location
         if (process.platform === 'win32') {
@@ -213,6 +271,9 @@ mb.on('ready', () => {
     log.info('Menubar ready')
     // createWindow()
     heartbeatHandle = setInterval(heartbeat, HEARTBEAT_INTERVAL)
+
+    // Check if toolbar icon should be updated (Windows only)
+    updateToolbarIcon()
 
     // Display config change triggers update
     screen.on('display-added', async () => {

@@ -12188,10 +12188,10 @@ source-map@^0.7.3:
   resolved "https://registry.yarnpkg.com/source-map/-/source-map-0.7.3.tgz#5302f8169031735226544092e64981f751750383"
   integrity sha512-CkCj6giN3S+n9qrYiBTX5gystlENnRW5jZeNLHpe6aue+SrHcG5VYwujhW9s4dY31mEGsxBDrHR6oI69fTXsaQ==
 
-space-eye-icons@^0.3.0:
-  version "0.3.1"
-  resolved "https://registry.yarnpkg.com/space-eye-icons/-/space-eye-icons-0.3.1.tgz#03490d1d1af1d46fee5276576887d1d0c927647d"
-  integrity sha512-Qm/FOVFO0Wm0W+C+o6Ou/5nmAUg0rUEHFXcQakY8Cn0ojHlzNtF24XLVyeelO6qsHnzSstumM6OxBSy0feW8nQ==
+space-eye-icons@^0.4.0:
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/space-eye-icons/-/space-eye-icons-0.4.0.tgz#9d7349498aa21c75de892be76e935699c1002f1d"
+  integrity sha512-L6so7Lgh1T18i8b3Qtef27LZCSM99zvVJG/6gaOFghdCAbiOgelGjZ3TrLd5czaWoTMUAB6VjNoaXzaO1esijg==
 
 space-eye-mac-node-api@^1.0.2:
   version "1.0.2"

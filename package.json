@@ -138,7 +138,7 @@
         "react-dom": "^16.8.6",
         "react-router-dom": "^5.2.0",
         "simplebar-react": "^2.2.0",
-        "space-eye-icons": "^0.3.0",
+        "space-eye-icons": "^0.4.0",
         "space-eye-mac-node-api": "^1.0.2",
         "space-eye-satellite-config": "^1.1.2",
         "space-eye-windows-node-api": "^1.0.3",
