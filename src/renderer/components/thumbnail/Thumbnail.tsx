@@ -15,6 +15,7 @@ import {
     VIEW_DOWNLOAD_PROGRESS,
     VISIBILITY_CHANGE_ALERT_CHANNEL
 } from '../../../shared/IpcDefinitions'
+import ReloadButton from './ReloadButton'
 import StatusIconAndDialog from './StatusIcon'
 
 ipcRenderer.setMaxListeners(30)
@@ -64,6 +65,13 @@ const ImageContainerBackground = styled.div<IsSelectedStyleProps>`
     box-shadow: ${props => (props.isSelected ? '0 3px 20px rgba(0, 0, 0, 0.5)' : 'none')};
     transition: box-shadow var(--transition-time), background-color var(--transition-time);
     cursor: ${props => (props.isSelected ? 'default' : 'pointer')};
+    // Hide reload icon when not hovering
+    #reload-icon {
+        display: none;
+    }
+    &:hover #reload-icon {
+        display: block;
+    }
 `
 
 /**
@@ -340,6 +348,7 @@ export default class Thumbnail extends React.Component<ThumbnailProps, Thumbnail
                             failed={this.state.loadingState === ThumbnailLoadingState.failed}
                             onHover={this.updateTimeDownloaded}
                         />
+                        <ReloadButton onClick={() => undefined} />
                         <ImageSwitcher
                             src={this.state.b64Image ?? ''}
                             loadingState={this.state.loadingState}
