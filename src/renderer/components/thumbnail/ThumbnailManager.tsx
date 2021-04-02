@@ -8,6 +8,7 @@ import { RootSatelliteConfig } from '../../../shared/config_types'
 import {
     GET_CURRENT_VIEW_CHANNEL,
     GET_SATELLITE_CONFIG_CHANNEL,
+    RELOAD_VIEW,
     SET_WALLPAPER_CHANNEL,
     VISIBILITY_CHANGE_ALERT_CHANNEL
 } from '../../../shared/IpcDefinitions'
@@ -58,6 +59,7 @@ export default class ThumbnailManager extends React.Component<
         this.onSelectImage = this.onSelectImage.bind(this)
         this.getThumbnailInformation = this.getThumbnailInformation.bind(this)
         this.update = this.update.bind(this)
+        this.onReloadView = this.onReloadView.bind(this)
     }
 
     async componentDidMount(): Promise<void> {
@@ -87,6 +89,16 @@ export default class ThumbnailManager extends React.Component<
         }
         this.setState({ selectedId: viewId })
         await ipc.callMain<number, void>(SET_WALLPAPER_CHANNEL, viewId)
+    }
+
+    /**
+     * Reload the currently selected view.
+     */
+    async onReloadView(): Promise<void> {
+        if (this.state.selectedId === undefined) {
+            return
+        }
+        await ipc.callMain<number, void>(RELOAD_VIEW, this.state.selectedId)
     }
 
     /**
@@ -169,6 +181,7 @@ export default class ThumbnailManager extends React.Component<
                         updateInterval={image.updateInterval}
                         isSelected={(id: number) => id === this.state.selectedId}
                         onClick={(id: number) => this.onSelectImage(id)}
+                        onReloadView={() => this.onReloadView()}
                         key={image.viewId}
                     />
                 ))}

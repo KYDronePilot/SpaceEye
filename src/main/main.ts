@@ -22,6 +22,7 @@ import {
     GET_VIEW_DOWNLOAD_TIME,
     OPEN_WINDOWS_ICON_SETTINGS,
     QUIT_APPLICATION_CHANNEL,
+    RELOAD_VIEW,
     SET_AUTO_UPDATE,
     SET_FIRST_RUN,
     SET_START_ON_LOGIN,
@@ -378,6 +379,11 @@ ipc.answerRenderer<number, void>(SET_WALLPAPER_CHANNEL, async viewId => {
     log.info('Wallpaper set request received for view:', viewId)
     AppConfigStore.currentViewId = viewId
     await WallpaperManager.update(Initiator.user)
+})
+
+ipc.answerRenderer<number, void>(RELOAD_VIEW, async viewId => {
+    log.info('Reload request received for view:', viewId)
+    await WallpaperManager.update(Initiator.user, true)
 })
 
 ipc.answerRenderer<void, number | undefined>(GET_CURRENT_VIEW_CHANNEL, () => {

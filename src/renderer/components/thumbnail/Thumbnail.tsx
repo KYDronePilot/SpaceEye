@@ -182,6 +182,7 @@ interface ThumbnailProps {
     updateInterval: number
     isSelected: (id: number) => boolean
     onClick: (id: number) => void
+    onReloadView: () => void
 }
 
 interface ThumbnailState {
@@ -331,7 +332,7 @@ export default class Thumbnail extends React.Component<ThumbnailProps, Thumbnail
     }
 
     public render(): React.ReactNode {
-        const { id, name, description, isSelected, onClick } = this.props
+        const { id, name, description, isSelected, onClick, onReloadView } = this.props
         const isSelectedValue = isSelected(id)
 
         return (
@@ -348,7 +349,15 @@ export default class Thumbnail extends React.Component<ThumbnailProps, Thumbnail
                             failed={this.state.loadingState === ThumbnailLoadingState.failed}
                             onHover={this.updateTimeDownloaded}
                         />
-                        <ReloadButton onClick={() => undefined} />
+                        <ReloadButton
+                            onClick={() => {
+                                if (isSelectedValue) {
+                                    onReloadView()
+                                } else {
+                                    onClick(id)
+                                }
+                            }}
+                        />
                         <ImageSwitcher
                             src={this.state.b64Image ?? ''}
                             loadingState={this.state.loadingState}

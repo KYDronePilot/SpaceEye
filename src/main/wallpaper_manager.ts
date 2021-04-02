@@ -126,6 +126,7 @@ export class WallpaperManager {
      * Non-error catching pipeline to update the wallpaper.
      *
      * @param lock - Acquired update pipeline lock
+     * @param force - Whether to force re-download the image
      * @throws {ViewNotSetError} if view not set in config when running
      * @throws {ViewConfigAccessError} if there's an issue while obtaining the
      * current view config
@@ -136,7 +137,7 @@ export class WallpaperManager {
      * running update tasks
      * @throws {Error} Unknown errors
      */
-    public static async updatePipeline(lock: UpdateLock): Promise<void> {
+    public static async updatePipeline(lock: UpdateLock, force: boolean): Promise<void> {
         log.debug('Entering update pipeline')
         const viewId = AppConfigStore.currentViewId
         // If no view ID set, nothing to update
@@ -178,10 +179,12 @@ export class WallpaperManager {
             log.debug('Lost update lock after checking for newest downloaded image')
             throw new LockInvalidatedError()
         }
-        // If there isn't a downloaded image or it's too old, download a new one
+        const oldImageToSet = imageToSet
+        // If there isn't a downloaded image, it's too old, or we are forced, download a new one
         if (
             imageToSet === undefined ||
-            moment.utc().diff(imageToSet.timestamp, 'seconds') > imageConfig.updateInterval
+            moment.utc().diff(imageToSet.timestamp, 'seconds') > imageConfig.updateInterval ||
+            force === true
         ) {
             log.info('New image must be downloaded')
             imageToSet = await downloadImage(
@@ -229,15 +232,25 @@ export class WallpaperManager {
                 imageConfig.defaultScaling
             )
         )
+        // If there was an old image and we were forced to update, delete it
+        // Prevents images from piling up when many force updates are called
+        if (force === true && oldImageToSet !== undefined) {
+            log.debug(
+                'Deleting image superseded by forced update:',
+                oldImageToSet.getDownloadPath()
+            )
+            await oldImageToSet.delete()
+        }
     }
 
     /**
      * Update the wallpaper according to the config.
      *
      * @param initiator - Who is initiating the update
+     * @param force - Whether to force a re-download of the image
      * @returns Whether the update completed successfully
      */
-    public static async update(initiator: Initiator): Promise<boolean> {
+    public static async update(initiator: Initiator, force = false): Promise<boolean> {
         const lock = UpdateLock.acquire(initiator)
         // If we couldn't get the lock, we can't proceed
         if (lock === undefined) {
@@ -247,7 +260,7 @@ export class WallpaperManager {
         log.info(`Update triggered by ${initiator}, lock acquisition succeeded`)
         try {
             // Try to run the pipeline and release the lock when done
-            await WallpaperManager.updatePipeline(lock)
+            await WallpaperManager.updatePipeline(lock, force)
             lock.release()
             // Delete old images
             await DownloadedImage.cleanupOldImages()
