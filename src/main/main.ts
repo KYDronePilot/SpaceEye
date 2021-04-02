@@ -10,17 +10,19 @@ import net from 'net'
 import * as path from 'path'
 import * as url from 'url'
 
+import { DownloadedThumbnailIpc, DownloadThumbnailIpcRequest, toBoolean } from '../shared'
 import { RootSatelliteConfig } from '../shared/config_types'
 import {
     DOWNLOAD_THUMBNAIL_CHANNEL,
-    DownloadThumbnailIpcResponse,
     GET_AUTO_UPDATE,
     GET_CURRENT_VIEW_CHANNEL,
     GET_FIRST_RUN,
     GET_SATELLITE_CONFIG_CHANNEL,
     GET_START_ON_LOGIN,
+    GET_VIEW_DOWNLOAD_TIME,
     OPEN_WINDOWS_ICON_SETTINGS,
     QUIT_APPLICATION_CHANNEL,
+    RELOAD_VIEW,
     SET_AUTO_UPDATE,
     SET_FIRST_RUN,
     SET_START_ON_LOGIN,
@@ -34,7 +36,7 @@ import { SatelliteConfigStore } from './satellite_config_store'
 import { Initiator } from './update_lock'
 import { setWindowVisibility, startUpdateChecking } from './updater'
 import { formatAxiosError } from './utils'
-import { WallpaperManager } from './wallpaper_manager'
+import { latestViewDownloadTimes, WallpaperManager } from './wallpaper_manager'
 
 const HEARTBEAT_INTERVAL = 60000
 let heartbeatHandle: number
@@ -379,31 +381,46 @@ ipc.answerRenderer<number, void>(SET_WALLPAPER_CHANNEL, async viewId => {
     await WallpaperManager.update(Initiator.user)
 })
 
+ipc.answerRenderer<number, void>(RELOAD_VIEW, async viewId => {
+    log.info('Reload request received for view:', viewId)
+    await WallpaperManager.update(Initiator.user, true)
+})
+
 ipc.answerRenderer<void, number | undefined>(GET_CURRENT_VIEW_CHANNEL, () => {
     log.info('Current view request received')
     return AppConfigStore.currentViewId
 })
 
-ipc.answerRenderer<string, DownloadThumbnailIpcResponse>(
+ipc.answerRenderer<DownloadThumbnailIpcRequest, DownloadedThumbnailIpc>(
     DOWNLOAD_THUMBNAIL_CHANNEL,
-    async thumbnailUrl => {
+    async request => {
         log.info('Download thumbnail request received')
         let webResponse
         try {
-            webResponse = await Axios.get(thumbnailUrl, { responseType: 'arraybuffer' })
+            webResponse = await Axios.get(request.url, {
+                responseType: 'arraybuffer',
+                headers: { 'If-None-Match': request.etag ?? '' },
+                validateStatus: status => (status >= 200 && status < 300) || status === 304
+            })
         } catch (error) {
             log.error('Error while downloading thumbnail:', formatAxiosError(error))
-            return {
-                dataUrl: undefined
-            }
+            return {}
+        }
+        if (webResponse.status === 304) {
+            return { isModified: false }
         }
         const b64Image = Buffer.from(webResponse.data, 'binary').toString('base64')
         const contentType = webResponse.headers['content-type'] ?? 'image/jpeg'
+        let timeTaken: number | undefined
+        if (webResponse.headers['x-amz-meta-time-image-taken'] !== undefined) {
+            timeTaken = moment.utc(webResponse.headers['x-amz-meta-time-image-taken']).valueOf()
+        }
         return {
+            isModified: true,
             dataUrl: `data:${contentType};base64,${b64Image}`,
-            expiration: moment(
-                webResponse.headers.expires ?? moment.utc().add(10, 'minutes')
-            ).valueOf()
+            isBackup: toBoolean(webResponse.headers['x-amz-meta-is-backup'] ?? ''),
+            timeTaken,
+            etag: webResponse.headers.etag ?? undefined
         }
     }
 )
@@ -450,6 +467,11 @@ ipc.answerRenderer(OPEN_WINDOWS_ICON_SETTINGS, () => {
     command.on('exit', code => {
         log.info('Windows icon settings cmd exited with:', code)
     })
+})
+
+ipc.answerRenderer<number, number | undefined>(GET_VIEW_DOWNLOAD_TIME, viewId => {
+    log.info('Getting latest download time for view', viewId)
+    return latestViewDownloadTimes[viewId]
 })
 
 if (process.platform === 'darwin') {

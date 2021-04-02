@@ -4,15 +4,16 @@ import * as React from 'react'
 import { ReactNode } from 'react'
 import styled from 'styled-components'
 
-import { RootSatelliteConfig } from '../../shared/config_types'
+import { RootSatelliteConfig } from '../../../shared/config_types'
 import {
     GET_CURRENT_VIEW_CHANNEL,
     GET_SATELLITE_CONFIG_CHANNEL,
+    RELOAD_VIEW,
     SET_WALLPAPER_CHANNEL,
     VISIBILITY_CHANGE_ALERT_CHANNEL
-} from '../../shared/IpcDefinitions'
+} from '../../../shared/IpcDefinitions'
+import { ThumbnailsContainer } from '../ThumbnailsContainer'
 import Thumbnail from './Thumbnail'
-import { ThumbnailsContainer } from './ThumbnailsContainer'
 
 /**
  * Information about a thumbnail to display.
@@ -22,6 +23,8 @@ interface ThumbnailInformation {
     viewId: number
     imageId: number
     name: string
+    description?: string
+    updateInterval: number
     url: string
     dimensions: [number, number]
 }
@@ -56,6 +59,7 @@ export default class ThumbnailManager extends React.Component<
         this.onSelectImage = this.onSelectImage.bind(this)
         this.getThumbnailInformation = this.getThumbnailInformation.bind(this)
         this.update = this.update.bind(this)
+        this.onReloadView = this.onReloadView.bind(this)
     }
 
     async componentDidMount(): Promise<void> {
@@ -88,6 +92,16 @@ export default class ThumbnailManager extends React.Component<
     }
 
     /**
+     * Reload the currently selected view.
+     */
+    async onReloadView(): Promise<void> {
+        if (this.state.selectedId === undefined) {
+            return
+        }
+        await ipc.callMain<number, void>(RELOAD_VIEW, this.state.selectedId)
+    }
+
+    /**
      * Get thumbnail information for the current config.
      */
     getThumbnailInformation(): ThumbnailInformation[] {
@@ -106,6 +120,8 @@ export default class ThumbnailManager extends React.Component<
                             viewId: view.id,
                             imageId: imageSource.id,
                             name: `${satellite.name} - ${view.name}`,
+                            description: view.description,
+                            updateInterval: imageSource.updateInterval,
                             url: imageSource.url,
                             dimensions: imageSource.dimensions
                         })
@@ -161,8 +177,11 @@ export default class ThumbnailManager extends React.Component<
                         id={image.viewId}
                         src={image.url}
                         name={image.name}
+                        description={image.description}
+                        updateInterval={image.updateInterval}
                         isSelected={(id: number) => id === this.state.selectedId}
                         onClick={(id: number) => this.onSelectImage(id)}
+                        onReloadView={() => this.onReloadView()}
                         key={image.viewId}
                     />
                 ))}

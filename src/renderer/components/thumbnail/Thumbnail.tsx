@@ -8,12 +8,15 @@ import moment, { Moment } from 'moment'
 import * as React from 'react'
 import styled from 'styled-components'
 
+import { DownloadedThumbnailIpc, DownloadThumbnailIpcRequest } from '../../../shared'
 import {
     DOWNLOAD_THUMBNAIL_CHANNEL,
-    DownloadThumbnailIpcResponse,
+    GET_VIEW_DOWNLOAD_TIME,
     VIEW_DOWNLOAD_PROGRESS,
     VISIBILITY_CHANGE_ALERT_CHANNEL
-} from '../../shared/IpcDefinitions'
+} from '../../../shared/IpcDefinitions'
+import ReloadButton from './ReloadButton'
+import StatusIconAndDialog from './StatusIcon'
 
 ipcRenderer.setMaxListeners(30)
 const log = electronLog.scope('thumbnail-component')
@@ -62,6 +65,13 @@ const ImageContainerBackground = styled.div<IsSelectedStyleProps>`
     box-shadow: ${props => (props.isSelected ? '0 3px 20px rgba(0, 0, 0, 0.5)' : 'none')};
     transition: box-shadow var(--transition-time), background-color var(--transition-time);
     cursor: ${props => (props.isSelected ? 'default' : 'pointer')};
+    // Hide reload icon when not hovering
+    #reload-icon {
+        display: none;
+    }
+    &:hover #reload-icon {
+        display: block;
+    }
 `
 
 /**
@@ -157,6 +167,9 @@ const ImageSwitcher: React.FC<ImageSwitcherProps> = props => {
 interface CachedImage {
     dataUrl: string
     expiration: Moment
+    isBackup?: boolean
+    timeTaken?: Moment
+    etag?: string
 }
 
 const lock = new AsyncLock()
@@ -165,19 +178,25 @@ interface ThumbnailProps {
     id: number
     src: string
     name: string
+    description?: string
+    updateInterval: number
     isSelected: (id: number) => boolean
     onClick: (id: number) => void
+    onReloadView: () => void
 }
 
 interface ThumbnailState {
     b64Image?: string
+    isBackup?: boolean
+    timeTaken?: Moment
+    timeDownloaded?: Moment
     loadingState: ThumbnailLoadingState
     cancelVisibilityChangeSub?: () => void
     cancelProgressChangeSub?: () => void
     downloadPercentage?: number
 }
 
-const thumbnailCache: { [key: number]: CachedImage } = {}
+const thumbnailCache: { [key: number]: CachedImage | undefined } = {}
 
 export default class Thumbnail extends React.Component<ThumbnailProps, ThumbnailState> {
     constructor(props: ThumbnailProps) {
@@ -189,6 +208,7 @@ export default class Thumbnail extends React.Component<ThumbnailProps, Thumbnail
 
         this.updateUnsafe = this.updateUnsafe.bind(this)
         this.update = this.update.bind(this)
+        this.updateTimeDownloaded = this.updateTimeDownloaded.bind(this)
     }
 
     async componentDidMount(): Promise<void> {
@@ -230,40 +250,76 @@ export default class Thumbnail extends React.Component<ThumbnailProps, Thumbnail
     }
 
     /**
+     * Update the time the image was last downloaded from main.
+     */
+    private async updateTimeDownloaded(): Promise<void> {
+        const timeDownloaded = await ipc.callMain<number, number | undefined>(
+            GET_VIEW_DOWNLOAD_TIME,
+            this.props.id
+        )
+        if (timeDownloaded !== undefined) {
+            this.setState({ timeDownloaded: moment(timeDownloaded) })
+        }
+    }
+
+    /**
      * Update the thumbnail with no concurrent locking mechanism.
      */
     private async updateUnsafe(): Promise<void> {
-        if (this.props.id in thumbnailCache) {
-            // If cached image is still in date, use it
-            const cachedImage = thumbnailCache[this.props.id]
-            if (moment.utc().diff(cachedImage.expiration, 'seconds') < 0) {
+        const cachedImage = thumbnailCache[this.props.id] ?? undefined
+        // If no image in state, try to get from cache
+        if (this.state.b64Image === undefined) {
+            if (cachedImage !== undefined) {
+                // Set the cached image
                 this.setState({
+                    loadingState: ThumbnailLoadingState.loaded,
                     b64Image: cachedImage.dataUrl,
-                    loadingState: ThumbnailLoadingState.loaded
+                    isBackup: cachedImage.isBackup,
+                    timeTaken: cachedImage.timeTaken
                 })
-                return
+            } else {
+                // Set the loading animation
+                this.setState({
+                    loadingState: ThumbnailLoadingState.loading
+                })
             }
         }
-        // If no image exists, set the loading icon
-        if (this.state.b64Image === undefined) {
-            this.setState({ loadingState: ThumbnailLoadingState.loading })
+        // If there's a cached image that's in date, it has already been set; nothing to do
+        if (cachedImage !== undefined && moment.utc().diff(cachedImage.expiration, 'seconds') < 0) {
+            return
         }
-        // Fetch a new image and cache it
-        const response = await ipc.callMain<string, DownloadThumbnailIpcResponse>(
+        // Fetch a new image
+        const response = await ipc.callMain<DownloadThumbnailIpcRequest, DownloadedThumbnailIpc>(
             DOWNLOAD_THUMBNAIL_CHANNEL,
-            this.props.src
+            { url: this.props.src, etag: cachedImage?.etag }
         )
-        // If it failed, report and exit
+        const newExpiration = moment(moment.utc().add(5, 'minutes'))
+        // If not modified, update expiration and exit
+        if (response.isModified === false) {
+            ;(cachedImage as CachedImage).expiration = newExpiration
+            return
+        }
+        // If download failed, report and exit
         if (response.dataUrl === undefined) {
             this.setState({ loadingState: ThumbnailLoadingState.failed })
             return
         }
-        // If successful, update cache and state
+        // Update cache and state
+        const momentTaken =
+            response.timeTaken !== undefined ? moment(response.timeTaken) : undefined
         thumbnailCache[this.props.id] = {
             dataUrl: response.dataUrl,
-            expiration: moment(response.expiration)
+            expiration: newExpiration,
+            etag: response.etag,
+            isBackup: response.isBackup,
+            timeTaken: momentTaken
         }
-        this.setState({ loadingState: ThumbnailLoadingState.loaded, b64Image: response.dataUrl })
+        this.setState({
+            loadingState: ThumbnailLoadingState.loaded,
+            b64Image: response.dataUrl,
+            isBackup: response.isBackup,
+            timeTaken: momentTaken
+        })
     }
 
     /**
@@ -276,13 +332,33 @@ export default class Thumbnail extends React.Component<ThumbnailProps, Thumbnail
     }
 
     public render(): React.ReactNode {
-        const { id, name, isSelected, onClick } = this.props
+        const { id, name, description, isSelected, onClick, onReloadView } = this.props
         const isSelectedValue = isSelected(id)
 
         return (
             <ThumbnailContainer isSelected={isSelectedValue}>
                 <ImageContainerBackground isSelected={isSelectedValue}>
                     <ImageContainer isSelected={isSelectedValue} onClick={() => onClick(id)}>
+                        <StatusIconAndDialog
+                            viewTitle={name}
+                            viewDescription={description}
+                            updateInterval={this.props.updateInterval}
+                            downloaded={this.state.timeDownloaded}
+                            imageTaken={this.state.timeTaken}
+                            isBackup={this.state.isBackup}
+                            failed={this.state.loadingState === ThumbnailLoadingState.failed}
+                            onHover={this.updateTimeDownloaded}
+                        />
+                        <ReloadButton
+                            onClick={() => {
+                                if (isSelectedValue) {
+                                    onReloadView()
+                                    this.update()
+                                } else {
+                                    onClick(id)
+                                }
+                            }}
+                        />
                         <ImageSwitcher
                             src={this.state.b64Image ?? ''}
                             loadingState={this.state.loadingState}

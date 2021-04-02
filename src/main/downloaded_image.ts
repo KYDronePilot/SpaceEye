@@ -106,6 +106,13 @@ export class DownloadedImage {
     }
 
     /**
+     * Delete the downloaded image.
+     */
+    public async delete(): Promise<void> {
+        await asyncUnlink(this.getPath())
+    }
+
+    /**
      * Get the path to the file.
      *
      * @returns Path to the downloaded file

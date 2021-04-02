@@ -136,6 +136,7 @@
         "moment": "^2.26.0",
         "react": "^16.8.6",
         "react-dom": "^16.8.6",
+        "react-moment": "^1.1.1",
         "react-router-dom": "^5.2.0",
         "simplebar-react": "^2.2.0",
         "space-eye-icons": "^0.4.0",
