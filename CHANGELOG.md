@@ -6,6 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic
 Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased
+
+### Added
+
+- Status icon in the top left of each thumbnail.
+  - Clicking on the icon reveals more info about the view and its status.
+- A force-reload button in the top right of a hovered thumbnail.
+  - Forces SpaceEye to re-download the image, in case the image was corrupted.
+
 ## [1.1.2]
 
 ### Fixed
