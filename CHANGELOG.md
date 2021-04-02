@@ -15,6 +15,16 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 - A force-reload button in the top right of a hovered thumbnail.
   - Forces SpaceEye to re-download the image, in case the image was corrupted.
 
+## Changes
+
+- Only download satellite config if it changed to reduce bandwidth.
+- No DNS HTTP probes on certain domains to prevent new image sources from
+  freezing up when downloading.
+
+## Fixed
+
+- Use dark icon on light Windows taskbar.
+
 ## [1.1.2]
 
 ### Fixed
