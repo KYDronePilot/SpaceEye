@@ -353,6 +353,7 @@ export default class Thumbnail extends React.Component<ThumbnailProps, Thumbnail
                             onClick={() => {
                                 if (isSelectedValue) {
                                     onReloadView()
+                                    this.update()
                                 } else {
                                     onClick(id)
                                 }
