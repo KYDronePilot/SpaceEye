@@ -28,7 +28,6 @@ const StatusIconDot = styled.div<StatusIconDotProps>`
     width: 9px;
     background-color: ${props => props.color};
     border-radius: 50%;
-    /* border: 1px solid black; */
     position: absolute;
     top: 7px;
     left: 7px;
@@ -118,7 +117,9 @@ const StatusDialog: React.FC<StatusDialogProps> = props => {
                     </Typography>
                 )}
                 <Box my={1}>
-                    <PropertyTable>{props.children}</PropertyTable>
+                    <PropertyTable>
+                        <tbody>{props.children}</tbody>
+                    </PropertyTable>
                 </Box>
                 <DialogActions>
                     <Button
@@ -134,22 +135,23 @@ const StatusDialog: React.FC<StatusDialogProps> = props => {
 }
 
 enum StatusType {
-    upToDate = 'Up to date',
+    nominal = 'Nominal',
     backup = 'Backup mode',
     failed = 'Failed'
 }
 
 const StatusToColor = {
-    [StatusType.upToDate]: Color.green,
+    [StatusType.nominal]: Color.green,
     [StatusType.backup]: Color.yellow,
     [StatusType.failed]: Color.red
 }
 
 const statusExplanations = {
-    [StatusType.upToDate]: undefined,
+    [StatusType.nominal]: undefined,
     [StatusType.backup]:
-        'A live image is not available right now, so one from a previous day is being shown instead.',
-    [StatusType.failed]: 'Failed to download the thumbnail for this view.'
+        'A live image is currently unavailable, so one from a previous day is being shown instead.',
+    [StatusType.failed]:
+        'Failed to download the thumbnail (and likely the full sized image) for this view.'
 }
 
 interface StatusProps {
@@ -164,11 +166,14 @@ interface StatusProps {
 }
 
 /**
- * @param isBackup
- * @param downloaded
- * @param imageTaken
- * @param updateInterval
- * @param failed
+ * Generate a summary description of the view status for the tooltip.
+ *
+ * @param updateInterval - How often the image is updated in seconds
+ * @param isBackup - Whether the image is a backup image
+ * @param downloaded - When the full sized image was last downloaded
+ * @param imageTaken - When the image was taken
+ * @param failed - Whether the thumbnail failed to download
+ * @returns Summary description
  */
 function statusSummary(
     updateInterval: number,
@@ -184,7 +189,7 @@ function statusSummary(
         if (downloaded !== undefined) {
             return `Downloaded ${downloaded.fromNow()}`
         }
-        return `Updates every ${updateInterval} seconds`
+        return `Updates every ${(updateInterval / 60).toFixed(0)} minutes`
     }
     if (isBackup === true) {
         if (imageTaken !== undefined) {
@@ -193,7 +198,7 @@ function statusSummary(
         return 'Backup image from a pervious day'
     }
     if (imageTaken !== undefined) {
-        return `Up to date image taken ${imageTaken.fromNow()}`
+        return `Image taken ${imageTaken.fromNow()}`
     }
     return 'Up to date imagery'
 }
@@ -226,7 +231,7 @@ export default class StatusIconAndDialog extends React.Component<StatusProps, St
         if (failed === true) {
             status = StatusType.failed
         } else {
-            status = isBackup === true ? StatusType.backup : StatusType.upToDate
+            status = isBackup === true ? StatusType.backup : StatusType.nominal
         }
         return (
             <>
