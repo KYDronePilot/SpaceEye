@@ -25,6 +25,9 @@
     "[jsonc]": {
         "editor.formatOnSave": false
     },
+    "[yaml]": {
+        "editor.formatOnSave": false
+    },
     "[typescript]": {
         "editor.rulers": [100]
     },
