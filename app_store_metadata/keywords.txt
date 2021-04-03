@@ -1,1 +1,1 @@
-menu bar,space,satellite,clouds,desktop,wallpaper,live,real-time,earth,weather,open source
+toolbar,space,satellite,clouds,desktop,wallpaper,live,real-time,earth,weather,open source
