@@ -46,20 +46,20 @@ Live satellite imagery for your **Mac** or **Windows** desktop background.
 SpaceEye is an open source desktop app which sets live, publicly available
 satellite imagery as your desktop background.
 
-New images are downloaded approximately every 20 minutes to an hour (depending
+New images are downloaded approximately every 10 minutes to an hour (depending
 on the view), giving an up-to-date, high resolution view of the Earth from
 space.
 
-Currently, the app provides 10 views of the Earth from 3 different geostationary
-weather satellites: Himawari-8, GOES-17 (West), and GOES-16 (East). This list
-will hopefully be expanded in the future.
+Currently, the app provides 12 views of the Earth from 5 different geostationary
+weather satellites: Himawari-8, GOES-17 (West), GOES-16 (East), Meteosat-8, and
+Meteosat-11. This list will hopefully be expanded in the future.
 
 ## Acknowledgements
 
 Special thanks to [NOAA STAR](https://www.star.nesdis.noaa.gov/star/index.php)
 and the [Regional and Mesoscale Meteorology Branch
 (RAMMB)](http://rammb.cira.colostate.edu) of NOAA/NESDIS (located at Colorado
-State University) for hosting the satellite imagery.
+State University) for providing the satellite imagery.
 
 ## Issues
 
