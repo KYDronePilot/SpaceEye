@@ -45,6 +45,8 @@ win:
   # certificateSubjectName: CN=SpaceEye Self Code Signing Certificate
   asarUnpack:
     - "**/*.node"
+  extraFiles:
+    from: build/win_dlls/
 mas:
   type: distribution
   entitlements: build/entitlements.mas.plist
