@@ -18,6 +18,11 @@ ACKNOWLEDGEMENTS
 
 Special thanks to NOAA STAR and the Regional and Mesoscale Meteorology Branch (RAMMB) of NOAA/NESDIS (located at Colorado State University) for providing the satellite imagery.
 
+# <MS only>
+# NOTE
+#
+# This app is not compatible with Windows 10 S Mode.
+
 ---
 
 Homepage: https://spaceeye.app
