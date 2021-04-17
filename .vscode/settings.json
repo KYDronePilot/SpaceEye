@@ -8,6 +8,7 @@
         "Scrollable",
         "etag",
         "fkill",
+        "APPX",
         "simplebar"
     ],
     "yaml.schemas": {

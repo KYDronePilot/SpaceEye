@@ -9,6 +9,7 @@ extraResources:
   - from: LICENSE
     to: ./
 afterSign: electron-builder-notarize
+appxManifestCreated: ./scripts/appxManifestCreated.js
 mac:
   category: public.app-category.utilities
   hardenedRuntime: true
@@ -28,9 +29,7 @@ mac:
     - "!**/dist/legal_notices.txt"
     - "!node_modules/space-eye-windows-node-api/**/*"
 win:
-  target:
-    - target: nsis
-      arch: x64
+  target: [nsis, appx]
   publish: [github]
   icon: node_modules/space-eye-icons/dist/windows_app.ico
   files:
@@ -39,6 +38,15 @@ win:
     - package.json
     - "!**/dist/legal_notices.txt"
     - "!node_modules/space-eye-mac-node-api/**/*"
+    - "!node_modules/@nodert-win10-*/**/*.h"
+    - "!node_modules/@nodert-win10-*/**/*.cpp"
+    - "!node_modules/@nodert-win10-*/windows.applicationmodel/build/binding*"
+    - "!node_modules/@nodert-win10-*/windows.applicationmodel/build/Release/obj"
+  # certificateSubjectName: CN=SpaceEye Self Code Signing Certificate
+  asarUnpack:
+    - "**/*.node"
+  extraFiles:
+    from: build/win_dlls/
 mas:
   type: distribution
   entitlements: build/entitlements.mas.plist
@@ -46,3 +54,9 @@ mas:
   extendInfo:
     LSMultipleInstancesProhibited: true
     ITSAppUsesNonExemptEncryption: false
+appx:
+  languages: [en-US]
+  identityName: 43181KYDronePilot.SpaceEye
+  publisher: CN=116F37C0-B35D-4480-B9E0-09E610E3E255
+  publisherDisplayName: KYDronePilot
+  applicationId: kydronepilot.spaceeye

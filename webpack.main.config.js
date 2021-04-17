@@ -47,6 +47,10 @@ module.exports = merge.smart(baseConfig, {
                     to: 'icons'
                 }
             ]
-        })
+        }),
+        // Suppresses warning about NodeRT dependency being used as an expression
+        new webpack.ContextReplacementPlugin(
+            /@nodert-win10-rs3/
+        )
     ]
 })

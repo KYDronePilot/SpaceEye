@@ -1,1 +1,11 @@
+# Mac App Store
 toolbar,space,satellite,clouds,desktop,wallpaper,live,real-time,earth,weather,open source
+
+# Microsoft Store
+space
+satellite
+desktop
+live wallpaper
+earth
+weather
+open source
