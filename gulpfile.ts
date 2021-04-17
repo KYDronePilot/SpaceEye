@@ -1,4 +1,5 @@
 /* eslint-disable jsdoc/require-returns */
+
 import { ChildProcess, exec, spawn, SpawnOptions } from 'child_process'
 import fkill from 'fkill'
 import fs from 'fs'
@@ -13,18 +14,14 @@ const asyncWriteFile = promisify(fs.writeFile)
 
 const BUILD_DIR = path.join(__dirname, 'build')
 const APPX_ASSETS = path.join(BUILD_DIR, 'appx')
-const SPACE_EYE_ICONS = path.join(
-    __dirname,
-    'node_modules',
-    'space-eye-icons',
-    'dist'
-)
+const SPACE_EYE_ICONS = path.join(__dirname, 'node_modules', 'space-eye-icons', 'dist')
 const NODE_MODULES_BIN = path.join(__dirname, 'node_modules', '.bin')
 const EXTENDED_PATH = NODE_MODULES_BIN + path.delimiter + (process.env.PATH ?? '')
 const DIST = path.join(__dirname, 'dist')
 const RELEASE = path.join(__dirname, 'release')
 const MAIN_DIST = path.join(DIST, 'main.js')
 const LEGAL_NOTICES = path.join(DIST, 'legal_notices.txt')
+const BADGES_DIR = path.join(__dirname, 'docs', 'img', 'badges')
 
 const defaultSpawnOptions: SpawnOptions = {
     env: {
@@ -202,6 +199,36 @@ export const appxManifestCreated = async function(): Promise<void> {
     // Add a custom header (need for suppression comment)
     rebuilt = `<?xml version="1.0" encoding="utf-8"?>\n<!--suppress XmlUnusedNamespaceDeclaration -->\n${rebuilt}`
     await fse.writeFile(manifest, rebuilt)
+}
+
+/**
+ * Download and save a file using curl.
+ *
+ * @param url - URL to download
+ * @param output - Output path to save file to
+ */
+async function curlFile(url: string, output: string) {
+    await asyncExec(`curl "${url}" -o "${output}"`)
+}
+
+/**
+ * Cache certain repo badges to reduce remote requests.
+ */
+export const cacheBadges = async function(): Promise<void> {
+    await Promise.all([
+        curlFile(
+            'https://img.shields.io/github/v/release/KYDronePilot/SpaceEye?label=latest%20release',
+            path.join(BADGES_DIR, 'latest-release.svg')
+        ),
+        curlFile(
+            'https://img.shields.io/badge/platforms-macOS%20%7C%20Windows-lightgrey',
+            path.join(BADGES_DIR, 'supported-platforms.svg')
+        ),
+        curlFile(
+            'https://img.shields.io/github/license/KYDronePilot/SpaceEye',
+            path.join(BADGES_DIR, 'license.svg')
+        )
+    ])
 }
 
 export const build = parallel(buildMain, buildRenderer)
