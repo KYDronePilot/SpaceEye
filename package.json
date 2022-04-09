@@ -138,7 +138,7 @@
         "glob": "^7.1.6",
         "lodash": "^4.17.19",
         "menubar": "^9.0.1",
-        "moment": "^2.26.0",
+        "moment": "^2.29.2",
         "react": "^16.8.6",
         "react-dom": "^16.8.6",
         "react-moment": "^1.1.1",
