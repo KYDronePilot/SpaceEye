@@ -19,11 +19,7 @@ Live satellite imagery for your **Mac** or **Windows** desktop background.
 
 <a href="https://apps.apple.com/app/spaceeye-satellite-wallpaper/id1539851747?mt=12&amp;itsct=apps_box&amp;itscg=30200" style="display: inline-block; overflow: hidden; border-top-left-radius: 13px; border-top-right-radius: 13px; border-bottom-right-radius: 13px; border-bottom-left-radius: 13px; width: 250px; height: 83px;"><img src="docs/img/mas_badge_black.svg" alt="Download on the Mac App Store" style="border-top-left-radius: 13px; border-top-right-radius: 13px; border-bottom-right-radius: 13px; border-bottom-left-radius: 13px; width: 250px; height: 83px;" width="250px" height="83px"></a>
 
-- Download from the **Mac App Store** by clicking the link above.
-- Download from the [latest GitHub release](https://github.com/KYDronePilot/SpaceEye/releases/latest):
-  - [SpaceEye-1.2.1.dmg](https://github.com/KYDronePilot/SpaceEye/releases/download/v1.2.1/SpaceEye-1.2.1.dmg)
-    or
-  - [SpaceEye-1.2.1-mac.zip](https://github.com/KYDronePilot/SpaceEye/releases/download/v1.2.1/SpaceEye-1.2.1-mac.zip)
+Download from the **Mac App Store** by clicking the link above.
 
 ### Windows
 
