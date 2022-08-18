@@ -7,8 +7,8 @@ Live satellite imagery for your **Mac** or **Windows** desktop background.
 ![Supported platforms](docs/img/badges/supported-platforms.svg)
 ![License](docs/img/badges/license.svg)
 
-![Latest Mac ZIP downloads](https://img.shields.io/github/downloads/KYDronePilot/SpaceEye/latest/SpaceEye-1.2.1-mac.zip)
-![Latest Mac DMG downloads](https://img.shields.io/github/downloads/KYDronePilot/SpaceEye/latest/SpaceEye-1.2.1.dmg)
+<!-- ![Latest Mac ZIP downloads](https://img.shields.io/github/downloads/KYDronePilot/SpaceEye/latest/SpaceEye-1.2.1-mac.zip)
+![Latest Mac DMG downloads](https://img.shields.io/github/downloads/KYDronePilot/SpaceEye/latest/SpaceEye-1.2.1.dmg) -->
 ![Latest Windows downloads](https://img.shields.io/github/downloads/KYDronePilot/SpaceEye/latest/SpaceEye-Setup-1.2.1.exe)
 
 ![App running on macOS](docs/img/macos_menubar.jpg)
