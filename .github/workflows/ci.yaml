@@ -31,11 +31,12 @@ jobs:
         if: startsWith(matrix.os, 'windows')
         uses: microsoft/setup-msbuild@v2
 
-      - name: Install newer node-gyp for Python 3 support (Windows)
+      - name: Install packages (Windows - allow upgrades for node-gyp)
         if: startsWith(matrix.os, 'windows')
-        run: npm install -g node-gyp@latest
+        run: yarn install --prefer-offline
 
-      - name: Install packages
+      - name: Install packages (macOS)
+        if: startsWith(matrix.os, 'macos')
         run: yarn install --frozen-lockfile --prefer-offline
 
       - name: Prepare for app notarization
