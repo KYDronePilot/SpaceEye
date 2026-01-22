@@ -27,11 +27,13 @@ jobs:
           architecture: x64
           cache: 'yarn'
 
-      - name: Setup Python 2.7 for node-gyp (Windows)
+      - name: Setup MSBuild (Windows)
         if: startsWith(matrix.os, 'windows')
-        uses: actions/setup-python@v5
-        with:
-          python-version: '2.7'
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Install newer node-gyp for Python 3 support (Windows)
+        if: startsWith(matrix.os, 'windows')
+        run: npm install -g node-gyp@latest
 
       - name: Install packages
         run: yarn install --frozen-lockfile --prefer-offline
