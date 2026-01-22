@@ -16,7 +16,7 @@
 
 Live satellite imagery for your **Mac** or **Windows** desktop background.
 
-![Build](https://github.com/KYDronePilot/SpaceEye/workflows/Build/badge.svg)
+<!-- ![Build](https://github.com/KYDronePilot/SpaceEye/workflows/Build/badge.svg) -->
 ![Latest release](docs/img/badges/latest-release.svg)
 ![Supported platforms](docs/img/badges/supported-platforms.svg)
 ![License](docs/img/badges/license.svg)
