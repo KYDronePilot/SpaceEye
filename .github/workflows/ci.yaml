@@ -31,13 +31,11 @@ jobs:
         if: startsWith(matrix.os, 'windows')
         uses: microsoft/setup-msbuild@v2
 
-      - name: Install packages (Windows - allow upgrades for node-gyp)
-        if: startsWith(matrix.os, 'windows')
-        run: yarn install --prefer-offline
-
-      - name: Install packages (macOS)
-        if: startsWith(matrix.os, 'macos')
+      - name: Install packages
         run: yarn install --frozen-lockfile --prefer-offline
+        env:
+          # Force node-sass to download prebuilt binary instead of building from source
+          SASS_FORCE_BUILD: false
 
       - name: Prepare for app notarization
         if: startsWith(matrix.os, 'macos')
