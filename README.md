@@ -1,3 +1,17 @@
+<div align="center">
+
+<img src="docs/img/EarthWatch Icon-iOS-Default-1024x1024@1x.png" alt="EarthWatch App Icon" width="120" height="120">
+
+### 📱 **SpaceEye for the iPhone is HERE!**
+
+**Download EarthWatch today and bring live satellite imagery to your Lock Screen and Home Screen!**
+
+<a href="https://apps.apple.com/au/app/earthwatch/id6757124855"><img src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg" alt="Download on the App Store" height="60"></a>
+
+---
+
+</div>
+
 # SpaceEye
 
 Live satellite imagery for your **Mac** or **Windows** desktop background.
