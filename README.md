@@ -4,9 +4,9 @@
 
 ### 📱 **SpaceEye for the iPhone is HERE!**
 
-**Download EarthWatch today and bring live satellite imagery to your Lock Screen and Home Screen!**
+**Download EarthWatch today!**
 
-<a href="https://apps.apple.com/au/app/earthwatch/id6757124855"><img src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg" alt="Download on the App Store" height="60"></a>
+<a href="https://apps.apple.com/au/app/earthwatch/id6757124855"><img src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg" alt="Download on the App Store" height="120"></a>
 
 ---
 
