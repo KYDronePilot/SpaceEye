@@ -27,6 +27,12 @@ jobs:
           architecture: x64
           cache: 'yarn'
 
+      - name: Setup Python 2.7 for node-gyp (Windows)
+        if: startsWith(matrix.os, 'windows')
+        uses: actions/setup-python@v5
+        with:
+          python-version: '2.7'
+
       - name: Install packages
         run: yarn install --frozen-lockfile --prefer-offline
 
