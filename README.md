@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="docs/img/EarthWatch Icon-iOS-Default-1024x1024@1x.png" alt="EarthWatch App Icon" width="120" height="120">
+<img src="docs/img/EarthWatch Icon-iOS-Default-1024x1024@1xTransparent.png" alt="EarthWatch App Icon" width="120" height="120">
 
 ### 📱 **SpaceEye for the iPhone is HERE!**
 
