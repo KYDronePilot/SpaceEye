@@ -14,7 +14,9 @@ jobs:
 
     strategy:
       matrix:
-        os: [macos-15, windows-latest]
+        os: [macos-15]
+        # windows-latest disabled due to node-sass v4.14.1 requiring Python 2 (node-gyp v3.8.0)
+        # Re-enable when upgrading to newer Electron version or sass-loader/dart-sass
 
     steps:
       - name: Check out Git repository
